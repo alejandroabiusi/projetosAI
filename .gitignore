@@ -1,0 +1,20 @@
+# Dados sensíveis
+.env
+*.db
+
+# Dados grandes (CSV/Excel)
+*.csv
+*.xlsx
+*.xls
+
+# Cache e temporários
+__pycache__/
+*.pyc
+.streamlit/secrets.toml
+
+# Caches do projeto
+**/geocode_cache.json
+**/cep_bairros.json
+
+# Claude config
+.claude/
