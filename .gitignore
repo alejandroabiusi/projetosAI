@@ -15,6 +15,23 @@ __pycache__/
 # Caches do projeto
 **/geocode_cache.json
 **/cep_bairros.json
+**/cache_cidades.json
+**/mapa_pontos.json
+
+# Downloads, backups, logs
+**/downloads/
+**/backups/
+**/logs/
+
+# HTML gerado
+**/mapa_empreendimentos.html
+
+# Docs de mapeamento (debug HTMLs)
+**/docs/mapeamento_auto/
+
+# JSON grandes
+**/mrv_detalhe.json
+**/novas_incorporadoras.json
 
 # Claude config
 .claude/
