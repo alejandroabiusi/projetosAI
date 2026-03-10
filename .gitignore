@@ -1,11 +1,17 @@
 # Dados sensíveis
 .env
-*.db
 
-# Dados grandes (CSV/Excel)
+# Bancos de dados (exceto os principais dos projetos)
+*.db
+!coleta/data/empreendimentos.db
+!analise_releases/dados_financeiros.db
+
+# Dados grandes (CSV/Excel) — exceto planilhas do projeto
 *.csv
 *.xlsx
 *.xls
+!analise_releases/planilhas/*.xlsx
+!analise_releases/schema_sugestao*.xlsx
 
 # Cache e temporários
 __pycache__/
