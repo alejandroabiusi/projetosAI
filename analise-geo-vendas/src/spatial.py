@@ -20,6 +20,20 @@ def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return RAIO_TERRA_KM * 2 * math.asin(math.sqrt(a))
 
 
+def haversine_np(lat_centro, lon_centro, lats, lons):
+    """Calcula distâncias em km (vetorizado com numpy)."""
+    lat1 = np.radians(lat_centro)
+    lon1 = np.radians(lon_centro)
+    lat2 = np.radians(lats)
+    lon2 = np.radians(lons)
+
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
+    return RAIO_TERRA_KM * 2 * np.arcsin(np.sqrt(a))
+
+
 def filtrar_por_raio(
     df: pd.DataFrame,
     lat_centro: float,
@@ -38,16 +52,11 @@ def filtrar_por_raio(
         df_valid["distancia_km"] = pd.Series(dtype=float)
         return df_valid
 
-    lat1 = np.radians(lat_centro)
-    lon1 = np.radians(lon_centro)
-    lat2 = np.radians(df_valid["latitude"].astype(float).values)
-    lon2 = np.radians(df_valid["longitude"].astype(float).values)
-
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-
-    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
-    distancias = RAIO_TERRA_KM * 2 * np.arcsin(np.sqrt(a))
+    distancias = haversine_np(
+        lat_centro, lon_centro,
+        df_valid["latitude"].astype(float).values,
+        df_valid["longitude"].astype(float).values,
+    )
 
     df_valid["distancia_km"] = distancias
     return df_valid[df_valid["distancia_km"] <= raio_km].copy()

@@ -17,7 +17,7 @@ from src.database import (
     sqlite_existe,
 )
 from src.geocoding import geocodificar_endereco
-from src.spatial import filtrar_por_periodo, filtrar_por_raio, gerar_circulo_raio
+from src.spatial import filtrar_por_periodo, filtrar_por_raio, gerar_circulo_raio, haversine_np
 from src.charts import (
     grafico_absorcao_mensal,
     grafico_absorcao_por_incorporadora,
@@ -70,11 +70,55 @@ def carregar_dados() -> pd.DataFrame:
 
 
 @st.cache_data(ttl=300)
+def carregar_opcoes_filtros() -> dict:
+    """Carrega apenas valores únicos para os filtros (leve)."""
+    from src.database import get_sqlite_connection
+    conn = get_sqlite_connection()
+    opcoes = {}
+
+    def _sql(query):
+        """Executa query com tratamento de banco bloqueado."""
+        try:
+            return pd.read_sql(query, conn)
+        except Exception:
+            return pd.DataFrame()
+
+    for col in ["estado", "cidade", "empreendimento", "incorporadora", "tipologia"]:
+        df = _sql(f"SELECT DISTINCT {col} FROM vendas WHERE {col} IS NOT NULL ORDER BY {col}")
+        opcoes[col] = df[col].tolist() if not df.empty else []
+
+    # Cidade por estado
+    df_ce = _sql("SELECT DISTINCT estado, cidade FROM vendas WHERE estado IS NOT NULL AND cidade IS NOT NULL ORDER BY cidade")
+    opcoes["_cidade_por_estado"] = df_ce.groupby("estado")["cidade"].apply(list).to_dict() if not df_ce.empty else {}
+
+    # Empreendimento por cidade
+    df_ec = _sql("SELECT DISTINCT cidade, empreendimento FROM vendas WHERE cidade IS NOT NULL AND empreendimento IS NOT NULL ORDER BY empreendimento")
+    opcoes["_empr_por_cidade"] = df_ec.groupby("cidade")["empreendimento"].apply(list).to_dict() if not df_ec.empty else {}
+
+    # Datas
+    df_datas = _sql("SELECT MIN(data_venda) as dmin, MAX(data_venda) as dmax FROM vendas WHERE data_venda IS NOT NULL")
+    if not df_datas.empty and df_datas.iloc[0, 0]:
+        opcoes["data_min"] = df_datas.iloc[0, 0]
+        opcoes["data_max"] = df_datas.iloc[0, 1]
+
+    # Renda e preço (percentis) — usa amostra para velocidade
+    df_rp = _sql("SELECT CAST(renda_cliente AS REAL) as renda, CAST(preco AS REAL) as preco FROM vendas WHERE renda_cliente IS NOT NULL AND preco IS NOT NULL")
+    if not df_rp.empty:
+        opcoes["renda_p01"] = int(df_rp["renda"].quantile(0.01))
+        opcoes["renda_p99"] = int(df_rp["renda"].quantile(0.99))
+        opcoes["preco_p01"] = int(df_rp["preco"].quantile(0.01))
+        opcoes["preco_p99"] = int(df_rp["preco"].quantile(0.99))
+
+    conn.close()
+    return opcoes
+
+
+@st.cache_data(ttl=300)
 def aplicar_filtros(
-    _df: pd.DataFrame,
     data_inicio,
     data_fim,
     incorporadoras: tuple,
+    estados: tuple,
     cidades: tuple,
     empreendimentos: tuple,
     usar_raio: bool,
@@ -87,40 +131,82 @@ def aplicar_filtros(
     preco_max: float | None = None,
     tipologias: tuple = (),
 ) -> pd.DataFrame:
-    """Aplica todos os filtros com cache para evitar recálculo."""
-    df = _df.copy()
+    """Aplica filtros via SQL direto no banco (sem carregar 876k linhas)."""
+    from src.database import get_sqlite_connection
+
+    where = []
+    params = []
 
     # Período
-    df = filtrar_por_periodo(df, data_inicio, data_fim)
+    if data_inicio:
+        where.append("data_venda >= ?")
+        params.append(str(data_inicio))
+    if data_fim:
+        where.append("data_venda <= ?")
+        params.append(str(data_fim))
 
     # Incorporadoras
-    if incorporadoras and "incorporadora" in df.columns:
-        df = df[df["incorporadora"].isin(incorporadoras)]
+    if incorporadoras:
+        placeholders = ",".join("?" * len(incorporadoras))
+        where.append(f"incorporadora IN ({placeholders})")
+        params.extend(incorporadoras)
 
-    # Geográfico
-    if usar_raio and lat_centro is not None and lon_centro is not None:
-        df = filtrar_por_raio(df, lat_centro, lon_centro, raio_km)
-    else:
+    # Geográfico (sem raio — filtro SQL)
+    if not usar_raio:
+        if estados:
+            placeholders = ",".join("?" * len(estados))
+            where.append(f"estado IN ({placeholders})")
+            params.extend(estados)
         if cidades:
-            df = df[df["cidade"].isin(cidades)]
+            placeholders = ",".join("?" * len(cidades))
+            where.append(f"cidade IN ({placeholders})")
+            params.extend(cidades)
         if empreendimentos:
-            df = df[df["empreendimento"].isin(empreendimentos)]
+            placeholders = ",".join("?" * len(empreendimentos))
+            where.append(f"empreendimento IN ({placeholders})")
+            params.extend(empreendimentos)
 
-    # Faixa de renda
-    if renda_min is not None and "renda_cliente" in df.columns:
-        df = df[df["renda_cliente"] >= renda_min]
-    if renda_max is not None and "renda_cliente" in df.columns:
-        df = df[df["renda_cliente"] <= renda_max]
+    # Renda
+    if renda_min is not None:
+        where.append("renda_cliente >= ?")
+        params.append(renda_min)
+    if renda_max is not None:
+        where.append("renda_cliente <= ?")
+        params.append(renda_max)
 
-    # Faixa de preço
-    if preco_min is not None and "preco" in df.columns:
-        df = df[df["preco"] >= preco_min]
-    if preco_max is not None and "preco" in df.columns:
-        df = df[df["preco"] <= preco_max]
+    # Preço
+    if preco_min is not None:
+        where.append("preco >= ?")
+        params.append(preco_min)
+    if preco_max is not None:
+        where.append("preco <= ?")
+        params.append(preco_max)
 
     # Tipologia
-    if tipologias and "tipologia" in df.columns:
-        df = df[df["tipologia"].isin(tipologias)]
+    if tipologias:
+        placeholders = ",".join("?" * len(tipologias))
+        where.append(f"tipologia IN ({placeholders})")
+        params.extend(tipologias)
+
+    sql = "SELECT * FROM vendas"
+    if where:
+        sql += " WHERE " + " AND ".join(where)
+
+    conn = get_sqlite_connection()
+    df = pd.read_sql(sql, conn, params=params)
+    conn.close()
+
+    # Converte tipos
+    if "data_venda" in df.columns:
+        df["data_venda"] = pd.to_datetime(df["data_venda"], errors="coerce")
+    for col in ["latitude", "longitude", "preco", "renda_cliente", "valor_financiado",
+                 "recursos_proprios", "metragem", "fgts", "valor_subsidio", "renda_total"]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    # Filtro por raio (pós-query, precisa de coordenadas)
+    if usar_raio and lat_centro is not None and lon_centro is not None:
+        df = filtrar_por_raio(df, lat_centro, lon_centro, raio_km)
 
     return df
 
@@ -160,55 +246,70 @@ with st.sidebar:
 
     st.divider()
 
-    # Carrega dados para preencher filtros
-    df_all = carregar_dados()
+    # Carrega opções para filtros (leve — só valores únicos)
+    _opcoes = carregar_opcoes_filtros()
 
     # ── Período ──
     st.subheader("Período")
 
-    if "data_venda" in df_all.columns:
-        datas_validas = df_all["data_venda"].dropna()
-        if not datas_validas.empty:
-            data_min = datas_validas.min().date()
-            data_max = datas_validas.max().date()
-        else:
-            data_min = pd.Timestamp("2020-01-01").date()
-            data_max = pd.Timestamp.now().date()
+    if _opcoes.get("data_min"):
+        data_min = pd.Timestamp(_opcoes["data_min"]).date()
+        data_max = pd.Timestamp(_opcoes["data_max"]).date()
     else:
         data_min = pd.Timestamp("2020-01-01").date()
         data_max = pd.Timestamp.now().date()
 
     col_d1, col_d2 = st.columns(2)
     with col_d1:
-        data_inicio = st.date_input("De", value=data_min, min_value=data_min, max_value=data_max, format="DD/MM/YYYY")
+        data_default = max(data_min, pd.Timestamp("2024-01-01").date())
+        data_inicio = st.date_input("De", value=data_default, min_value=data_min, max_value=data_max, format="DD/MM/YYYY")
     with col_d2:
         data_fim = st.date_input("Até", value=data_max, min_value=data_min, max_value=data_max, format="DD/MM/YYYY")
 
     st.divider()
 
-    # ── Filtro por Cidade / Empreendimento ──
+    # ── Filtro por UF / Cidade / Empreendimento ──
     st.subheader("Localização")
 
+    estados_sel = []
     cidades_sel = []
     emprs_sel = []
 
-    if "cidade" in df_all.columns:
-        cidades = sorted(df_all["cidade"].dropna().unique())
+    if _opcoes.get("estado"):
+        estados_sel = st.multiselect(
+            "UF",
+            options=_opcoes["estado"],
+            default=[],
+            help="Selecione um ou mais estados",
+        )
+
+    # Cidades filtradas por estado
+    if estados_sel:
+        cidades_disp = sorted(set(
+            c for uf in estados_sel
+            for c in _opcoes.get("_cidade_por_estado", {}).get(uf, [])
+        ))
+    else:
+        cidades_disp = _opcoes.get("cidade", [])
+
+    if cidades_disp:
         cidades_sel = st.multiselect(
             "Cidades",
-            options=cidades,
+            options=cidades_disp,
             default=[],
             help="Selecione uma ou mais cidades",
         )
 
-    if "empreendimento" in df_all.columns:
-        if cidades_sel:
-            emprs_disponiveis = sorted(
-                df_all[df_all["cidade"].isin(cidades_sel)]["empreendimento"].dropna().unique()
-            )
-        else:
-            emprs_disponiveis = sorted(df_all["empreendimento"].dropna().unique())
+    # Empreendimentos filtrados por cidade
+    if cidades_sel:
+        emprs_disponiveis = sorted(set(
+            e for c in cidades_sel
+            for e in _opcoes.get("_empr_por_cidade", {}).get(c, [])
+        ))
+    else:
+        emprs_disponiveis = _opcoes.get("empreendimento", [])
 
+    if emprs_disponiveis:
         emprs_sel = st.multiselect(
             "Empreendimentos",
             options=emprs_disponiveis,
@@ -219,10 +320,33 @@ with st.sidebar:
     st.divider()
 
     # ── Raio geográfico (opcional) ──
-    tem_coords = (
-        "latitude" in df_all.columns
-        and df_all["latitude"].notna().any()
-    )
+    from src.database import get_sqlite_connection
+
+    def _coords_empreendimento(nome_empr):
+        """Busca coordenadas de um empreendimento no banco."""
+        conn = get_sqlite_connection()
+        try:
+            df_e = pd.read_sql(
+                "SELECT AVG(latitude) as lat, AVG(longitude) as lon FROM vendas WHERE empreendimento = ? AND latitude IS NOT NULL",
+                conn, params=[nome_empr]
+            )
+            if not df_e.empty and pd.notna(df_e.iloc[0, 0]):
+                return float(df_e.iloc[0, 0]), float(df_e.iloc[0, 1])
+        except Exception:
+            pass
+        finally:
+            conn.close()
+        return None, None
+
+    # Verifica se tem coordenadas no banco (query leve)
+    conn_check = get_sqlite_connection()
+    try:
+        _n_coords = pd.read_sql("SELECT COUNT(*) as n FROM vendas WHERE latitude IS NOT NULL", conn_check).iloc[0, 0]
+    except Exception:
+        _n_coords = 0
+    finally:
+        conn_check.close()
+    tem_coords = _n_coords > 0
 
     lat_centro, lon_centro, raio_km = None, None, None
     usar_raio = False
@@ -232,58 +356,60 @@ with st.sidebar:
         usar_raio = st.checkbox("Ativar filtro por raio", value=False)
 
         if usar_raio:
-            # Se tem empreendimento selecionado (sidebar ou mapa), usa como centro
-            empr_como_centro = False
-            _empr_click = st.session_state.get("empr_click")
-            _empr_centro_nome = None
+            modo_centro = st.radio(
+                "Centro do raio",
+                ["Empreendimento", "Coordenadas", "Endereço"],
+                horizontal=True,
+                help="Escolha como definir o ponto central do raio",
+            )
 
-            if _empr_click:
-                df_empr = df_all[df_all["empreendimento"] == _empr_click]
-                empr_lat = df_empr["latitude"].dropna().mean()
-                empr_lon = df_empr["longitude"].dropna().mean()
-                if pd.notna(empr_lat) and pd.notna(empr_lon):
-                    empr_como_centro = True
-                    _empr_centro_nome = _empr_click
-            elif len(emprs_sel) == 1:
-                df_empr = df_all[df_all["empreendimento"] == emprs_sel[0]]
-                empr_lat = df_empr["latitude"].dropna().mean()
-                empr_lon = df_empr["longitude"].dropna().mean()
-                if pd.notna(empr_lat) and pd.notna(empr_lon):
-                    empr_como_centro = True
-                    _empr_centro_nome = emprs_sel[0]
-
-            if empr_como_centro:
-                st.info(f"Centro: {_empr_centro_nome}")
-                lat_centro = empr_lat
-                lon_centro = empr_lon
-            else:
-                modo_loc = st.radio(
-                    "Centro do raio",
-                    ["Endereço", "Coordenadas"],
-                    horizontal=True,
-                )
-
-                if modo_loc == "Endereço":
-                    endereco = st.text_input(
-                        "Endereço",
-                        placeholder="Rua, número, cidade, estado...",
-                    )
-                    if endereco:
-                        if st.button("Buscar coordenadas"):
-                            with st.spinner("Geocodificando..."):
-                                lat, lon = geocodificar_endereco(endereco)
-                                if lat and lon:
-                                    st.session_state["lat_centro"] = lat
-                                    st.session_state["lon_centro"] = lon
-                                    st.success(f"Encontrado: {lat:.6f}, {lon:.6f}")
-                                else:
-                                    st.error("Endereço não encontrado.")
-
-                    lat_centro = st.session_state.get("lat_centro")
-                    lon_centro = st.session_state.get("lon_centro")
-                else:
+            if modo_centro == "Coordenadas":
+                col_lat, col_lon = st.columns(2)
+                with col_lat:
                     lat_centro = st.number_input("Latitude", value=-23.5505, format="%.6f")
+                with col_lon:
                     lon_centro = st.number_input("Longitude", value=-46.6333, format="%.6f")
+
+            elif modo_centro == "Endereço":
+                endereco = st.text_input(
+                    "Endereço",
+                    placeholder="Rua, número, cidade, estado...",
+                )
+                if endereco:
+                    if st.button("Buscar coordenadas"):
+                        with st.spinner("Geocodificando..."):
+                            lat, lon = geocodificar_endereco(endereco)
+                            if lat and lon:
+                                st.session_state["lat_centro"] = lat
+                                st.session_state["lon_centro"] = lon
+                                st.success(f"Encontrado: {lat:.6f}, {lon:.6f}")
+                            else:
+                                st.error("Endereço não encontrado.")
+
+                lat_centro = st.session_state.get("lat_centro")
+                lon_centro = st.session_state.get("lon_centro")
+
+            else:  # Empreendimento
+                _empr_click = st.session_state.get("empr_click")
+                _empr_centro_nome = None
+
+                if _empr_click:
+                    empr_lat, empr_lon = _coords_empreendimento(_empr_click)
+                    if empr_lat:
+                        _empr_centro_nome = _empr_click
+                        lat_centro = empr_lat
+                        lon_centro = empr_lon
+                elif len(emprs_sel) == 1:
+                    empr_lat, empr_lon = _coords_empreendimento(emprs_sel[0])
+                    if empr_lat:
+                        _empr_centro_nome = emprs_sel[0]
+                        lat_centro = empr_lat
+                        lon_centro = empr_lon
+
+                if _empr_centro_nome:
+                    st.info(f"Centro: {_empr_centro_nome}")
+                else:
+                    st.caption("Selecione um empreendimento no sidebar ou clique no mapa.")
 
             raio_km = st.select_slider(
                 "Raio (km)",
@@ -294,8 +420,8 @@ with st.sidebar:
         st.divider()
 
     # ── Filtro de incorporadoras ──
-    if "incorporadora" in df_all.columns:
-        incorporadoras = sorted(df_all["incorporadora"].dropna().unique())
+    if _opcoes.get("incorporadora"):
+        incorporadoras = _opcoes["incorporadora"]
         incorporadoras_sel = st.multiselect(
             "Incorporadoras",
             options=incorporadoras,
@@ -311,42 +437,38 @@ with st.sidebar:
 
     # Faixa de renda
     renda_min_val, renda_max_val = None, None
-    if "renda_cliente" in df_all.columns:
-        renda_vals = df_all["renda_cliente"].dropna()
-        if not renda_vals.empty:
-            r_min = int(renda_vals.quantile(0.01))
-            r_max = int(renda_vals.quantile(0.99))
-            renda_range = st.slider(
-                "Faixa de Renda (R$)",
-                min_value=r_min,
-                max_value=r_max,
-                value=(r_min, r_max),
-                step=500,
-                format="R$ %d",
-            )
-            renda_min_val, renda_max_val = renda_range
+    if _opcoes.get("renda_p01") is not None:
+        r_min = _opcoes["renda_p01"]
+        r_max = _opcoes["renda_p99"]
+        renda_range = st.slider(
+            "Faixa de Renda (R$)",
+            min_value=r_min,
+            max_value=r_max,
+            value=(r_min, r_max),
+            step=500,
+            format="R$ %d",
+        )
+        renda_min_val, renda_max_val = renda_range
 
     # Faixa de preço
     preco_min_val, preco_max_val = None, None
-    if "preco" in df_all.columns:
-        preco_vals = df_all["preco"].dropna()
-        if not preco_vals.empty:
-            p_min = int(preco_vals.quantile(0.01))
-            p_max = int(preco_vals.quantile(0.99))
-            preco_range = st.slider(
-                "Faixa de Preço (R$)",
-                min_value=p_min,
-                max_value=p_max,
-                value=(p_min, p_max),
-                step=10000,
-                format="R$ %d",
-            )
-            preco_min_val, preco_max_val = preco_range
+    if _opcoes.get("preco_p01") is not None:
+        p_min = _opcoes["preco_p01"]
+        p_max = _opcoes["preco_p99"]
+        preco_range = st.slider(
+            "Faixa de Preço (R$)",
+            min_value=p_min,
+            max_value=p_max,
+            value=(p_min, p_max),
+            step=10000,
+            format="R$ %d",
+        )
+        preco_min_val, preco_max_val = preco_range
 
     # Tipologia
     tipologias_sel = ()
-    if "tipologia" in df_all.columns:
-        tips_disponiveis = sorted(df_all["tipologia"].dropna().unique())
+    if _opcoes.get("tipologia"):
+        tips_disponiveis = _opcoes["tipologia"]
         tipologias_sel = st.multiselect(
             "Tipologia",
             options=tips_disponiveis,
@@ -371,12 +493,17 @@ if usar_raio and lat_centro is None:
 # Empreendimento selecionado via mapa
 empr_click = st.session_state.get("empr_click")
 
-# Se tem empr_click + raio ativado → raio centrado no empreendimento (empr_click vira centro, não filtro)
+# Se tem empr_click + raio no modo Empreendimento → raio centrado no empreendimento
+# Se tem empr_click + raio no modo Coordenadas/Endereço → raio usa coords manuais, empr_click filtra
 # Se tem empr_click sem raio → filtra só por aquele empreendimento
-if empr_click and usar_raio:
+_modo_centro = "Empreendimento"
+if usar_raio and tem_coords:
+    _modo_centro = modo_centro
+
+if empr_click and usar_raio and _modo_centro == "Empreendimento":
     usar_raio_efetivo = True
     emprs_efetivos = tuple(emprs_sel)  # raio cuida da filtragem geográfica
-elif empr_click:
+elif empr_click and not usar_raio:
     usar_raio_efetivo = False
     emprs_efetivos = (empr_click,)
 else:
@@ -385,10 +512,10 @@ else:
 
 with st.spinner("Aplicando filtros e gerando análises..."):
     df_filtrado = aplicar_filtros(
-        carregar_dados(),
         data_inicio,
         data_fim,
         tuple(incorporadoras_sel),
+        tuple(estados_sel),
         tuple(cidades_sel),
         emprs_efetivos,
         usar_raio_efetivo,
@@ -493,47 +620,68 @@ df_com_coords = df_filtrado.dropna(subset=["latitude", "longitude"]) if "latitud
 if not df_com_coords.empty:
     st.subheader("Mapa de Vendas")
 
-    # Atribui cores por incorporadora
-    if "incorporadora" in df_com_coords.columns:
-        incorporadoras_unicas = df_com_coords["incorporadora"].dropna().unique()
-        paleta = [
+    layers = []
+
+    # Pins de TODOS os empreendimentos (sempre visíveis — query leve)
+    conn_mapa = get_sqlite_connection()
+    try:
+        emprs_todos = pd.read_sql("""
+            SELECT empreendimento,
+                   AVG(latitude) as latitude, AVG(longitude) as longitude,
+                   MIN(incorporadora) as incorporadora,
+                   MIN(cidade) as cidade, MIN(estado) as estado,
+                   COUNT(*) as vendas
+            FROM vendas
+            WHERE latitude IS NOT NULL
+            GROUP BY empreendimento
+        """, conn_mapa)
+    except Exception:
+        emprs_todos = pd.DataFrame()
+    finally:
+        conn_mapa.close()
+
+    if not emprs_todos.empty:
+
+        # Cores por incorporadora
+        incorporadoras_pin = emprs_todos["incorporadora"].dropna().unique()
+        paleta_pins = [
             [38, 166, 154], [66, 165, 245], [255, 112, 67], [171, 71, 188],
             [102, 187, 106], [255, 202, 40], [239, 83, 80], [141, 110, 99],
             [120, 144, 156], [236, 64, 122],
         ]
-        cor_map = {inc: paleta[i % len(paleta)] for i, inc in enumerate(incorporadoras_unicas)}
-        df_com_coords = df_com_coords.copy()
-        df_com_coords["cor"] = df_com_coords["incorporadora"].map(cor_map)
-        df_com_coords["cor"] = df_com_coords["cor"].apply(
-            lambda x: x if isinstance(x, list) else [158, 158, 158]
+        cor_map_pins = {inc: paleta_pins[i % len(paleta_pins)] for i, inc in enumerate(incorporadoras_pin)}
+
+        emprs_todos = emprs_todos.copy()
+        emprs_todos["cor"] = emprs_todos["incorporadora"].map(
+            lambda x: cor_map_pins.get(x, [158, 158, 158]) + [200]
         )
-    else:
-        df_com_coords = df_com_coords.copy()
-        df_com_coords["cor"] = [[38, 166, 154]] * len(df_com_coords)
 
-    layers = []
-
-    # Pontos de vendas
-    layers.append(pdk.Layer(
-        "ScatterplotLayer",
-        data=df_com_coords,
-        get_position=["longitude", "latitude"],
-        get_color="cor",
-        get_radius=80,
-        pickable=True,
-        opacity=0.8,
-        auto_highlight=True,
-    ))
+        layers.append(pdk.Layer(
+            "ScatterplotLayer",
+            data=emprs_todos,
+            get_position=["longitude", "latitude"],
+            get_color="cor",
+            get_radius=200,
+            pickable=True,
+            opacity=0.8,
+            auto_highlight=True,
+        ))
 
     # Centro e raio (só se filtro por raio ativado)
     if usar_raio and lat_centro and lon_centro:
+        # Pin do centro — azul para manual, vermelho para empreendimento
+        _cor_pin = [30, 100, 220, 230] if _modo_centro in ("Coordenadas", "Endereço") else [220, 20, 60, 200]
+        _pin_data = pd.DataFrame([{
+            "lat": lat_centro, "lon": lon_centro,
+            "info": f"Pin manual ({lat_centro:.4f}, {lon_centro:.4f})" if _modo_centro in ("Coordenadas", "Endereço") else "Centro do raio",
+        }])
         layers.append(pdk.Layer(
             "ScatterplotLayer",
-            data=pd.DataFrame([{"lat": lat_centro, "lon": lon_centro}]),
+            data=_pin_data,
             get_position=["lon", "lat"],
-            get_color=[220, 20, 60, 200],
-            get_radius=150,
-            pickable=False,
+            get_color=_cor_pin,
+            get_radius=200,
+            pickable=True,
         ))
 
         circulo_pontos = gerar_circulo_raio(lat_centro, lon_centro, raio_km)
@@ -637,16 +785,34 @@ if not df_com_coords.empty:
     if "empr_pendente" in st.session_state:
         _dialog_filtrar(st.session_state["empr_pendente"])
 
-    # Legenda
-    if "incorporadora" in df_com_coords.columns and len(incorporadoras_unicas) > 0:
+    # Legenda do mapa — incorporadoras presentes nas cidades do filtro
+    _cidades_filtro = df_filtrado["cidade"].dropna().unique().tolist() if "cidade" in df_filtrado.columns else []
+    _incorps_legenda = []
+    if _cidades_filtro:
+        try:
+            conn_leg = get_sqlite_connection()
+            _ph = ",".join("?" * len(_cidades_filtro))
+            _df_leg = pd.read_sql(
+                f"SELECT DISTINCT incorporadora FROM vendas WHERE cidade IN ({_ph}) AND incorporadora IS NOT NULL ORDER BY incorporadora",
+                conn_leg, params=_cidades_filtro,
+            )
+            conn_leg.close()
+            _incorps_legenda = _df_leg["incorporadora"].tolist()
+        except Exception:
+            pass
+
+    if _incorps_legenda:
         with st.expander("Legenda do Mapa"):
-            n_cols = min(5, len(incorporadoras_unicas))
+            _legenda_items = [(cor_map_pins.get(inc, [158, 158, 158]), inc) for inc in _incorps_legenda]
+            if usar_raio_efetivo and _modo_centro in ("Coordenadas", "Endereço"):
+                _legenda_items.append(([30, 100, 220], "Pin manual (centro)"))
+
+            n_cols = min(5, len(_legenda_items))
             legend_cols = st.columns(n_cols)
-            for i, inc in enumerate(incorporadoras_unicas):
-                cor = cor_map[inc]
+            for i, (cor_leg, label) in enumerate(_legenda_items):
                 with legend_cols[i % n_cols]:
                     st.markdown(
-                        f'<span style="color: rgb({cor[0]},{cor[1]},{cor[2]}); font-size: 20px;">●</span> {inc}',
+                        f'<span style="color: rgb({cor_leg[0]},{cor_leg[1]},{cor_leg[2]}); font-size: 20px;">●</span> {label}',
                         unsafe_allow_html=True,
                     )
 

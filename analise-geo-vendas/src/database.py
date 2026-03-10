@@ -64,8 +64,8 @@ def get_mysql_engine():
 
 
 def get_sqlite_connection():
-    """Retorna conexão SQLite local."""
-    return sqlite3.connect(str(SQLITE_PATH))
+    """Retorna conexão SQLite local com timeout para concorrência."""
+    return sqlite3.connect(str(SQLITE_PATH), timeout=30)
 
 
 def _extrair_cidade_estado(municipio: str) -> tuple[str, str]:
@@ -126,7 +126,12 @@ def importar_arquivo(file_path: str, tabela: str = "vendas") -> int:
     if path.suffix in (".xlsx", ".xls") or ".xlsx" in path.name or ".xls" in path.name:
         df = pd.read_excel(file_path)
     else:
-        df = pd.read_csv(file_path, encoding="utf-8", low_memory=False)
+        # Detecta separador (pipe ou vírgula)
+        with open(file_path, encoding="utf-8") as f:
+            primeira_linha = f.readline()
+        sep = "|" if "|" in primeira_linha else ","
+        df = pd.read_csv(file_path, sep=sep, encoding="utf-8", low_memory=False,
+                         on_bad_lines="skip")
 
     # Normaliza nomes de colunas
     df.columns = (
@@ -201,13 +206,19 @@ def _transformar_siopi(df: pd.DataFrame) -> pd.DataFrame:
 
     # Data da venda
     if "data_venda" in df.columns:
-        df["data_venda"] = pd.to_datetime(df["data_venda"], errors="coerce")
+        df["data_venda"] = pd.to_datetime(df["data_venda"], dayfirst=True, errors="coerce")
 
-    # Colunas numéricas
+    # Colunas numéricas — limpa formato BR (240.000,00 → 240000.00)
     for col in ["preco", "valor_compra_venda", "valor_financiado", "recursos_proprios",
                  "renda_cliente", "renda_total", "metragem", "encargo_mensal",
                  "fgts", "valor_subsidio"]:
         if col in df.columns:
+            df[col] = (
+                df[col].astype(str)
+                .str.replace(r"[R$\s%]", "", regex=True)
+                .str.replace(".", "", regex=False)
+                .str.replace(",", ".", regex=False)
+            )
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
     # Placeholder para coordenadas (serão preenchidas por geocodificação)
