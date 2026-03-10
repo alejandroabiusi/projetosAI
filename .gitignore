@@ -33,5 +33,10 @@ __pycache__/
 **/mrv_detalhe.json
 **/novas_incorporadoras.json
 
+# Temp e debug
+**/temp_pages/
+**/pp_page*.png
+**/nul
+
 # Claude config
 .claude/
