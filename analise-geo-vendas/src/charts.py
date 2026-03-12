@@ -13,16 +13,19 @@ import plotly.graph_objects as go
 
 _CEP_BAIRROS_PATH = Path(__file__).parent.parent / "data" / "cep_bairros.json"
 _cep_cache: dict | None = None
+_cep_cache_mtime: float = 0
 
 
 def _carregar_cep_bairros() -> dict:
-    """Carrega mapeamento CEP → bairro/cidade do cache JSON."""
-    global _cep_cache
-    if _cep_cache is None:
-        if _CEP_BAIRROS_PATH.exists():
+    """Carrega mapeamento CEP -> bairro/cidade do cache JSON (recarrega se arquivo mudou)."""
+    global _cep_cache, _cep_cache_mtime
+    if _CEP_BAIRROS_PATH.exists():
+        mtime = _CEP_BAIRROS_PATH.stat().st_mtime
+        if _cep_cache is None or mtime != _cep_cache_mtime:
             _cep_cache = json.loads(_CEP_BAIRROS_PATH.read_text(encoding="utf-8"))
-        else:
-            _cep_cache = {}
+            _cep_cache_mtime = mtime
+    if _cep_cache is None:
+        _cep_cache = {}
     return _cep_cache
 
 

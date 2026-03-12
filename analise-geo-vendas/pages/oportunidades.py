@@ -85,52 +85,33 @@ def carregar_pontos_cidade(cidade, estado, data_inicio, data_fim) -> pd.DataFram
     return df
 
 
-def _gerar_grid_zonas(df_pontos: pd.DataFrame, raio_km: float) -> list[dict]:
-    """
-    Gera uma grade de pontos que cobre a área dos dados,
-    espaçados por 2*raio para que os círculos não se sobreponham.
-    Retorna lista de dicts com lat, lon de cada centro de zona.
-    """
-    lat_min = df_pontos["latitude"].min()
-    lat_max = df_pontos["latitude"].max()
-    lon_min = df_pontos["longitude"].min()
-    lon_max = df_pontos["longitude"].max()
-
-    # Espaçamento em graus (~2*raio para não sobrepor)
-    km_per_deg_lat = 111.0
-    km_per_deg_lon = 111.0 * math.cos(math.radians((lat_min + lat_max) / 2))
-
-    step_lat = (2 * raio_km) / km_per_deg_lat
-    step_lon = (2 * raio_km) / km_per_deg_lon
-
-    # Margem de 1 raio inteiro para cobrir pontos periféricos
-    margin_lat = step_lat
-    margin_lon = step_lon
-
-    zonas = []
-    lat = lat_min - margin_lat
-    while lat <= lat_max + margin_lat:
-        lon = lon_min - margin_lon
-        while lon <= lon_max + margin_lon:
-            zonas.append({"lat": lat, "lon": lon})
-            lon += step_lon
-        lat += step_lat
-
-    return zonas
+@st.cache_data(ttl=600)
+def _carregar_zonas_precalc(cidade, estado, raio_km) -> list[dict]:
+    """Le centros de zona pre-calculados do banco."""
+    conn = get_sqlite_connection()
+    df = pd.read_sql(
+        "SELECT zona_id, latitude, longitude FROM zonas_precalc WHERE cidade = ? AND estado = ? AND raio_km = ? ORDER BY zona_id",
+        conn, params=[cidade, estado, raio_km],
+    )
+    conn.close()
+    return [{"lat": r["latitude"], "lon": r["longitude"]} for _, r in df.iterrows()]
 
 
 @st.cache_data(ttl=300)
 def analisar_zonas(cidade, estado, data_inicio, data_fim, raio_km, min_vendas_zona) -> pd.DataFrame:
     """
-    Para cada zona (círculo de raio_km), conta vendas do mercado vs Tenda.
-    Retorna DataFrame com as zonas rankeadas por oportunidade.
+    Para cada zona (circulo de raio_km), conta vendas do mercado vs Tenda.
+    Usa centros de zona pre-calculados (tabela zonas_precalc).
     """
     df_pontos = carregar_pontos_cidade(cidade, estado, data_inicio, data_fim)
 
     if df_pontos.empty:
         return pd.DataFrame()
 
-    zonas = _gerar_grid_zonas(df_pontos, raio_km)
+    zonas = _carregar_zonas_precalc(cidade, estado, raio_km)
+
+    if not zonas:
+        return pd.DataFrame()
 
     lats = df_pontos["latitude"].values.astype(float)
     lons = df_pontos["longitude"].values.astype(float)
@@ -169,6 +150,10 @@ def analisar_zonas(cidade, estado, data_inicio, data_fim, raio_km, min_vendas_zo
         emprs_conc = df_pontos.loc[mask_dentro & ~is_tenda, "empreendimento"].value_counts().head(3)
         top_emprs = ", ".join(emprs_conc.index.tolist()) if not emprs_conc.empty else ""
 
+        # Empreendimentos da Tenda nesta zona
+        emprs_tenda = df_pontos.loc[mask_dentro & is_tenda, "empreendimento"].value_counts().head(3)
+        top_tenda = ", ".join(emprs_tenda.index.tolist()) if not emprs_tenda.empty else "—"
+
         resultados.append({
             "zona": i + 1,
             "lat": zona["lat"],
@@ -181,6 +166,7 @@ def analisar_zonas(cidade, estado, data_inicio, data_fim, raio_km, min_vendas_zo
             "ticket_medio": ticket,
             "tipologia_dominante": tipo_top,
             "top_empreendimentos": top_emprs,
+            "empreendimentos_tenda": top_tenda,
         })
 
     if not resultados:
@@ -291,11 +277,14 @@ with st.sidebar:
     st.subheader("Período de Análise")
     col1, col2 = st.columns(2)
     with col1:
-        data_inicio = st.date_input("De", value=pd.Timestamp("2022-01-01").date(),
+        data_inicio = st.date_input("De", value=pd.Timestamp("2024-01-01").date(),
                                      format="DD/MM/YYYY", key="oport_dt_ini")
     with col2:
         data_fim = st.date_input("Até", value=pd.Timestamp.now().date(),
                                   format="DD/MM/YYYY", key="oport_dt_fim")
+
+    # Placeholder para filtro UF/Cidade (preenchido após carregar ranking)
+    _sidebar_cidade_container = st.container()
 
     st.divider()
     min_vendas = st.slider("Mínimo de vendas na cidade", 50, 5000, 200, step=50)
@@ -333,7 +322,37 @@ with col_m4:
 
 st.markdown("---")
 
-cidades_lista = (ranking_filtrado["cidade"] + "/" + ranking_filtrado["estado"]).tolist()
+# ── Filtro UF + Cidade (sidebar, no container reservado acima) ──
+_ufs_disponiveis = sorted(ranking_filtrado["estado"].dropna().unique().tolist())
+
+with _sidebar_cidade_container:
+    st.divider()
+    st.subheader("Filtro de Cidade")
+    _uf_sel = st.selectbox("UF", ["Todas"] + _ufs_disponiveis, key="oport_uf")
+
+    if _uf_sel != "Todas":
+        _ranking_uf = ranking_filtrado[ranking_filtrado["estado"] == _uf_sel]
+    else:
+        _ranking_uf = ranking_filtrado
+
+    # Ordena alfabeticamente e inclui quantidade no label
+    _ranking_uf_sorted = _ranking_uf.sort_values("cidade", ascending=True)
+    _cidades_opcoes = [
+        f"{row['cidade']} ({int(row['vendas_mercado']):,} vendas)"
+        for _, row in _ranking_uf_sorted.iterrows()
+    ]
+    _cidades_keys = [
+        f"{row['cidade']}/{row['estado']}"
+        for _, row in _ranking_uf_sorted.iterrows()
+    ]
+    _cidade_map = dict(zip(_cidades_opcoes, _cidades_keys))
+
+    _cidade_label = st.selectbox(
+        "Cidade", _cidades_opcoes, index=None,
+        placeholder="Selecione uma cidade...",
+        key="oport_cidade_global",
+    ) if _cidades_opcoes else None
+    _cidade_sel_global = _cidade_map.get(_cidade_label) if _cidade_label else None
 
 tab_ranking, tab_zonas, tab_perfil = st.tabs([
     "Ranking de Cidades",
@@ -386,10 +405,8 @@ with tab_ranking:
 with tab_zonas:
     st.subheader(f"Zonas de Oportunidade (raio {raio_zona} km)")
 
-    cidade_sel = st.selectbox("Selecione uma cidade", cidades_lista, key="oport_cidade_zonas")
-
-    if cidade_sel:
-        _cidade, _estado = cidade_sel.rsplit("/", 1)
+    if _cidade_sel_global:
+        _cidade, _estado = _cidade_sel_global.rsplit("/", 1)
 
         with st.spinner("Analisando zonas geográficas..."):
             df_zonas = analisar_zonas(_cidade, _estado, data_inicio, data_fim,
@@ -446,18 +463,63 @@ with tab_zonas:
                 path = [[p["lon"], p["lat"]] for p in circulo]
 
                 # Círculo preenchido (polygon)
+                _zona_info = (f"<b>Zona #{int(zona['ranking'])}</b><br/>"
+                              f"Score: {zona['score']}<br/>"
+                              f"Vendas mercado: {int(zona['vendas_mercado'])}<br/>"
+                              f"Vendas Tenda: {int(zona['vendas_tenda'])}<br/>"
+                              f"% Tenda: {zona['pct_tenda']}%")
                 layers.append(pdk.Layer(
                     "PolygonLayer",
-                    data=[{"polygon": path, "score": zona["score"],
-                           "ranking": zona["ranking"],
-                           "vendas": zona["vendas_mercado"],
-                           "tenda": zona["vendas_tenda"],
-                           "pct": zona["pct_tenda"]}],
+                    data=[{"polygon": path, "info": _zona_info}],
                     get_polygon="polygon",
                     get_fill_color=cor,
                     get_line_color=[r, g, b, 180],
                     line_width_min_pixels=2,
                     pickable=True,
+                    auto_highlight=True,
+                ))
+
+            # Pins de empreendimentos da cidade (agrupados)
+            df_pontos = carregar_pontos_cidade(_cidade, _estado, data_inicio, data_fim)
+            if not df_pontos.empty:
+                emprs_mapa = df_pontos.groupby("empreendimento").agg(
+                    latitude=("latitude", "mean"),
+                    longitude=("longitude", "mean"),
+                    incorporadora=("incorporadora", "first"),
+                    vendas=("empreendimento", "size"),
+                    tipologia=("tipologia", "first"),
+                    ticket=("preco", "mean"),
+                ).reset_index()
+                emprs_mapa["ticket"] = emprs_mapa["ticket"].round(0).fillna(0).astype(int)
+
+                # Cores por incorporadora
+                incorps = emprs_mapa["incorporadora"].dropna().unique()
+                paleta = [
+                    [38, 166, 154], [66, 165, 245], [255, 112, 67], [171, 71, 188],
+                    [102, 187, 106], [255, 202, 40], [239, 83, 80], [141, 110, 99],
+                    [120, 144, 156], [236, 64, 122],
+                ]
+                cor_incorp = {inc: paleta[i % len(paleta)] for i, inc in enumerate(incorps)}
+                emprs_mapa["cor"] = emprs_mapa["incorporadora"].map(
+                    lambda x: cor_incorp.get(x, [158, 158, 158]) + [220]
+                )
+                # Formata tooltip do empreendimento
+                emprs_mapa["info"] = emprs_mapa.apply(
+                    lambda r: f"<b>{r['empreendimento']}</b><br/>"
+                              f"{r['incorporadora']}<br/>"
+                              f"{r['vendas']} vendas | {r['tipologia']}<br/>"
+                              f"Ticket: R$ {r['ticket']:,}",
+                    axis=1
+                )
+
+                layers.append(pdk.Layer(
+                    "ScatterplotLayer",
+                    data=emprs_mapa,
+                    get_position=["longitude", "latitude"],
+                    get_color="cor",
+                    get_radius=120,
+                    pickable=True,
+                    opacity=0.9,
                     auto_highlight=True,
                 ))
 
@@ -509,11 +571,7 @@ with tab_zonas:
                     zoom=zoom, pitch=0,
                 ),
                 tooltip={
-                    "html": "<b>Zona #{ranking}</b><br/>"
-                            "Score: {score}<br/>"
-                            "Vendas mercado: {vendas}<br/>"
-                            "Vendas Tenda: {tenda}<br/>"
-                            "% Tenda: {pct}%",
+                    "html": "{info}",
                     "style": {"backgroundColor": "#1a1a2e", "color": "white"},
                 },
             )
@@ -532,24 +590,24 @@ with tab_zonas:
             df_tabela_zonas = df_zonas[[
                 "ranking", "vendas_mercado", "vendas_tenda", "vendas_concorrencia",
                 "pct_tenda", "n_incorporadoras", "ticket_medio",
-                "tipologia_dominante", "top_empreendimentos", "score",
+                "tipologia_dominante", "top_empreendimentos", "empreendimentos_tenda", "score",
             ]].copy()
             df_tabela_zonas.columns = [
                 "#", "Vendas Mercado", "Vendas Tenda", "Vendas Concorrência",
                 "% Tenda", "Incorporadoras", "Ticket Médio",
-                "Tipologia", "Top Empreendimentos", "Score",
+                "Tipologia", "Top Concorrentes", "Tenda na zona", "Score",
             ]
             st.dataframe(df_tabela_zonas, use_container_width=True, height=400)
+    else:
+        st.info("Selecione uma cidade na barra lateral para analisar as zonas de oportunidade.")
 
 
 # ── Tab 3: Perfil da Oportunidade ──
 with tab_perfil:
     st.subheader("Perfil da Oportunidade")
 
-    cidade_sel_perfil = st.selectbox("Selecione uma cidade", cidades_lista, key="oport_cidade_perfil")
-
-    if cidade_sel_perfil:
-        _cidade_p, _estado_p = cidade_sel_perfil.rsplit("/", 1)
+    if _cidade_sel_global:
+        _cidade_p, _estado_p = _cidade_sel_global.rsplit("/", 1)
         perfil = carregar_perfil_oportunidade(_cidade_p, _estado_p, data_inicio, data_fim)
 
         col_p1, col_p2 = st.columns(2)
@@ -617,3 +675,5 @@ with tab_perfil:
         if not df_emprs.empty:
             df_emprs.columns = ["Empreendimento", "Incorporadora", "Vendas", "Ticket Médio", "Tipologia"]
             st.dataframe(df_emprs, use_container_width=True)
+    else:
+        st.info("Selecione uma cidade na barra lateral para ver o perfil da oportunidade.")

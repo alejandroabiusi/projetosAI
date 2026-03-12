@@ -22,15 +22,15 @@ def _limpar_cep(cep: str) -> str:
     return re.sub(r"\D", "", str(cep)).strip()
 
 
-def _buscar_viacep(cep: str) -> dict | None:
-    """Busca dados do CEP na API ViaCEP."""
+def _buscar_cep(cep: str) -> dict | None:
+    """Busca dados do CEP na API OpenCEP (sem token, sem bloqueio)."""
     cep_limpo = _limpar_cep(cep)
     if len(cep_limpo) != 8:
         return None
     try:
-        url = f"https://viacep.com.br/ws/{cep_limpo}/json/"
+        url = f"https://opencep.com/v1/{cep_limpo}"
         with urlopen(url, timeout=10) as resp:
-            data = json.loads(resp.read().decode("latin-1"))
+            data = json.loads(resp.read())
             if "erro" in data:
                 return None
             return {
@@ -76,7 +76,7 @@ def main():
             do_cache += 1
             continue
 
-        resultado = _buscar_viacep(cep)
+        resultado = _buscar_cep(cep)
 
         if resultado and resultado["bairro"]:
             cache[cep] = resultado
@@ -93,8 +93,8 @@ def main():
                 cache[cep] = {"bairro": "", "cidade": "", "uf": ""}
             falhas += 1
 
-        # ViaCEP pede ~300ms entre requests
-        time.sleep(0.35)
+        # ViaCEP — delay conservador para evitar bloqueio
+        time.sleep(0.6)
 
     # Salva cache final
     CACHE_PATH.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
