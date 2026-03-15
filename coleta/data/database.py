@@ -150,6 +150,47 @@ def criar_banco():
     conn.commit()
     conn.close()
 
+    # Cria tabelas de controle (runs + changelog)
+    criar_tabelas_controle()
+
+
+def criar_tabelas_controle():
+    """Cria tabelas de controle para rastreamento de mudancas."""
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS runs (
+            id TEXT PRIMARY KEY,
+            inicio TEXT NOT NULL,
+            fim TEXT,
+            status TEXT,
+            etapas_ok INTEGER DEFAULT 0,
+            etapas_erro INTEGER DEFAULT 0,
+            novos INTEGER DEFAULT 0,
+            mudancas INTEGER DEFAULT 0,
+            total_apos INTEGER,
+            duracao_segundos INTEGER
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS changelog (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            run_id TEXT NOT NULL,
+            empresa TEXT NOT NULL,
+            nome TEXT NOT NULL,
+            tipo TEXT NOT NULL,
+            campo TEXT,
+            valor_anterior TEXT,
+            valor_novo TEXT,
+            data_evento TEXT NOT NULL
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
 
 def garantir_coluna(nome_coluna, tipo="INTEGER DEFAULT 0"):
     """
@@ -284,6 +325,119 @@ def listar_colunas():
     colunas = [row[1] for row in cursor.execute("PRAGMA table_info(empreendimentos)")]
     conn.close()
     return colunas
+
+
+# Campos rastreados para deteccao de mudancas
+CAMPOS_RASTREADOS = [
+    "fase", "preco_a_partir", "total_unidades", "evolucao_obra_pct",
+    "dormitorios_descricao", "area_min_m2", "area_max_m2",
+]
+
+
+def snapshot_empreendimentos():
+    """
+    Retorna snapshot do estado atual de todos os empreendimentos.
+    Chave: (empresa, nome) -> dict com campos rastreados.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    campos = ", ".join(["empresa", "nome", "cidade"] + CAMPOS_RASTREADOS)
+    cursor.execute(f"SELECT {campos} FROM empreendimentos")
+    snapshot = {}
+    for row in cursor.fetchall():
+        chave = (row["empresa"], row["nome"])
+        snapshot[chave] = {campo: row[campo] for campo in CAMPOS_RASTREADOS}
+        snapshot[chave]["cidade"] = row["cidade"]
+    conn.close()
+    return snapshot
+
+
+def registrar_mudanca(run_id, empresa, nome, tipo, campo=None, anterior=None, novo=None):
+    """Registra uma mudanca no changelog."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO changelog (run_id, empresa, nome, tipo, campo, valor_anterior, valor_novo, data_evento) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (run_id, empresa, nome, tipo, campo,
+         str(anterior) if anterior is not None else None,
+         str(novo) if novo is not None else None,
+         datetime.now().isoformat()),
+    )
+    conn.commit()
+    conn.close()
+
+
+def comparar_snapshots(antes, depois, run_id):
+    """
+    Compara dois snapshots e registra mudancas no changelog.
+    Retorna dict com contadores: {'novos': N, 'mudancas': M}.
+    """
+    novos = 0
+    mudancas = 0
+
+    # Detectar novos empreendimentos
+    for chave in depois:
+        if chave not in antes:
+            empresa, nome = chave
+            registrar_mudanca(run_id, empresa, nome, "novo")
+            novos += 1
+
+    # Detectar mudancas em empreendimentos existentes
+    for chave in antes:
+        if chave not in depois:
+            continue
+        dados_antes = antes[chave]
+        dados_depois = depois[chave]
+        for campo in CAMPOS_RASTREADOS:
+            val_antes = dados_antes.get(campo)
+            val_depois = dados_depois.get(campo)
+            # Normalizar None vs valores vazios
+            if val_antes is None and val_depois is None:
+                continue
+            if str(val_antes) != str(val_depois):
+                empresa, nome = chave
+                # Tipo especifico para fase e preco
+                if campo == "fase":
+                    tipo = "fase_mudou"
+                elif campo == "preco_a_partir":
+                    tipo = "preco_mudou"
+                else:
+                    tipo = "campo_mudou"
+                registrar_mudanca(run_id, empresa, nome, tipo, campo, val_antes, val_depois)
+                mudancas += 1
+
+    return {"novos": novos, "mudancas": mudancas}
+
+
+def registrar_run(run_id, inicio, fim, status, stats):
+    """Registra uma execucao na tabela runs."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    duracao = int((fim - inicio).total_seconds())
+    cursor.execute(
+        "INSERT OR REPLACE INTO runs (id, inicio, fim, status, etapas_ok, etapas_erro, "
+        "novos, mudancas, total_apos, duracao_segundos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (run_id, inicio.isoformat(), fim.isoformat(), status,
+         stats.get("etapas_ok", 0), stats.get("etapas_erro", 0),
+         stats.get("novos", 0), stats.get("mudancas", 0),
+         stats.get("total_apos", 0), duracao),
+    )
+    conn.commit()
+    conn.close()
+
+
+def obter_changelog(run_id):
+    """Retorna todas as mudancas de uma execucao."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM changelog WHERE run_id = ? ORDER BY tipo, empresa, nome",
+        (run_id,),
+    )
+    rows = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return rows
 
 
 # Inicializa o banco ao importar o modulo

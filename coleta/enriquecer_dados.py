@@ -26,6 +26,7 @@ import time
 import json
 import logging
 import argparse
+import sqlite3
 import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
@@ -57,6 +58,30 @@ EMPRESA_CONFIG = {
     "Benx":              {"tipo_acesso": "requests",   "download_key": "benx"},
     "Cury":              {"tipo_acesso": "selenium",   "download_key": "cury"},
     "Metrocasa":         {"tipo_acesso": "selenium",   "download_key": "metrocasa"},
+    # Construtoras do scraper genérico
+    "VIC Engenharia":    {"tipo_acesso": "requests",   "download_key": "vic"},
+    "Vasco Construtora": {"tipo_acesso": "requests",   "download_key": "vasco"},
+    "Vinx":              {"tipo_acesso": "requests",   "download_key": "vinx"},
+    "Riformato":         {"tipo_acesso": "requests",   "download_key": "riformato"},
+    "ACLF":              {"tipo_acesso": "requests",   "download_key": "aclf"},
+    "BM7":               {"tipo_acesso": "requests",   "download_key": "bm7"},
+    "FYP Engenharia":    {"tipo_acesso": "requests",   "download_key": "fyp"},
+    "Smart Construtora": {"tipo_acesso": "requests",   "download_key": "smart"},
+    "Jotanunes":         {"tipo_acesso": "requests",   "download_key": "jotanunes"},
+    "Cavazani":          {"tipo_acesso": "requests",   "download_key": "cavazani"},
+    "Carrilho":          {"tipo_acesso": "requests",   "download_key": "carrilho"},
+    "BP8":               {"tipo_acesso": "requests",   "download_key": "bp8"},
+    "ACL Incorporadora": {"tipo_acesso": "requests",   "download_key": "acl"},
+    "Novolar":           {"tipo_acesso": "requests",   "download_key": "novolar"},
+    "Árbore":            {"tipo_acesso": "requests",   "download_key": "arbore"},
+    "SUGOI":             {"tipo_acesso": "requests",   "download_key": "sugoi"},
+    "Emccamp":           {"tipo_acesso": "requests",   "download_key": "emccamp"},
+    "EPH":               {"tipo_acesso": "requests",   "download_key": "eph"},
+    "Ampla":             {"tipo_acesso": "requests",   "download_key": "ampla"},
+    "Novvo":             {"tipo_acesso": "requests",   "download_key": "novvo"},
+    "M.Lar":             {"tipo_acesso": "requests",   "download_key": "mlar"},
+    "Ún1ca":             {"tipo_acesso": "requests",   "download_key": "unica"},
+    "Viva Benx":         {"tipo_acesso": "requests",   "download_key": "vivabenx"},
 }
 
 HEADERS = {
@@ -147,7 +172,7 @@ def buscar_registros(empresa, campo="todos", forcar=False, limite=0):
 
     # Selecionar campos disponiveis
     cols_select = ["id", "nome", "slug", "url_fonte", "endereco", "cidade", "estado", "bairro"]
-    for extra in ["latitude", "longitude", "data_lancamento", "registro_incorporacao"]:
+    for extra in ["latitude", "longitude", "data_lancamento", "registro_incorporacao", "cep"]:
         if extra in colunas_existentes:
             cols_select.append(extra)
 
@@ -520,6 +545,29 @@ def extrair_coordenadas(soup, html_raw):
         except (json.JSONDecodeError, TypeError, ValueError):
             pass
 
+    # 5. Resolver links curtos do Google Maps (maps.app.goo.gl)
+    for a_tag in soup.find_all("a", href=True):
+        href = a_tag["href"]
+        if "maps.app.goo.gl" in href or "goo.gl/maps" in href:
+            try:
+                resp = requests.head(href, allow_redirects=True, timeout=10,
+                                     headers={"User-Agent": "Mozilla/5.0"})
+                final_url = resp.url
+                # @LAT,LNG
+                m = re.search(r"@(-?\d+\.?\d+),\s*(-?\d+\.?\d+)", final_url)
+                if m:
+                    lat, lng = float(m.group(1)), float(m.group(2))
+                    if _validar_coords_brasil(lat, lng):
+                        return str(lat), str(lng)
+                # !3dLAT!4dLNG
+                m = re.search(r"!3d(-?\d+\.?\d+)!4d(-?\d+\.?\d+)", final_url)
+                if m:
+                    lat, lng = float(m.group(1)), float(m.group(2))
+                    if _validar_coords_brasil(lat, lng):
+                        return str(lat), str(lng)
+            except Exception:
+                pass
+
     return None, None
 
 
@@ -572,6 +620,43 @@ def extrair_endereco_de_pagina(soup, texto_completo):
 # ============================================================
 # GEOCODING NOMINATIM
 # ============================================================
+
+CEP_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "ceps_brasil.db")
+
+
+def extrair_cep_de_html(soup, html_raw):
+    """Extrai CEP de texto da pagina HTML."""
+    # Padrão: 5 dígitos, hífen, 3 dígitos
+    ceps = re.findall(r"\b(\d{5})-?(\d{3})\b", html_raw)
+    for d5, d3 in ceps:
+        cep = d5 + d3
+        # Filtrar CEPs invalidos (00000xxx, 99999xxx)
+        if cep[:5] not in ("00000", "99999") and int(d5) > 0:
+            return cep
+    return None
+
+
+def geocodificar_por_cep(cep):
+    """Geocodifica CEP usando base local de CEPs (basedosdados.org)."""
+    if not cep or not os.path.exists(CEP_DB_PATH):
+        return None, None
+    cep_limpo = re.sub(r"\D", "", cep)
+    if len(cep_limpo) != 8:
+        return None, None
+    try:
+        conn = sqlite3.connect(CEP_DB_PATH)
+        cur = conn.cursor()
+        cur.execute("SELECT latitude, longitude FROM ceps WHERE cep = ?", (cep_limpo,))
+        row = cur.fetchone()
+        conn.close()
+        if row and row[0] and row[1]:
+            lat, lng = float(row[0]), float(row[1])
+            if _validar_coords_brasil(lat, lng):
+                return str(lat), str(lng)
+    except Exception:
+        pass
+    return None, None
+
 
 _ultimo_geocode = 0
 
@@ -676,6 +761,8 @@ def enriquecer_empresa(empresa, config, campo, forcar, limite, sem_geocoding, pr
             logger.info(f"  [{i}/{total}] {nome}")
 
             dados_novos = {}
+            html = None
+            soup = None
 
             try:
                 if tipo_acesso == "api_mrv":
@@ -733,15 +820,29 @@ def enriquecer_empresa(empresa, config, campo, forcar, limite, sem_geocoding, pr
                     if data_ri:
                         dados_novos["data_lancamento"] = data_ri
 
-                # Geocoding fallback
-                if not sem_geocoding and campo in ("todos", "coordenadas"):
-                    end_final = dados_novos.get("endereco") or endereco
+                # Geocoding fallback: CEP local > Nominatim
+                if campo in ("todos", "coordenadas"):
                     lat_final = dados_novos.get("latitude") or lat
-                    if end_final and not lat_final:
-                        lat_g, lng_g = geocodificar_nominatim(end_final, cidade, estado)
-                        if lat_g and lng_g:
-                            dados_novos["latitude"] = lat_g
-                            dados_novos["longitude"] = lng_g
+                    if not lat_final:
+                        # Tentar extrair CEP da página para geocodificar
+                        if html:
+                            cep_encontrado = extrair_cep_de_html(soup, html)
+                            if cep_encontrado:
+                                lat_c, lng_c = geocodificar_por_cep(cep_encontrado)
+                                if lat_c and lng_c:
+                                    dados_novos["latitude"] = lat_c
+                                    dados_novos["longitude"] = lng_c
+                                    if not rec.get("cep"):
+                                        dados_novos["cep"] = cep_encontrado
+
+                    lat_final = dados_novos.get("latitude") or lat
+                    if not lat_final and not sem_geocoding:
+                        end_final = dados_novos.get("endereco") or endereco
+                        if end_final:
+                            lat_g, lng_g = geocodificar_nominatim(end_final, cidade, estado)
+                            if lat_g and lng_g:
+                                dados_novos["latitude"] = lat_g
+                                dados_novos["longitude"] = lng_g
 
                 # Atualizar banco
                 if dados_novos:

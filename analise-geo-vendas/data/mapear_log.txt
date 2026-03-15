@@ -1,0 +1,17 @@
+Total CEPs únicos: 290272
+Cache carregado: 4823 entradas
+CEPs pendentes: 285449
+OpenCEP: 142724 CEPs (inicio -> meio)
+CEP Aberto: 142725 CEPs (fim -> meio)
+Iniciando...
+
+  [200 novos] Cache: 5023 CEPs (4815 com bairro) | OpenCEP: 139ok/2fail | CEPAberto: 13ok/46fail
+  [400 novos] Cache: 5223 CEPs (4981 com bairro) | OpenCEP: 278ok/5fail | CEPAberto: 40ok/77fail
+  [600 novos] Cache: 5423 CEPs (5143 com bairro) | OpenCEP: 412ok/13fail | CEPAberto: 68ok/107fail
+  [800 novos] Cache: 5623 CEPs (5312 com bairro) | OpenCEP: 552ok/15fail | CEPAberto: 97ok/136fail
+  [1000 novos] Cache: 5823 CEPs (5477 com bairro) | OpenCEP: 688ok/21fail | CEPAberto: 126ok/165fail
+  [1200 novos] Cache: 6023 CEPs (5643 com bairro) | OpenCEP: 828ok/23fail | CEPAberto: 152ok/197fail
+  [1400 novos] Cache: 6223 CEPs (5811 com bairro) | OpenCEP: 968ok/26fail | CEPAberto: 180ok/226fail
+  [1600 novos] Cache: 6423 CEPs (5981 com bairro) | OpenCEP: 1107ok/29fail | CEPAberto: 211ok/253fail
+  [1800 novos] Cache: 6623 CEPs (6151 com bairro) | OpenCEP: 1247ok/31fail | CEPAberto: 241ok/281fail
+  [2000 novos] Cache: 6823 CEPs (6308 com bairro) | OpenCEP: 1379ok/41fail | CEPAberto: 266ok/314fail

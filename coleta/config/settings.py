@@ -103,6 +103,27 @@ EMPRESAS_MZ = [PLANOEPLANO, CURY, MRV, DIRECIONAL, CYRELA, MOURADUBEUX]
 TODAS_EMPRESAS = EMPRESAS_MZ + [TENDA]
 
 # ============================================================
+# ATUALIZACAO RECORRENTE
+# ============================================================
+ATUALIZACAO = {
+    "backup_antes": True,
+    "max_backups": 10,
+    "timeout_por_scraper": 1800,  # 30 min
+    "retry_falhas": True,
+    "campos_rastreados": ["fase", "preco_a_partir", "total_unidades",
+                          "evolucao_obra_pct", "area_min_m2", "area_max_m2"],
+}
+
+# ============================================================
+# EMAIL DE NOTIFICACAO
+# ============================================================
+EMAIL = {
+    "metodo": "outlook",  # ou "smtp"
+    "destinatarios": [],  # preencher com emails do time IM
+    "assunto_prefixo": "[Coleta IM]",
+}
+
+# ============================================================
 # PARAMETROS DO SELENIUM
 # ============================================================
 SELENIUM = {

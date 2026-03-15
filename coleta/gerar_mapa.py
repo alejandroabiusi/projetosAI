@@ -20,7 +20,16 @@ CORES = {
     "Pacaembu": "#c0392b",
     "Conx": "#7f8c8d",
     "Mundo Apto": "#2980b9",
-    "Benx": "#8e44ad",
+    "Viva Benx": "#e91e63",
+    "Novolar": "#16a085",
+    "Árbore": "#27ae60",
+    "SUGOI": "#2c3e50",
+    "Emccamp": "#8e44ad",
+    "EPH": "#d4ac0d",
+    "Ampla": "#5dade2",
+    "Novvo": "#a569bd",
+    "M.Lar": "#eb984e",
+    "Ún1ca": "#45b39d",
 }
 
 
@@ -30,7 +39,7 @@ def main():
     cur = conn.cursor()
     cur.execute("""
         SELECT nome, empresa, cidade, estado, latitude, longitude, fase, preco_a_partir, endereco,
-               data_lancamento, total_unidades
+               data_lancamento, total_unidades, url_fonte
         FROM empreendimentos
         WHERE latitude IS NOT NULL AND latitude != ''
         AND longitude IS NOT NULL AND longitude != ''
@@ -44,8 +53,8 @@ def main():
         "breve lancamento": "Breve Lançamento",
         "futuro lançamento": "Breve Lançamento",
         "futuro lancamento": "Breve Lançamento",
-        "pré-lançamento": "Pré-Lançamento",
-        "pre-lancamento": "Pré-Lançamento",
+        "pré-lançamento": "Breve Lançamento",
+        "pre-lancamento": "Breve Lançamento",
         "em construção": "Em Construção",
         "em construcao": "Em Construção",
         "em obras": "Em Construção",
@@ -89,6 +98,7 @@ def main():
                     "end": r["endereco"] or "",
                     "dl": r["data_lancamento"] or "",
                     "un": r["total_unidades"] if r["total_unidades"] else None,
+                    "url": r["url_fonte"] or "",
                 })
         except (ValueError, TypeError):
             pass
@@ -139,6 +149,8 @@ def main():
   .popup-title {{ font-weight: bold; font-size: 14px; color: #2c3e50; margin-bottom: 4px; }}
   .popup-empresa {{ display: inline-block; padding: 2px 8px; border-radius: 10px; color: white; font-size: 11px; margin-bottom: 4px; }}
   .popup-info {{ color: #555; font-size: 12px; }}
+  .popup-link {{ display: inline-block; margin-top: 6px; padding: 4px 12px; background: #3498db; color: white; text-decoration: none; border-radius: 4px; font-size: 11px; font-weight: 600; }}
+  .popup-link:hover {{ background: #2980b9; }}
   .summary-panel {{
     position: absolute; bottom: 20px; left: 12px; z-index: 1000;
     background: rgba(255,255,255,0.95); padding: 12px 16px;
@@ -162,11 +174,11 @@ def main():
 </div>
 
 <div class="filter-panel" id="filters">
-  <strong>Empresa:</strong><br>
-  <div id="filter-empresa"></div>
-  <hr style="margin:6px 0;border:none;border-top:1px solid #ddd">
   <strong>Status:</strong><br>
   <div id="filter-status"></div>
+  <hr style="margin:6px 0;border:none;border-top:1px solid #ddd">
+  <strong>Empresa:</strong><br>
+  <div id="filter-empresa"></div>
 </div>
 
 <div class="summary-panel" id="summary">
@@ -229,6 +241,7 @@ pontos.forEach(p => {{
   if (p.un) info += '<br><span class="popup-info">' + p.un + ' unidades</span>';
   if (p.dl) info += '<br><span class="popup-info">Lanc.: ' + p.dl + '</span>';
   if (p.end) info += '<br><span class="popup-info" style="font-size:11px;color:#888">' + p.end + '</span>';
+  if (p.url) info += '<br><a class="popup-link" href="' + p.url + '" target="_blank">Ver no site</a>';
 
   marker.bindPopup(info);
   marker._empresa = p.e;
@@ -249,7 +262,21 @@ pontos.forEach(p => {{
 
 map.addLayer(clusters);
 
-// Rebuild map based on active filters
+// Cross-filter: build lookup of which empresas have which statuses
+const empByStatus = {{}};
+const statusByEmp = {{}};
+pontos.forEach(p => {{
+  const st = p.f || 'Sem info';
+  if (!empByStatus[st]) empByStatus[st] = new Set();
+  empByStatus[st].add(p.e);
+  if (!statusByEmp[p.e]) statusByEmp[p.e] = new Set();
+  statusByEmp[p.e].add(st);
+}});
+
+const empCheckboxes = {{}};
+const stCheckboxes = {{}};
+
+// Rebuild map + update cross-filter availability
 function applyFilters() {{
   clusters.clearLayers();
   allMarkers.forEach(m => {{
@@ -257,49 +284,48 @@ function applyFilters() {{
       clusters.addLayer(m);
     }}
   }});
+  updateCrossFilters();
 }}
 
-// Empresa checkboxes
-const fpEmp = document.getElementById('filter-empresa');
-const empToggle = document.createElement('span');
-empToggle.className = 'toggle-all';
-empToggle.textContent = 'Desmarcar todas';
-empToggle._allChecked = true;
-empToggle.addEventListener('click', () => {{
-  empToggle._allChecked = !empToggle._allChecked;
-  empToggle.textContent = empToggle._allChecked ? 'Desmarcar todas' : 'Marcar todas';
-  fpEmp.querySelectorAll('input[type=checkbox]').forEach(cb => {{
-    cb.checked = empToggle._allChecked;
-    const emp = cb._empresa;
-    if (empToggle._allChecked) {{ activeEmpresas.add(emp); }} else {{ activeEmpresas.delete(emp); }}
+function updateCrossFilters() {{
+  // Which empresas have at least one active status?
+  const availEmpresas = new Set();
+  activeStatus.forEach(st => {{
+    if (empByStatus[st]) empByStatus[st].forEach(e => availEmpresas.add(e));
   }});
-  applyFilters();
-}});
-fpEmp.appendChild(empToggle);
+  // Which statuses have at least one active empresa?
+  const availStatus = new Set();
+  activeEmpresas.forEach(e => {{
+    if (statusByEmp[e]) statusByEmp[e].forEach(st => availStatus.add(st));
+  }});
 
-Object.keys(empresaCount)
-  .sort((a,b) => empresaCount[b] - empresaCount[a])
-  .forEach(emp => {{
-    const label = document.createElement('label');
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = true;
-    cb.style.marginRight = '4px';
-    cb._empresa = emp;
-    cb.addEventListener('change', () => {{
-      if (cb.checked) {{ activeEmpresas.add(emp); }} else {{ activeEmpresas.delete(emp); }}
-      applyFilters();
+  // Disable/enable empresa checkboxes
+  Object.entries(empCheckboxes).forEach(([emp, obj]) => {{
+    const avail = availEmpresas.has(emp);
+    obj.label.style.opacity = avail ? '1' : '0.35';
+    obj.cb.disabled = !avail;
+    // Count only matching markers
+    let cnt = 0;
+    allMarkers.forEach(m => {{
+      if (m._empresa === emp && activeStatus.has(m._status)) cnt++;
     }});
-    const dot = document.createElement('span');
-    dot.className = 'dot';
-    dot.style.cssText = 'display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;background:' + (cores[emp]||'#999');
-    label.appendChild(cb);
-    label.appendChild(dot);
-    label.appendChild(document.createTextNode(' ' + emp + ' (' + empresaCount[emp] + ')'));
-    fpEmp.appendChild(label);
+    obj.countSpan.textContent = avail ? ' ' + emp + ' (' + cnt + ')' : ' ' + emp + ' (0)';
   }});
 
-// Status checkboxes
+  // Disable/enable status checkboxes
+  Object.entries(stCheckboxes).forEach(([st, obj]) => {{
+    const avail = availStatus.has(st);
+    obj.label.style.opacity = avail ? '1' : '0.35';
+    obj.cb.disabled = !avail;
+    let cnt = 0;
+    allMarkers.forEach(m => {{
+      if (m._status === st && activeEmpresas.has(m._empresa)) cnt++;
+    }});
+    obj.countSpan.textContent = avail ? ' ' + st + ' (' + cnt + ')' : ' ' + st + ' (0)';
+  }});
+}}
+
+// --- Status checkboxes (first) ---
 const fpSt = document.getElementById('filter-status');
 const stToggle = document.createElement('span');
 stToggle.className = 'toggle-all';
@@ -330,9 +356,57 @@ Object.keys(statusCount)
       if (cb.checked) {{ activeStatus.add(st); }} else {{ activeStatus.delete(st); }}
       applyFilters();
     }});
+    const countSpan = document.createElement('span');
+    countSpan.textContent = ' ' + st + ' (' + statusCount[st] + ')';
     label.appendChild(cb);
-    label.appendChild(document.createTextNode(' ' + st + ' (' + statusCount[st] + ')'));
+    label.appendChild(countSpan);
     fpSt.appendChild(label);
+    stCheckboxes[st] = {{ cb, label, countSpan }};
+  }});
+
+// --- Empresa checkboxes (second) ---
+const fpEmp = document.getElementById('filter-empresa');
+const empToggle = document.createElement('span');
+empToggle.className = 'toggle-all';
+empToggle.textContent = 'Desmarcar todas';
+empToggle._allChecked = true;
+empToggle.addEventListener('click', () => {{
+  empToggle._allChecked = !empToggle._allChecked;
+  empToggle.textContent = empToggle._allChecked ? 'Desmarcar todas' : 'Marcar todas';
+  fpEmp.querySelectorAll('input[type=checkbox]').forEach(cb => {{
+    if (!cb.disabled) {{
+      cb.checked = empToggle._allChecked;
+      const emp = cb._empresa;
+      if (empToggle._allChecked) {{ activeEmpresas.add(emp); }} else {{ activeEmpresas.delete(emp); }}
+    }}
+  }});
+  applyFilters();
+}});
+fpEmp.appendChild(empToggle);
+
+Object.keys(empresaCount)
+  .sort((a,b) => empresaCount[b] - empresaCount[a])
+  .forEach(emp => {{
+    const label = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = true;
+    cb.style.marginRight = '4px';
+    cb._empresa = emp;
+    cb.addEventListener('change', () => {{
+      if (cb.checked) {{ activeEmpresas.add(emp); }} else {{ activeEmpresas.delete(emp); }}
+      applyFilters();
+    }});
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    dot.style.cssText = 'display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;background:' + (cores[emp]||'#999');
+    const countSpan = document.createElement('span');
+    countSpan.textContent = ' ' + emp + ' (' + empresaCount[emp] + ')';
+    label.appendChild(cb);
+    label.appendChild(dot);
+    label.appendChild(countSpan);
+    fpEmp.appendChild(label);
+    empCheckboxes[emp] = {{ cb, label, countSpan }};
   }});
 
 // Quadro resumo dinamico

@@ -13,7 +13,10 @@ Uso:
     python scrapers/generico_empreendimentos.py --listar
 
 Empresas configuradas:
-    magik_jc, kazzas, vibra, pacaembu, mundo_apto, conx, benx, metrocasa
+    magik_jc, kazzas, vibra, pacaembu, mundo_apto, conx, benx, metrocasa,
+    novvo, novolar, emccamp, sugoi, arbore, ampla, mlar, eph, unica,
+    riformato, cavazani, smart, bm7, construlike, fyp, vl, jotanunes,
+    piacentini, aclf, setai_gp, vinx, bp8
 """
 
 import os
@@ -203,6 +206,419 @@ EMPRESAS = {
             "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
         },
     },
+
+    # ============================================================
+    # NOVAS INCORPORADORAS (2026-03)
+    # ============================================================
+
+    "novvo": {
+        "nome_banco": "Novvo",
+        "base_url": "https://meunovvo.com.br",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://meunovvo.com.br/",
+        ],
+        "padrao_link": r"meunovvo\.com\.br/(novvo-marajoara|santamarina|novvoanaliafranco|vilaprudente|novvo-barra-funda)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:Av\.|Avenida|Rua|R\.|Estrada|Estr\.)[^,\n]+(?:,\s*\d+)?"},
+            "bairro": {"method": "regex", "pattern": r"(?:Bairro|bairro):\s*(.+?)(?:\n|$)"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?)"},
+            "numero_torres": {"method": "regex", "pattern": r"(\d+)\s*torres?"},
+            "numero_andares": {"method": "regex", "pattern": r"(\d+)\s*andares?"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "novolar": {
+        "nome_banco": "Novolar",
+        "base_url": "https://www.novolar.com.br",
+        "urls_listagem": [
+            "https://www.novolar.com.br/",
+            "https://www.novolar.com.br/imoveis/",
+        ],
+        "padrao_link": r"novolar\.com\.br/imoveis/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*(?:n[ºo°]?\s*)?\d+)?"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?)"},
+        },
+    },
+
+    "emccamp": {
+        "nome_banco": "Emccamp",
+        "base_url": "https://emccamp.com.br",
+        "urls_listagem": [
+            "https://emccamp.com.br/",
+            "https://emccamp.com.br/imoveis/",
+        ],
+        "padrao_link": r"emccamp\.com\.br/empreendimento/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "bairro": {"method": "regex", "pattern": r"(?:Bairro|bairro):\s*(.+?)(?:\n|$)"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "numero_torres": {"method": "regex", "pattern": r"(\d+)\s*torres?"},
+            "numero_andares": {"method": "regex", "pattern": r"(\d+)\s*(?:andares?|pavimentos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*[Aa]\s*\d+(?:[.,]\d+)?\s*m[²2]|\d+(?:[.,]\d+)?\s*m[²2]"},
+        },
+    },
+
+    "sugoi": {
+        "nome_banco": "SUGOI",
+        "nome_from_title": True,
+        "base_url": "https://sugoisa.com.br",
+        "urls_listagem": [
+            "https://sugoisa.com.br/todos-imoveis/",
+        ],
+        "padrao_link": r"sugoisa\.com\.br/imoveis/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title, .entry-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:Av\.|Avenida|Rua|R\.|Estr\.|Estrada)[^,\n]+(?:,\s*[\d.]+)?"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[-aA]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "arbore": {
+        "nome_banco": "Árbore",
+        "base_url": "https://arboreengenharia.com.br",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://arboreengenharia.com.br/",
+            "https://arboreengenharia.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"arboreengenharia\.com\.br/empreendimentos/([\w_-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title, .entry-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:Rua|R\.|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "bairro": {"method": "regex", "pattern": r"Bairro\s+([\w\s]+?)(?:\s*[-–]|\n)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "ampla": {
+        "nome_banco": "Ampla",
+        "nome_from_title": True,
+        "base_url": "https://www.amplaincorporadora.com.br",
+        "urls_listagem": [
+            "https://www.amplaincorporadora.com.br/",
+        ],
+        "padrao_link": r"amplaincorporadora\.com\.br/imoveis/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida)[^,\n]+(?:,\s*\d+)?"},
+            "bairro": {"method": "regex", "pattern": r"(?:Bairro|bairro):\s*(.+?)(?:\n|$)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "mlar": {
+        "nome_banco": "M.Lar",
+        "base_url": "https://www.mlarempreendimentos.com.br",
+        "nome_from_title": True,
+        "estado_default": "CE",
+        "urls_listagem": [
+            "https://www.mlarempreendimentos.com.br/",
+        ],
+        "padrao_link": r"mlarempreendimentos\.com\.br/empreendimento/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida)[^,\n]+(?:,\s*\d+)?"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|suítes?|dormit[oó]rios?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "eph": {
+        "nome_banco": "EPH",
+        "nome_from_title": True,
+        "base_url": "https://ephincorporadora.com.br",
+        "urls_listagem": [
+            "https://ephincorporadora.com.br/",
+        ],
+        "padrao_link": r"ephincorporadora\.com\.br/imoveis/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title, .entry-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:Estr\.|Estrada|R\.|Rua|Av\.|Avenida)[^,\n]+(?:,\s*\d+)?"},
+            "bairro": {"method": "regex", "pattern": r"(?:Bairro|bairro):\s*(.+?)(?:\n|$)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "unica": {
+        "nome_banco": "Ún1ca",
+        "base_url": "https://un1ca.com.br",
+        "estado_default": "CE",
+        "urls_listagem": [
+            "https://un1ca.com.br/",
+        ],
+        "padrao_link": r"un1ca\.com\.br/(?:empreendimento/)?(?!blog|contato|sobre|politica)(unica[\w-]+|un1ca[\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida)[^,\n]+(?:,\s*\d+)?"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    # ============================================================
+    # NOVAS INCORPORADORAS (2026-03 batch 2)
+    # ============================================================
+
+    "riformato": {
+        "nome_banco": "Riformato",
+        "base_url": "https://riformato.com.br",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://riformato.com.br/fase/lancamento/",
+            "https://riformato.com.br/fase/breve-lancamentos/",
+            "https://riformato.com.br/fase/construcao/",
+            "https://riformato.com.br/fase/prontos/",
+            "https://riformato.com.br/fase/entregues/",
+        ],
+        "padrao_link": r"riformato\.com\.br/empreendimento/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "bairro": {"method": "regex", "pattern": r"([A-ZÀ-Ú][a-zà-ú]+(?:\s+[A-ZÀ-Ú][a-zà-ú]+)*)\s*[-–]\s*São Paulo"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "cavazani": {
+        "nome_banco": "Cavazani",
+        "base_url": "https://cavazani.com.br",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://cavazani.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"cavazani\.com\.br/((?:urbano|rubi|turmalinas|parque|solar|sinfonia)[\w-]*)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "numero_torres": {"method": "regex", "pattern": r"(\d+)\s*torres?"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "smart": {
+        "nome_banco": "Smart Construtora",
+        "base_url": "https://smartincorporadora.com.br",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://smartincorporadora.com.br/",
+            "https://smartincorporadora.com.br/imoveis/",
+        ],
+        "padrao_link": r"smartincorporadora\.com\.br/imoveis/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "bm7": {
+        "nome_banco": "BM7",
+        "base_url": "https://bm7construtora.com.br",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://bm7construtora.com.br/",
+            "https://bm7construtora.com.br/todos-os-empreendimentos/",
+        ],
+        "padrao_link": r"bm7(?:construtora|empreendimentos)\.com\.br/(?:property|empreendimento)/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "construlike": {
+        "nome_banco": "Construlike",
+        "base_url": "https://construlike.com.br",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://construlike.com.br/",
+            "https://construlike.com.br/empreendimentos",
+        ],
+        "padrao_link": r"construlike\.com\.br/empreendimentos?/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "numero_torres": {"method": "regex", "pattern": r"(\d+)\s*torres?"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "fyp": {
+        "nome_banco": "FYP Engenharia",
+        "base_url": "https://fyp.com.br",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://fyp.com.br/",
+            "https://fyp.com.br/imoveis/",
+        ],
+        "padrao_link": r"fyp\.com\.br/((?:aov|flexmed|maxy|masb|masa|cerejeiras|alamedas|california|boa-vista|jardim|varandas|residencial)[\w-]*)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "vl": {
+        "nome_banco": "VL Construtora",
+        "base_url": "https://www.vlconstrutora.com.br",
+        "nome_from_title": True,
+        "estado_default": "PE",
+        "urls_listagem": [
+            "https://www.vlconstrutora.com.br/",
+            "https://www.vlconstrutora.com.br/encontre-seu-apartamento/",
+        ],
+        "padrao_link": r"vlconstrutora\.com\.br/empreendimento/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "jotanunes": {
+        "nome_banco": "Jotanunes",
+        "base_url": "https://jotanunes.com",
+        "nome_from_title": True,
+        "estado_default": "SE",
+        "urls_listagem": [
+            "https://jotanunes.com/",
+            "https://jotanunes.com/empreendimentos/",
+        ],
+        "padrao_link": r"jotanunes\.com/empreendimentos/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "piacentini": {
+        "nome_banco": "Piacentini",
+        "base_url": "https://piacentiniconstrutora.com.br",
+        "nome_from_title": True,
+        "estado_default": "PR",
+        "urls_listagem": [
+            "https://piacentiniconstrutora.com.br/",
+            "https://piacentiniconstrutora.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"piacentiniconstrutora\.com\.br/empreendimentos?/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "aclf": {
+        "nome_banco": "ACLF",
+        "base_url": "https://aclf.com.br",
+        "nome_from_title": True,
+        "estado_default": "PE",
+        "urls_listagem": [
+            "https://aclf.com.br/",
+            "https://aclf.com.br/imovel-estado/lancamento/",
+            "https://aclf.com.br/imovel-estado/em-construcao/",
+            "https://aclf.com.br/imovel-estado/portfolio/",
+        ],
+        "padrao_link": r"aclf\.com\.br/imovel/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "setai_gp": {
+        "nome_banco": "Setai/Grupo GP",
+        "base_url": "https://setaigrupogp.com.br",
+        "nome_from_title": True,
+        "estado_default": "PB",
+        "cidade_default": "João Pessoa",
+        "urls_listagem": [
+            "https://setaigrupogp.com.br/",
+            "https://setaigrupogp.com.br/empreendimentos-setai/",
+        ],
+        "padrao_link": r"setaigrupogp\.com\.br/empreendimentos?(?:-setai)?/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|suítes?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "vinx": {
+        "nome_banco": "Vinx",
+        "base_url": "https://vinx.com.br",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://vinx.com.br/empreendimentos",
+            "https://vinx.com.br/empreendimentos?f=t_6",
+            "https://vinx.com.br/empreendimentos?f=t_8",
+        ],
+        "padrao_link": r"vinx\.com\.br/empreendimento/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "bp8": {
+        "nome_banco": "BP8",
+        "base_url": "https://bp8construtora.com.br",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://bp8construtora.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"bp8construtora\.com\.br/((?:pin|pop|via|villa|ceo|reserva|ramada)[\w_-]*)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
 }
 
 
@@ -330,7 +746,7 @@ def extrair_dados_empreendimento(html, url, config, logger):
     dados = {
         "empresa": config["nome_banco"],
         "url_fonte": url,
-        "estado": "SP",  # Default, sera ajustado se encontrado
+        "estado": config.get("estado_default", "SP"),
         "cidade": None,  # Será extraído do HTML/endereço
     }
 
@@ -386,21 +802,64 @@ def extrair_dados_empreendimento(html, url, config, logger):
         else:
             dados["endereco"] = endereco_limpo
 
-    # Fallbacks
-    if not dados.get("nome"):
+    # Nomes invalidos comuns (capturados de botoes, status, etc)
+    _NOMES_INVALIDOS = {
+        "fale com a gente!", "not acceptable!", "em obras", "lançamento",
+        "lancamento", "pronto para morar", "entregue", "breve lançamento",
+        "breve lancamento", "100% vendido", "futuro lançamento",
+    }
+    _PREFIXOS_INVALIDOS = ("apartamento ", "imóvel ", "imovel ", "comprar ", "venda de ")
+
+    def _nome_valido(n):
+        if not n or len(n.strip()) < 3:
+            return False
+        nl = n.strip().lower()
+        if nl in _NOMES_INVALIDOS:
+            return False
+        if any(nl.startswith(p) for p in _PREFIXOS_INVALIDOS):
+            return False
+        if len(nl) > 80:
+            return False
+        return True
+
+    # Se config pede nome do <title>, usar direto
+    if config.get("nome_from_title") or not _nome_valido(dados.get("nome")):
+        title_tag = soup.find("title")
+        if title_tag and title_tag.string:
+            title_text = title_tag.string.strip()
+            # Separar pelo ULTIMO separador (preserva nomes compostos como "X | Cond. 04")
+            nome_empresa = config.get("nome_banco", "").lower()
+            for sep in [" - ", " | ", " – ", " — "]:
+                if sep in title_text:
+                    partes = title_text.split(sep)
+                    # Remove partes que contenham o nome da empresa
+                    partes_validas = [p.strip() for p in partes if nome_empresa not in p.strip().lower()
+                                      and "incorporadora" not in p.strip().lower()
+                                      and "construtora" not in p.strip().lower()
+                                      and "engenharia" not in p.strip().lower()]
+                    if partes_validas:
+                        title_text = (sep).join(partes_validas).strip()
+                    else:
+                        title_text = partes[0].strip()
+                    break
+            if _nome_valido(title_text):
+                dados["nome"] = title_text
+
+    # Fallback via parser nome_fallback
+    if not _nome_valido(dados.get("nome")):
         fallback = config.get("parsers", {}).get("nome_fallback")
         if fallback:
             valor = extrair_por_css(soup, fallback) if fallback.get("method") == "css" else extrair_por_parser(texto_completo, fallback)
-            if valor:
+            if _nome_valido(valor):
                 dados["nome"] = valor
 
-    # Se ainda nao tem nome, usar o slug formatado
-    if not dados.get("nome"):
+    # Ultimo recurso: slug formatado
+    if not _nome_valido(dados.get("nome")):
         slug = dados.get("slug", "")
-        dados["nome"] = slug.replace("-", " ").title()
+        dados["nome"] = slug.replace("-", " ").replace("_", " ").title()
 
-    # Extrair fase/status a partir do texto
-    fase = detectar_fase(texto_completo)
+    # Extrair fase/status a partir do HTML (com fallback para texto)
+    fase = detectar_fase(texto_completo, soup)
     if fase:
         dados["fase"] = fase
 
@@ -438,6 +897,13 @@ def extrair_dados_empreendimento(html, url, config, logger):
     binarios = detectar_atributos_binarios(texto_completo)
     dados.update(binarios)
 
+    # Extrair cidade e estado do texto (padrao "Cidade/UF" ou "Cidade - UF")
+    if not dados.get("cidade"):
+        cidade_estado = extrair_cidade_estado(texto_completo)
+        if cidade_estado:
+            dados["cidade"] = cidade_estado[0]
+            dados["estado"] = cidade_estado[1]
+
     # Extrair bairro e cidade do texto se nao encontrado via parser
     if not dados.get("bairro"):
         bairro = extrair_bairro(texto_completo, url)
@@ -447,23 +913,68 @@ def extrair_dados_empreendimento(html, url, config, logger):
     return dados
 
 
-def detectar_fase(texto):
-    """Detecta fase do empreendimento a partir do texto."""
+def detectar_fase(texto, soup=None):
+    """Detecta fase do empreendimento a partir do HTML e texto.
+
+    Estratégia:
+    1. Procura em elementos HTML de status (span.status, badges, etc.)
+    2. Procura no texto principal (<main>/<article>)
+    3. Fallback: texto completo com restrições
+
+    Ordem de prioridade:
+    breve lançamento > lançamento > em construção/obras > 100% vendido > pronto
+    """
+    FASES = [
+        (["breve lançamento", "breve lancamento", "futuro lançamento", "futuro lancamento"], "Breve Lançamento"),
+        (["lançamento", "lancamento"], "Lançamento"),
+        (["em obra", "em construção", "em construcao", "obras em andamento", "obra em andamento"], "Em Construção"),
+        (["100% vendido"], "100% Vendido"),
+        (["pronto para morar", "pronto para entregar", "imóvel pronto", "imovel pronto", "entregue", "entregues"], "Pronto"),
+    ]
+
+    def match_fase(t):
+        t = t.lower()
+        for keywords, fase in FASES:
+            for kw in keywords:
+                if kw in t:
+                    return fase
+        return None
+
+    # 1. Procurar em elementos HTML de status (mais confiável)
+    if soup:
+        for sel in ['span.status', '.status', '.badge', '.fase', '[class*="status"]', '[class*="fase"]', '[class*="estagio"]']:
+            for el in soup.select(sel):
+                fase = match_fase(el.get_text())
+                if fase:
+                    return fase
+
+    # 2. Texto do conteúdo principal (<main>/<article>)
+    if soup:
+        main_soup = soup.find('main') or soup.find('article') or soup.find(id='content') or soup.find(class_='content')
+        if main_soup:
+            fase = match_fase(main_soup.get_text(separator="\n", strip=True))
+            if fase:
+                return fase
+
+    # 3. Fallback: texto completo com restrições
+    #    - "breve lançamento"/"lançamento" aparecem em menus de todo site → só nos primeiros 500 chars
+    #    - "em obra/construção" é mais específico → aceitar no texto completo
+    #    - "vendido"/"entregue" sozinhos são genéricos → só nos 500 primeiros
     texto_lower = texto.lower()
-    if "100% vendido" in texto_lower or "vendido" in texto_lower[:500]:
-        return "100% Vendido"
-    if "pronto para morar" in texto_lower or "pronto para entregar" in texto_lower or "imóvel pronto" in texto_lower or "imovel pronto" in texto_lower:
-        return "Pronto"
-    if "entregue" in texto_lower[:500] or "entregues" in texto_lower[:500]:
-        return "Pronto"
-    if "em obra" in texto_lower or "em construção" in texto_lower or "em construcao" in texto_lower or "obras em andamento" in texto_lower:
-        return "Em Construção"
-    if "breve lançamento" in texto_lower or "breve lancamento" in texto_lower:
-        return "Breve Lançamento"
-    if "futuro lançamento" in texto_lower or "futuro lancamento" in texto_lower:
-        return "Futuro Lançamento"
-    if "lançamento" in texto_lower[:500] or "lancamento" in texto_lower[:500]:
-        return "Lançamento"
+    # Alta confiança: primeiros 500 chars
+    for keywords, fase in FASES:
+        for kw in keywords:
+            if kw in texto_lower[:500]:
+                return fase
+    # Média confiança: texto completo, apenas keywords específicos
+    for keywords, fase in FASES:
+        if fase in ("Breve Lançamento", "Lançamento"):
+            continue
+        for kw in keywords:
+            if kw in ("vendido", "entregue", "entregues"):
+                continue
+            if kw in texto_lower:
+                return fase
     return None
 
 
@@ -506,6 +1017,25 @@ def extrair_itens_lazer(soup, texto):
             itens.add(termo.title())
 
     return sorted(itens)
+
+
+def extrair_cidade_estado(texto, max_chars=3000):
+    """Extrai cidade e estado do texto em padroes como 'São Paulo/SP', 'Fortaleza - CE'.
+    Limita busca aos primeiros max_chars caracteres para evitar capturar dados do footer/sidebar."""
+    UFS_VALIDAS = {"AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA","PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO"}
+    texto_topo = texto[:max_chars]
+    # Padrao: "Cidade/UF" ou "Cidade - UF" ou "Cidade – UF"
+    for pattern in [
+        r"([A-ZÀ-Ú][a-zà-ú]+(?:[ \t]+(?:de|do|da|dos|das|e|[A-ZÀ-Ú][a-zà-ú]+))*)[ \t]*/[ \t]*([A-Z]{2})",
+        r"([A-ZÀ-Ú][a-zà-ú]+(?:[ \t]+(?:de|do|da|dos|das|e|[A-ZÀ-Ú][a-zà-ú]+))*)[ \t]*[-–][ \t]*([A-Z]{2})\b",
+    ]:
+        matches = re.findall(pattern, texto_topo)
+        for cidade, uf in matches:
+            cidade = cidade.strip()
+            uf = uf.strip()
+            if uf in UFS_VALIDAS and len(cidade) >= 3:
+                return (cidade, uf)
+    return None
 
 
 def extrair_bairro(texto, url):
