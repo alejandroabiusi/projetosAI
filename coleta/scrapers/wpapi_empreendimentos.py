@@ -78,12 +78,13 @@ EMPRESAS = {
         "api_endpoint": "https://vicengenharia.com.br/wp-json/wp/v2/empreendimentos",
         "post_type": "empreendimentos",
         "per_page": 50,
-        "estado_default": "SP",
+        "estado_default": "MG",
+        "extrair_localizacao_classes": True,  # cidade/estado via class_list
+        "endereco_sede": "Av. Álvares Cabral, 1777",  # ignorar este endereco (sede)
         "status_selectors": [
             '.status', '.badge', '[class*="status"]', '[class*="fase"]',
         ],
         "parsers": {
-            "endereco": {"pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
             "total_unidades": {"pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
             "dormitorios_descricao": {"pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
             "metragens_descricao": {"pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
@@ -324,6 +325,45 @@ def fetch_taxonomies(config, logger):
     return tax_map
 
 
+UFS_SLUG = {
+    "ac": "AC", "al": "AL", "am": "AM", "ap": "AP", "ba": "BA", "ce": "CE",
+    "df": "DF", "es": "ES", "go": "GO", "ma": "MA", "mg": "MG", "ms": "MS",
+    "mt": "MT", "pa": "PA", "pb": "PB", "pe": "PE", "pi": "PI", "pr": "PR",
+    "rj": "RJ", "rn": "RN", "ro": "RO", "rr": "RR", "rs": "RS", "sc": "SC",
+    "se": "SE", "sp": "SP", "to": "TO",
+}
+
+
+def extrair_localizacao_de_classes(class_list):
+    """
+    Extrai cidade e estado das classes CSS do post WP.
+    Classes tipo: localizacao-sp, localizacao-contagem, localizacao-jundiai
+    """
+    estado = None
+    cidades = []
+    for cls in class_list:
+        if not cls.startswith("localizacao-"):
+            continue
+        valor = cls.replace("localizacao-", "")
+        if valor in UFS_SLUG:
+            estado = UFS_SLUG[valor]
+        else:
+            # Converter slug para nome de cidade
+            cidade = valor.replace("-", " ").title()
+            # Correcoes de nomes compostos
+            cidade = (cidade
+                      .replace(" De ", " de ")
+                      .replace(" Do ", " do ")
+                      .replace(" Da ", " da ")
+                      .replace(" Dos ", " dos ")
+                      .replace(" Das ", " das ")
+                      .replace(" E ", " e "))
+            cidades.append(cidade)
+    # Retorna a primeira cidade encontrada (a mais especifica)
+    cidade = cidades[0] if cidades else None
+    return cidade, estado
+
+
 def coletar_posts_api(config, logger):
     """Coleta todos os posts via WP REST API com paginacao."""
     posts = []
@@ -487,6 +527,15 @@ def processar_empresa(empresa_key, atualizar=False):
             "data_coleta": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
 
+        # Extrair localizacao das classes CSS (VIC e similares)
+        if config.get("extrair_localizacao_classes"):
+            class_list = post.get("class_list", [])
+            cidade_cls, estado_cls = extrair_localizacao_de_classes(class_list)
+            if cidade_cls:
+                dados["cidade"] = cidade_cls
+            if estado_cls:
+                dados["estado"] = estado_cls
+
         # Map taxonomy terms
         if "cidade" in tax_map:
             cidade_ids = post.get("cidade", [])
@@ -513,6 +562,17 @@ def processar_empresa(empresa_key, atualizar=False):
         html = fetch_html(link, logger)
         if html:
             page_data = extrair_dados_pagina(html, link, config, logger)
+
+            # Filtrar endereco da sede (se configurado)
+            endereco_sede = config.get("endereco_sede")
+            if endereco_sede and page_data.get("endereco"):
+                if endereco_sede.lower() in page_data["endereco"].lower():
+                    logger.info(f"  Ignorando endereco da sede: {page_data['endereco']}")
+                    page_data.pop("endereco", None)
+                    # Coordenadas vindas dessa pagina provavelmente sao da sede tambem
+                    page_data.pop("latitude", None)
+                    page_data.pop("longitude", None)
+
             # Merge page_data into dados (page_data wins for non-None values)
             for k, v in page_data.items():
                 if v is not None:

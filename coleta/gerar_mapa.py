@@ -194,9 +194,10 @@ const cores = {cores_json};
 
 const map = L.map('map', {{ zoomControl: true }}).setView([-15.8, -47.9], 5);
 
-L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
-  attribution: '&copy; OpenStreetMap contributors',
-  maxZoom: 18
+L.tileLayer('https://{{s}}.basemaps.cartocdn.com/light_all/{{z}}/{{x}}/{{y}}@2x.png', {{
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+  maxZoom: 19,
+  subdomains: 'abcd'
 }}).addTo(map);
 
 const clusters = L.markerClusterGroup({{
