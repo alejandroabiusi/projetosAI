@@ -935,7 +935,7 @@ def detectar_fase(texto, soup=None):
         (["lançamento", "lancamento"], "Lançamento"),
         (["em obra", "em construção", "em construcao", "obras em andamento", "obra em andamento"], "Em Construção"),
         (["100% vendido"], "100% Vendido"),
-        (["pronto para morar", "pronto para entregar", "imóvel pronto", "imovel pronto", "entregue", "entregues"], "Pronto"),
+        (["pronto para morar", "pronto para entregar", "imóvel pronto", "imovel pronto", "pronto", "entregue", "entregues"], "Pronto"),
     ]
 
     def match_fase(t):
@@ -953,6 +953,15 @@ def detectar_fase(texto, soup=None):
                 fase = match_fase(el.get_text())
                 if fase:
                     return fase
+
+        # Links de taxonomia de status (ex: Magik JC /estagio_obra/pronto/)
+        # Ignora links dentro de nav/header/menu (que listam todas as fases)
+        for el in soup.select('a[href*="estagio_obra"], a[href*="estagio-obra"], a[href*="status-obra"]'):
+            if el.find_parent(['nav', 'header', 'ul', 'ol']):
+                continue
+            fase = match_fase(el.get_text())
+            if fase:
+                return fase
 
     # 2. Extrair do <title> (padrão "Nome | Status" usado por Conx e outros)
     if soup:
@@ -989,7 +998,7 @@ def detectar_fase(texto, soup=None):
         if fase in ("Breve Lançamento", "Lançamento"):
             continue
         for kw in keywords:
-            if kw in ("vendido", "entregue", "entregues"):
+            if kw in ("vendido", "entregue", "entregues", "pronto"):
                 continue
             if kw in texto_lower:
                 return fase
