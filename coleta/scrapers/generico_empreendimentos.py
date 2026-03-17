@@ -948,7 +948,7 @@ def detectar_fase(texto, soup=None):
 
     # 1. Procurar em elementos HTML de status (mais confiável)
     if soup:
-        for sel in ['span.status', '.status', '.badge', '.fase', '[class*="status"]', '[class*="fase"]', '[class*="estagio"]']:
+        for sel in ['span.status', '.status', '.badge', '.tag', '.fase', '[class*="status"]', '[class*="fase"]', '[class*="estagio"]']:
             for el in soup.select(sel):
                 fase = match_fase(el.get_text())
                 if fase:
