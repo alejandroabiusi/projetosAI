@@ -833,10 +833,16 @@ def extrair_dados_empreendimento(html, url, config, logger):
                 if sep in title_text:
                     partes = title_text.split(sep)
                     # Remove partes que contenham o nome da empresa
+                    _fases_title = ["breve lançamento", "breve lancamento", "futuro lançamento",
+                                     "futuro lancamento", "lançamento", "lancamento",
+                                     "em obra", "em obras", "em construção", "em construcao",
+                                     "pronto para morar", "pronto para entregar",
+                                     "imóvel pronto", "imovel pronto", "100% vendido"]
                     partes_validas = [p.strip() for p in partes if nome_empresa not in p.strip().lower()
                                       and "incorporadora" not in p.strip().lower()
                                       and "construtora" not in p.strip().lower()
-                                      and "engenharia" not in p.strip().lower()]
+                                      and "engenharia" not in p.strip().lower()
+                                      and not any(f in p.strip().lower() for f in _fases_title)]
                     if partes_validas:
                         title_text = (sep).join(partes_validas).strip()
                     else:
@@ -948,7 +954,19 @@ def detectar_fase(texto, soup=None):
                 if fase:
                     return fase
 
-    # 2. Texto do conteúdo principal (<main>/<article>)
+    # 2. Extrair do <title> (padrão "Nome | Status" usado por Conx e outros)
+    if soup:
+        title_tag = soup.find('title')
+        if title_tag:
+            title_text = title_tag.get_text()
+            if '|' in title_text:
+                # Pega a parte depois do último "|" (geralmente o status)
+                title_part = title_text.rsplit('|', 1)[-1].strip()
+                fase = match_fase(title_part)
+                if fase:
+                    return fase
+
+    # 3. Texto do conteúdo principal (<main>/<article>)
     if soup:
         main_soup = soup.find('main') or soup.find('article') or soup.find(id='content') or soup.find(class_='content')
         if main_soup:
@@ -956,7 +974,7 @@ def detectar_fase(texto, soup=None):
             if fase:
                 return fase
 
-    # 3. Fallback: texto completo com restrições
+    # 4. Fallback: texto completo com restrições
     #    - "breve lançamento"/"lançamento" aparecem em menus de todo site → só nos primeiros 500 chars
     #    - "em obra/construção" é mais específico → aceitar no texto completo
     #    - "vendido"/"entregue" sozinhos são genéricos → só nos 500 primeiros
