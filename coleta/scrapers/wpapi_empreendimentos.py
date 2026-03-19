@@ -214,9 +214,11 @@ def extrair_cidade_estado(texto, max_chars=3000):
 def detectar_fase(texto, soup=None):
     """Detecta fase do empreendimento."""
     FASES = [
-        (["breve lançamento", "breve lancamento", "futuro lançamento", "futuro lancamento"], "Breve Lançamento"),
+        (["breve lançamento", "breve lancamento", "futuros lançamentos", "futuros lancamentos", "futuro lançamento", "futuro lancamento"], "Breve Lançamento"),
         (["lançamento", "lancamento"], "Lançamento"),
-        (["em obra", "em construção", "em construcao", "obras em andamento", "obra em andamento"], "Em Construção"),
+        (["em obra", "em construção", "em construcao",
+          "obras em andamento", "obra em andamento", "obras iniciadas", "obra iniciada",
+          "obras em finalização", "obras em finalizacao"], "Em Construção"),
         (["100% vendido"], "100% Vendido"),
         (["pronto para morar", "pronto para entregar", "imóvel pronto", "imovel pronto", "entregue", "entregues"], "Pronto"),
     ]

@@ -252,11 +252,18 @@ def processar_item(item, estado_slug):
     preco = extrair_preco(preco_str)
 
     # URL da pagina do empreendimento
-    # O _path retorna algo como /content/dam/mrv/.../slug
-    # A URL publica segue o padrao mrv.com.br/{estado}/{slug-final}
+    # _path: /content/dam/mrv/.../bahia/apartamentos/camacari/slug/slug
+    # URL:   https://mrv.com.br/imoveis/bahia/camacari/apartamentos-slug
     path_parts = slug.strip("/").split("/") if slug else []
     slug_final = path_parts[-1] if path_parts else ""
-    url_fonte = f"https://mrv.com.br/{estado_slug}/{slug_final}" if slug_final else "https://mrv.com.br"
+    if len(path_parts) >= 4:
+        p_estado = path_parts[-4].lower()   # bahia
+        p_tipo = path_parts[-3].lower()     # apartamentos
+        p_cidade = path_parts[-2].lower()   # camacari
+        p_slug = path_parts[-1].lower()     # solar-das-amendoeiras
+        url_fonte = f"https://mrv.com.br/imoveis/{p_estado}/{p_cidade}/{p_tipo}-{p_slug}"
+    else:
+        url_fonte = f"https://mrv.com.br/{estado_slug}/{slug_final}" if slug_final else "https://mrv.com.br"
 
     # Selos e promocoes para texto de atributos
     # A API pode retornar selos como lista de strings ou lista de dicts

@@ -234,6 +234,7 @@ EMPRESAS = {
     "novolar": {
         "nome_banco": "Novolar",
         "base_url": "https://www.novolar.com.br",
+        "fase_selector": "div.selos",
         "urls_listagem": [
             "https://www.novolar.com.br/",
             "https://www.novolar.com.br/imoveis/",
@@ -864,8 +865,28 @@ def extrair_dados_empreendimento(html, url, config, logger):
         slug = dados.get("slug", "")
         dados["nome"] = slug.replace("-", " ").replace("_", " ").title()
 
-    # Extrair fase/status a partir do HTML (com fallback para texto)
-    fase = detectar_fase(texto_completo, soup)
+    # Extrair fase/status — primeiro via seletor específico da config, depois genérico
+    fase = None
+    fase_sel = config.get("fase_selector") if config else None
+    if fase_sel and soup:
+        el = soup.select_one(fase_sel)
+        if el:
+            t = el.get_text(strip=True).lower()
+            # Match direto no texto curto do selo (inclui "pronto" isolado)
+            fase_map = {
+                "breve lançamento": "Breve Lançamento", "breve lancamento": "Breve Lançamento",
+                "lançamento": "Lançamento", "lancamento": "Lançamento",
+                "em obra": "Em Construção", "em construção": "Em Construção", "em construcao": "Em Construção",
+                "obras iniciadas": "Em Construção", "obras em finalização": "Em Construção",
+                "100% vendido": "100% Vendido",
+                "pronto para morar": "Pronto", "pronto": "Pronto", "entregue": "Pronto",
+            }
+            for kw, val in fase_map.items():
+                if kw in t:
+                    fase = val
+                    break
+    if not fase:
+        fase = detectar_fase(texto_completo, soup)
     if fase:
         dados["fase"] = fase
 
@@ -931,9 +952,11 @@ def detectar_fase(texto, soup=None):
     breve lançamento > lançamento > em construção/obras > 100% vendido > pronto
     """
     FASES = [
-        (["breve lançamento", "breve lancamento", "futuro lançamento", "futuro lancamento"], "Breve Lançamento"),
+        (["breve lançamento", "breve lancamento", "futuros lançamentos", "futuros lancamentos", "futuro lançamento", "futuro lancamento"], "Breve Lançamento"),
         (["lançamento", "lancamento"], "Lançamento"),
-        (["em obra", "em construção", "em construcao", "obras em andamento", "obra em andamento"], "Em Construção"),
+        (["em obra", "em construção", "em construcao",
+          "obras em andamento", "obra em andamento", "obras iniciadas", "obra iniciada",
+          "obras em finalização", "obras em finalizacao", "obra em finalização", "obra em finalizacao"], "Em Construção"),
         (["100% vendido"], "100% Vendido"),
         (["pronto para morar", "pronto para entregar", "imóvel pronto", "imovel pronto", "pronto", "entregue", "entregues"], "Pronto"),
     ]
@@ -946,10 +969,47 @@ def detectar_fase(texto, soup=None):
                     return fase
         return None
 
-    # 1. Procurar em elementos HTML de status (mais confiável)
+    # 0. H2 subtitle (Smart e similares): h2 do nome tem sibling com fase
+    #    Ex: h2="Smart Vila Augusta" → sibling="Breve Lançamento em Guarulhos | 389 unidades"
+    #    Também: h2="Status da obra" indica Em Construção
+    if soup:
+        for h2 in soup.find_all('h2'):
+            h2_text = h2.get_text(strip=True).lower()
+            # h2 "Status da obra" = empreendimento em construção
+            if 'status da obra' in h2_text:
+                return "Em Construção"
+            # Pular h2 de seções genéricas
+            if any(skip in h2_text for skip in ['conheça outros', 'outros imóveis', 'outros imoveis', 'relacionados']):
+                continue
+            # Checar subtitle (sibling do h2)
+            nxt = h2.find_next_sibling()
+            if nxt:
+                sub = nxt.get_text(strip=True)
+                if sub:
+                    fase = match_fase(sub)
+                    if fase:
+                        return fase
+
+    # 1a. Taxonomia WordPress via classes CSS (ex: progresso-da-obra-em-construcao)
+    if soup:
+        # Procurar elemento com classe de taxonomia WP de progresso/estagio
+        tax_el = soup.find(class_=re.compile(r'progresso[-_]', re.I))
+        if not tax_el:
+            tax_el = soup.find(class_=re.compile(r'estagio[-_](?!obra)', re.I))
+        if tax_el:
+            classes_str = " ".join(tax_el.get("class", []))
+            fase = match_fase(classes_str.replace("-", " "))
+            if fase:
+                return fase
+
+    # 1b. Procurar em elementos HTML de status (badges, tags)
+    #     Ignora elementos dentro de cards de listagem (outros empreendimentos)
     if soup:
         for sel in ['span.status', '.status', '.badge', '.tag', '.fase', '[class*="status"]', '[class*="fase"]', '[class*="estagio"]']:
             for el in soup.select(sel):
+                # Pular se está dentro de card/listagem de outros empreendimentos
+                if el.find_parent(class_=re.compile(r'card|listing|grid|carousel|slider|swiper|related|outros', re.I)):
+                    continue
                 fase = match_fase(el.get_text())
                 if fase:
                     return fase
@@ -983,25 +1043,32 @@ def detectar_fase(texto, soup=None):
             if fase:
                 return fase
 
-    # 4. Fallback: texto completo com restrições
-    #    - "breve lançamento"/"lançamento" aparecem em menus de todo site → só nos primeiros 500 chars
-    #    - "em obra/construção" é mais específico → aceitar no texto completo
-    #    - "vendido"/"entregue" sozinhos são genéricos → só nos 500 primeiros
+    # 4. Fallback: texto com prioridade invertida
+    #    "lançamento" é genérico demais (aparece em menus, links, outros imóveis)
+    #    Priorizar fases específicas antes de cair em "lançamento"
     texto_lower = texto.lower()
-    # Alta confiança: primeiros 500 chars
-    for keywords, fase in FASES:
-        for kw in keywords:
-            if kw in texto_lower[:500]:
-                return fase
-    # Média confiança: texto completo, apenas keywords específicos
+    texto_500 = texto_lower[:500]
+
+    # 4a. Fases específicas no texto completo (alta confiança)
     for keywords, fase in FASES:
         if fase in ("Breve Lançamento", "Lançamento"):
             continue
         for kw in keywords:
-            if kw in ("vendido", "entregue", "entregues", "pronto"):
+            if kw in ("pronto",):  # "pronto" sozinho é genérico
                 continue
             if kw in texto_lower:
                 return fase
+
+    # 4b. "breve lançamento" nos primeiros 500 chars (evita pegar de menus)
+    for kw in FASES[0][0]:  # keywords de Breve Lançamento
+        if kw in texto_500:
+            return "Breve Lançamento"
+
+    # 4c. "lançamento" nos primeiros 500 chars (baixa confiança)
+    for kw in FASES[1][0]:  # keywords de Lançamento
+        if kw in texto_500:
+            return "Lançamento"
+
     return None
 
 

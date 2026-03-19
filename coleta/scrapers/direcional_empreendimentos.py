@@ -128,30 +128,61 @@ def extrair_dados_empreendimento(html, url):
         nome = re.sub(r'\s+', ' ', nome).strip()
         dados["nome"] = nome
 
-    # Fase/Status - procurar badges, tags ou texto
+    # Fase/Status — timeline de status da Direcional
+    # O site renderiza timeline via JS com imagens lazy-loaded:
+    #   complete_*.png        → fase concluída
+    #   complete-lancamento_* → fase ATUAL (ativa)
+    #   in-progress_*         → fase futura
+    # A imagem fica em div.col-auto e o texto da fase no sibling seguinte.
     fase = None
-    # Procurar em spans com classes de status
-    for tag in soup.find_all(["span", "div", "p"], class_=re.compile(r"status|fase|tag|badge|label", re.I)):
-        texto = tag.get_text(strip=True).lower()
-        if any(f in texto for f in ["lançamento", "lancamento", "breve", "pronto", "obra", "entregue"]):
-            fase = tag.get_text(strip=True)
+
+    # 1. Procurar img com data-src ou src contendo "complete-lancamento"
+    for img in soup.find_all("img", attrs={"data-src": re.compile(r"complete.lancamento")}):
+        parent = img.parent
+        if parent:
+            for sib in parent.find_next_siblings():
+                t = sib.get_text(strip=True)
+                if t:
+                    fase = t
+                    break
+        if fase:
             break
-
+    # Fallback: buscar no src também
     if not fase:
-        # Procurar no breadcrumb ou texto geral
-        texto_lower = texto_completo.lower()
-        if "pronto para morar" in texto_lower or "imóvel pronto" in texto_lower:
-            fase = "Pronto"
-        elif "em obra" in texto_lower or "em construção" in texto_lower:
-            fase = "Em Construção"
-        elif "breve lançamento" in texto_lower or "breve lancamento" in texto_lower:
-            fase = "Breve Lançamento"
-        elif "futuro lançamento" in texto_lower or "futuro lancamento" in texto_lower:
-            fase = "Futuro Lançamento"
-        elif "lançamento" in texto_lower[:1000] or "lancamento" in texto_lower[:1000]:
-            fase = "Lançamento"
+        for img in soup.find_all("img", src=re.compile(r"complete.lancamento")):
+            parent = img.parent
+            if parent and parent.name != "noscript":
+                for sib in parent.find_next_siblings():
+                    t = sib.get_text(strip=True)
+                    if t:
+                        fase = t
+                        break
+            if fase:
+                break
 
+    # 2. Badges/tags genéricos
+    if not fase:
+        for tag in soup.find_all(["span", "div", "p"], class_=re.compile(r"status|fase|tag|badge|label", re.I)):
+            texto = tag.get_text(strip=True).lower()
+            if any(f in texto for f in ["lançamento", "lancamento", "breve", "pronto", "obra", "entregue"]):
+                fase = tag.get_text(strip=True)
+                break
+
+    # Normalizar
     if fase:
+        fase_lower = fase.lower()
+        if "pronto" in fase_lower:
+            fase = "Pronto"
+        elif "obras avançadas" in fase_lower or "obras avancadas" in fase_lower:
+            fase = "Em Construção"
+        elif "em obra" in fase_lower or "em construção" in fase_lower or "em construcao" in fase_lower:
+            fase = "Em Construção"
+        elif "breve" in fase_lower and "lançamento" in fase_lower:
+            fase = "Breve Lançamento"
+        elif "futuro" in fase_lower and "lançamento" in fase_lower:
+            fase = "Breve Lançamento"
+        elif "lançamento" in fase_lower or "lancamento" in fase_lower:
+            fase = "Lançamento"
         dados["fase"] = fase
 
     # Endereco - procurar padroes como "Rua/Av/Alameda... - Bairro, Cidade - UF"

@@ -14,15 +14,17 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 # Prefixo do KML -> nome amigável da região
 REGIOES = {
     "SP": "São Paulo",
+    "RMSP": "RM de São Paulo",
     "RJ": "Rio de Janeiro",
-    "BH": "Belo Horizonte",
-    "CWB": "Curitiba",
-    "POA": "Porto Alegre",
-    "BSB": "Brasília",
-    "SAL": "Salvador",
-    "REC": "Recife",
-    "FOR": "Fortaleza",
-    "CAM": "Campinas",
+    "MG": "Minas Gerais",
+    "PR": "Paraná",
+    "RS": "Rio Grande do Sul",
+    "BA": "Bahia",
+    "PE": "Pernambuco",
+    "CE": "Ceará",
+    "GO": "Goiás",
+    "JP": "João Pessoa",
+    "CPS": "Campinas",
 }
 
 CORES = {
@@ -55,11 +57,14 @@ def _extrair_prefixo_regiao(filename):
     """Extrai prefixo da região do nome do arquivo KML.
 
     'Clusteres MPR SP.kml' -> 'SP'
-    'Clusteres MPR RJ.kml' -> 'RJ'
+    'MPR_-_BA.kml' -> 'BA'
     """
     base = os.path.splitext(os.path.basename(filename))[0]
-    # Pega a última palavra como prefixo da região
-    parts = base.split()
+    # Formato novo: MPR_-_XX → split por '_' e pega ultimo
+    # Formato antigo: Clusteres MPR SP → split por espaço e pega ultimo
+    parts = re.split(r'[\s_]+', base)
+    # Filtra partes vazias e hifens soltos
+    parts = [p for p in parts if p and p != '-']
     return parts[-1].upper() if parts else "X"
 
 
@@ -89,6 +94,11 @@ def _parse_single_kml(kml_path, prefix):
 
     clusters = []
     for idx, pm in enumerate(root.findall('.//kml:Placemark', ns), 1):
+        # Extrair número do nome original (ex: "Cluster 3" → 3)
+        pm_name = pm.find('kml:name', ns).text or ''
+        num_match = re.search(r'\d+', pm_name)
+        num = int(num_match.group()) if num_match else idx
+
         style_ref = pm.find('kml:styleUrl', ns).text.lstrip('#')
         normal_id = stylemap_to_normal.get(style_ref, style_ref)
         color = style_colors.get(normal_id, '#ff0000')
@@ -104,7 +114,7 @@ def _parse_single_kml(kml_path, prefix):
             polygons.append(ring)
 
         clusters.append({
-            'name': f'{prefix}{idx}',
+            'name': f'{prefix}{num}',
             'region': prefix,
             'color': color,
             'polygons': polygons,
@@ -282,6 +292,23 @@ def main():
   .filter-panel label:hover {{ color: #2980b9; }}
   .toggle-all {{ cursor: pointer; color: #2980b9; font-size: 11px; margin: 2px 0 4px; display: inline-block; }}
   .toggle-all:hover {{ text-decoration: underline; }}
+  .section-header {{
+    display: flex; align-items: center; cursor: pointer; margin: 2px 0;
+    font-weight: 600; font-size: 12px; color: #2c3e50;
+  }}
+  .section-header:hover {{ color: #2980b9; }}
+  .section-arrow {{
+    display: inline-block; font-size: 9px; margin-right: 5px; transition: transform 0.15s;
+  }}
+  .section-arrow.open {{ transform: rotate(90deg); }}
+  .section-body {{ display: none; margin-left: 2px; }}
+  .section-body.open {{ display: block; }}
+  .cluster-toggle {{
+    display: flex; align-items: center; gap: 6px; margin-bottom: 4px; cursor: pointer;
+  }}
+  .cluster-toggle input {{ margin: 0; }}
+  .cluster-toggle-label {{ font-weight: 600; font-size: 12px; color: #2c3e50; }}
+  #cluster-details {{ display: none; }}
   .popup-title {{ font-weight: bold; font-size: 14px; color: #2c3e50; margin-bottom: 4px; }}
   .popup-empresa {{ display: inline-block; padding: 2px 8px; border-radius: 10px; color: white; font-size: 11px; margin-bottom: 4px; }}
   .popup-info {{ color: #555; font-size: 12px; }}
@@ -301,16 +328,24 @@ def main():
   .summary-table tr:last-child td {{ border-top: 1px solid #ccc; font-weight: 700; }}
   .summary-dot {{ display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }}
   .region-header {{
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center;
     margin: 4px 0 2px; cursor: pointer; font-weight: 600; font-size: 12px; color: #2c3e50;
   }}
   .region-header:hover {{ color: #2980b9; }}
+  .region-name {{ flex: 1; text-align: left; }}
+  .region-arrow {{
+    display: inline-block; font-size: 9px; margin-right: 4px; transition: transform 0.15s;
+  }}
+  .region-arrow.open {{ transform: rotate(90deg); }}
+  .region-btns {{ display: flex; gap: 4px; flex-shrink: 0; }}
   .region-zoom {{
-    font-size: 10px; font-weight: normal; color: #3498db; margin-left: 6px;
+    font-size: 10px; font-weight: normal; color: #3498db;
     padding: 1px 6px; border: 1px solid #3498db; border-radius: 3px;
+    width: 40px; text-align: center;
   }}
   .region-zoom:hover {{ background: #3498db; color: white; }}
-  .region-clusters {{ margin-left: 4px; }}
+  .region-clusters {{ margin-left: 16px; display: none; }}
+  .region-clusters.open {{ display: block; }}
 </style>
 </head>
 <body>
@@ -321,16 +356,29 @@ def main():
 </div>
 
 <div class="filter-panel" id="filters">
-  <div id="filter-clusters" style="display:none">
-    <strong>Cluster MPR:</strong><br>
-    <div id="cluster-checkboxes"></div>
-    <hr style="margin:6px 0;border:none;border-top:1px solid #ddd">
+  <div class="section-header" onclick="toggleSection('status-section','status-arrow')">
+    <span class="section-arrow" id="status-arrow">&#9654;</span> Status
   </div>
-  <strong>Status:</strong><br>
-  <div id="filter-status"></div>
+  <div class="section-body" id="status-section">
+    <div id="filter-status"></div>
+  </div>
   <hr style="margin:6px 0;border:none;border-top:1px solid #ddd">
-  <strong>Empresa:</strong><br>
-  <div id="filter-empresa"></div>
+  <div class="section-header" onclick="toggleSection('empresa-section','empresa-arrow')">
+    <span class="section-arrow" id="empresa-arrow">&#9654;</span> Empresa
+  </div>
+  <div class="section-body" id="empresa-section">
+    <div id="filter-empresa"></div>
+  </div>
+  <div id="filter-clusters" style="display:none">
+    <hr style="margin:6px 0;border:none;border-top:1px solid #ddd">
+    <label class="cluster-toggle">
+      <input type="checkbox" id="cluster-master-toggle">
+      <span class="cluster-toggle-label">Filtrar por Cluster MPR</span>
+    </label>
+    <div id="cluster-details">
+      <div id="cluster-checkboxes"></div>
+    </div>
+  </div>
 </div>
 
 <div class="summary-panel" id="summary">
@@ -341,6 +389,13 @@ def main():
 <div id="map"></div>
 
 <script>
+function toggleSection(bodyId, arrowId) {{
+  const body = document.getElementById(bodyId);
+  const arrow = document.getElementById(arrowId);
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}}
+
 const pontos = {points_json};
 const cores = {cores_json};
 const mprClusters = {clusters_json};
@@ -393,7 +448,6 @@ pontos.forEach(p => {{
   if (p.cl) info += ' <span style="font-size:11px;color:#666;font-weight:600">' + p.cl + '</span>';
   info += '<br><span class="popup-info">' + p.c + (p.uf ? '/' + p.uf : '') + '</span>';
   if (p.f && p.f !== 'Sem info') info += '<br><span class="popup-info">' + p.f + '</span>';
-  if (p.p) info += '<br><span class="popup-info">A partir de R$ ' + fmt(p.p) + '</span>';
   if (p.un) info += '<br><span class="popup-info">' + p.un + ' unidades</span>';
   if (p.dl) info += '<br><span class="popup-info">Lanc.: ' + p.dl + '</span>';
   if (p.end) info += '<br><span class="popup-info" style="font-size:11px;color:#888">' + p.end + '</span>';
@@ -452,9 +506,10 @@ pontos.forEach(p => {{
 const empCheckboxes = {{}};
 const stCheckboxes = {{}};
 const clCheckboxes = {{}};
+let clusterFilterEnabled = false;
 
 function markerVisible(m) {{
-  return activeEmpresas.has(m._empresa) && activeStatus.has(m._status) && activeClusters.has(m._cluster);
+  return activeEmpresas.has(m._empresa) && activeStatus.has(m._status) && (!clusterFilterEnabled || activeClusters.has(m._cluster));
 }}
 
 function applyFilters() {{
@@ -466,16 +521,16 @@ function applyFilters() {{
 }}
 
 function updateCrossFilters() {{
-  // Empresa availability: needs at least one active status AND one active cluster
+  // Empresa availability: needs at least one active status AND (cluster filter off OR one active cluster)
   Object.entries(empCheckboxes).forEach(([emp, obj]) => {{
     const hasStatus = statusByEmp[emp] && [...statusByEmp[emp]].some(s => activeStatus.has(s));
-    const hasCluster = clusterByEmp[emp] && [...clusterByEmp[emp]].some(c => activeClusters.has(c));
+    const hasCluster = !clusterFilterEnabled || (clusterByEmp[emp] && [...clusterByEmp[emp]].some(c => activeClusters.has(c)));
     const avail = hasStatus && hasCluster;
     obj.label.style.opacity = avail ? '1' : '0.35';
     obj.cb.disabled = !avail;
     let cnt = 0;
     allMarkers.forEach(m => {{
-      if (m._empresa === emp && activeStatus.has(m._status) && activeClusters.has(m._cluster)) cnt++;
+      if (m._empresa === emp && activeStatus.has(m._status) && (!clusterFilterEnabled || activeClusters.has(m._cluster))) cnt++;
     }});
     obj.countSpan.textContent = ' ' + emp + ' (' + cnt + ')';
   }});
@@ -483,18 +538,18 @@ function updateCrossFilters() {{
   // Status availability
   Object.entries(stCheckboxes).forEach(([st, obj]) => {{
     const hasEmp = empByStatus[st] && [...empByStatus[st]].some(e => activeEmpresas.has(e));
-    const hasCluster = clusterByStatus[st] && [...clusterByStatus[st]].some(c => activeClusters.has(c));
+    const hasCluster = !clusterFilterEnabled || (clusterByStatus[st] && [...clusterByStatus[st]].some(c => activeClusters.has(c)));
     const avail = hasEmp && hasCluster;
     obj.label.style.opacity = avail ? '1' : '0.35';
     obj.cb.disabled = !avail;
     let cnt = 0;
     allMarkers.forEach(m => {{
-      if (m._status === st && activeEmpresas.has(m._empresa) && activeClusters.has(m._cluster)) cnt++;
+      if (m._status === st && activeEmpresas.has(m._empresa) && (!clusterFilterEnabled || activeClusters.has(m._cluster))) cnt++;
     }});
     obj.countSpan.textContent = ' ' + st + ' (' + cnt + ')';
   }});
 
-  // Cluster availability
+  // Cluster availability (only when filter is enabled)
   Object.entries(clCheckboxes).forEach(([cl, obj]) => {{
     const hasEmp = empByCluster[cl] && [...empByCluster[cl]].some(e => activeEmpresas.has(e));
     const hasStatus = statusByCluster[cl] && [...statusByCluster[cl]].some(s => activeStatus.has(s));
@@ -556,9 +611,42 @@ if (mprClusters.length > 0) {{
     const header = document.createElement('div');
     header.className = 'region-header';
 
+    const arrow = document.createElement('span');
+    arrow.className = 'region-arrow';
+    arrow.textContent = '\u25B6';
+    header.appendChild(arrow);
+
     const headerLeft = document.createElement('span');
+    headerLeft.className = 'region-name';
     headerLeft.textContent = regionLabel;
     header.appendChild(headerLeft);
+
+    const btns = document.createElement('span');
+    btns.className = 'region-btns';
+
+    // Botão toggle all (marcar/desmarcar todos da região)
+    const toggleBtn = document.createElement('span');
+    toggleBtn.className = 'region-zoom';
+    toggleBtn.textContent = 'todos';
+    toggleBtn._allChecked = true;
+    toggleBtn.addEventListener('click', (e) => {{
+      e.stopPropagation();
+      toggleBtn._allChecked = !toggleBtn._allChecked;
+      const checked = toggleBtn._allChecked;
+      clustersByRegion[region].forEach(cl => {{
+        const obj = clCheckboxes[cl];
+        if (obj && !obj.cb.disabled) {{
+          obj.cb.checked = checked;
+          if (checked) {{ activeClusters.add(cl); }} else {{ activeClusters.delete(cl); }}
+        }}
+        const lg = clusterLayerGroups[cl];
+        if (lg) {{
+          if (checked) {{ lg.addTo(map); }} else {{ map.removeLayer(lg); }}
+        }}
+      }});
+      applyFilters();
+    }});
+    btns.appendChild(toggleBtn);
 
     const zoomBtn = document.createElement('span');
     zoomBtn.className = 'region-zoom';
@@ -568,11 +656,19 @@ if (mprClusters.length > 0) {{
       const rb = regionBounds[region];
       if (rb) map.fitBounds(rb, {{ padding: [40, 40] }});
     }});
-    header.appendChild(zoomBtn);
-    fpCl.appendChild(header);
+    btns.appendChild(zoomBtn);
+    header.appendChild(btns);
 
     const container = document.createElement('div');
     container.className = 'region-clusters';
+
+    // Clicar no header expande/recolhe
+    header.addEventListener('click', () => {{
+      const isOpen = container.classList.toggle('open');
+      arrow.classList.toggle('open', isOpen);
+    }});
+
+    fpCl.appendChild(header);
 
     clustersByRegion[region].forEach(cl => {{
       const label = document.createElement('label');
@@ -621,7 +717,7 @@ if (mprClusters.length > 0) {{
     clCheckboxes[SEM_CLUSTER] = {{ cb, label, countSpan }};
   }}
 
-  // Polygon overlays on the map
+  // Polygon overlays on the map (start hidden — cluster filter off by default)
   const clusterLayerGroups = {{}};
   mprClusters.forEach(cl => {{
     const layerGroup = L.layerGroup();
@@ -635,7 +731,7 @@ if (mprClusters.length > 0) {{
         interactive: false
       }}).addTo(layerGroup);
     }});
-    layerGroup.addTo(map);
+    // Não adiciona ao mapa ainda (filtro começa desligado)
     clusterLayerGroups[cl.name] = layerGroup;
   }});
 
@@ -643,11 +739,34 @@ if (mprClusters.length > 0) {{
   Object.entries(clCheckboxes).forEach(([cl, obj]) => {{
     if (cl === SEM_CLUSTER) return;
     obj.cb.addEventListener('change', () => {{
+      if (!clusterFilterEnabled) return;
       const lg = clusterLayerGroups[cl];
       if (lg) {{
         if (obj.cb.checked) {{ lg.addTo(map); }} else {{ map.removeLayer(lg); }}
       }}
     }});
+  }});
+
+  // Master toggle: habilita/desabilita filtro por cluster
+  const masterToggle = document.getElementById('cluster-master-toggle');
+  const clusterDetails = document.getElementById('cluster-details');
+  masterToggle.addEventListener('change', () => {{
+    clusterFilterEnabled = masterToggle.checked;
+    clusterDetails.style.display = clusterFilterEnabled ? 'block' : 'none';
+    if (clusterFilterEnabled) {{
+      // Mostrar polígonos dos clusters marcados
+      Object.entries(clCheckboxes).forEach(([cl, obj]) => {{
+        if (cl === SEM_CLUSTER) return;
+        const lg = clusterLayerGroups[cl];
+        if (lg) {{
+          if (obj.cb.checked) {{ lg.addTo(map); }} else {{ map.removeLayer(lg); }}
+        }}
+      }});
+    }} else {{
+      // Esconder todos os polígonos
+      Object.values(clusterLayerGroups).forEach(lg => map.removeLayer(lg));
+    }}
+    applyFilters();
   }});
 }}
 
