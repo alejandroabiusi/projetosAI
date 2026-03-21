@@ -14,6 +14,16 @@ Coletar dados de empreendimentos imobiliários de 22+ incorporadoras brasileiras
 - **`changelog`** — cada mudança detectada (empresa, nome, tipo, campo, valor_anterior, valor_novo)
 - Tipos de mudança: `novo`, `fase_mudou`, `preco_mudou`, `campo_mudou`
 - Campos rastreados: fase, preco_a_partir, total_unidades, evolucao_obra_pct, dormitorios_descricao, area_min_m2, area_max_m2
+- **`reconciliacao`** — rastreamento de URLs que sumiram do sitemap (Direcional)
+- Tipos: `renomeado` (URL redirecionou), `relancado` (novo produto nas mesmas coordenadas <200m), `cancelado` (sem substituto)
+- Colunas: nome_anterior, nome_novo, url_anterior, url_nova, fase_anterior, fase_nova, distancia_metros, observacao
+
+### Banco de movimentações: `data/movimentacoes.db` (separado)
+- **`movimentacoes`** — histórico completo do ciclo de vida de cada produto
+- Tipos: `novo`, `removido`, `fase_mudou`, `preco_mudou`, `campo_mudou`, `renomeado`, `relancado`, `cancelado`
+- Colunas: data, empresa, nome, url_fonte, tipo, campo, valor_anterior, valor_novo, observacao, origem
+- Alimentado automaticamente por `inserir_empreendimento()`, `registrar_mudanca()` e `registrar_reconciliacao()`
+- Módulo: `data/movimentacoes.py` — funções: `registrar_movimentacao()`, `consultar_movimentacoes()`, `resumo_movimentacoes()`, `historico_empreendimento()`
 
 ## Arquitetura dos Scrapers
 
@@ -22,11 +32,12 @@ Coletar dados de empreendimentos imobiliários de 22+ incorporadoras brasileiras
 - `mrv_detalhes.py` — MRV detalhes por empreendimento
 - `cury_empreendimentos.py` — Cury via API GraphQL interna
 - `vivaz_empreendimentos.py` — Vivaz via API REST (`/imovel/informacoes/`)
-- `direcional_empreendimentos.py` — Direcional via requests + BeautifulSoup
+- `direcional_empreendimentos.py` — Direcional via requests + BeautifulSoup (dedup por url_fonte, reconciliação de URLs órfãs)
 - `planoeplano_empreendimentos.py` — Plano&Plano via requests (páginas SSR)
 - `metrocasa_empreendimentos.py` — Metrocasa via Next.js API (`/api/properties`)
 - `vivabenx_empreendimentos.py` — Viva Benx via sitemap XML + BeautifulSoup (empreendimentos MCMV em SP)
 - `generico_empreendimentos.py` — Scraper genérico para: Pacaembu, Conx, Vibra, Magik JC, Kazzas, Mundo Apto, Novvo, Novolar, Emccamp, SUGOI, Árbore, Ampla, M.Lar, EPH, Ún1ca
+- `verificar_status.py` — Verificação de status de ~2017 URLs existentes: re-detecta fases, reconcilia URLs mortas (redirect → nome → localização → marca "Removido"). Batch para MRV/Vivaz (API), Direcional/VivaBenx (sitemap), individual para genéricos. Flag `--sem-selenium` pula Cury/Metrocasa. Resumível via JSON de progresso.
 
 ### Problema conhecido (root cause corrigido parcialmente)
 - `generico_empreendimentos.py` linha 331 hardcodava `cidade="São Paulo"` para TODAS as empresas genéricas
@@ -50,7 +61,7 @@ Coletar dados de empreendimentos imobiliários de 22+ incorporadoras brasileiras
 Substitui `run_coleta.py` para uso recorrente. **NÃO apaga o banco**. Fluxo:
 1. Backup do banco atual (`data/backups/`)
 2. Snapshot do estado atual (empresa+nome → campos rastreados)
-3. Roda todos os 9 scrapers (com timeout de 30min cada, retry 1x se falhar)
+3. Roda todos os 9 scrapers + verificação de status (com timeout de 30min cada, retry 1x se falhar)
 4. Roda enriquecimento (enriquecer_dados, enriquecer_unidades, corrigir_nomes, validar_coordenadas)
 5. Snapshot novo → compara → popula `changelog`
 6. Gera mapa atualizado
@@ -144,6 +155,13 @@ python run_coleta.py
 # === Atualização recorrente (mantém banco, detecta mudanças) ===
 python run_atualizacao.py
 python run_atualizacao.py --sem-email --sem-mapa  # teste rápido
+
+# === Verificação de status (URLs existentes) ===
+python scrapers/verificar_status.py                     # Verificar tudo
+python scrapers/verificar_status.py --empresa MRV       # Só uma empresa
+python scrapers/verificar_status.py --sem-selenium      # Pular Cury/Metrocasa
+python scrapers/verificar_status.py --dry-run            # Só verificar, não atualizar
+python scrapers/verificar_status.py --limite 5           # Max 5 por empresa (teste)
 
 # === Enriquecimento manual ===
 python enriquecer_dados.py

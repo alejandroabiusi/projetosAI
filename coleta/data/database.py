@@ -20,6 +20,7 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.settings import DATA_DIR
+from data.movimentacoes import registrar_movimentacao
 
 
 DB_PATH = os.path.join(DATA_DIR, "empreendimentos.db")
@@ -188,6 +189,23 @@ def criar_tabelas_controle():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS reconciliacao (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            data TEXT NOT NULL,
+            empresa TEXT NOT NULL,
+            tipo TEXT NOT NULL,
+            nome_anterior TEXT,
+            nome_novo TEXT,
+            url_anterior TEXT NOT NULL,
+            url_nova TEXT,
+            fase_anterior TEXT,
+            fase_nova TEXT,
+            distancia_metros REAL,
+            observacao TEXT
+        )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -262,6 +280,17 @@ def inserir_empreendimento(dados):
     conn.commit()
     last_id = cursor.lastrowid
     conn.close()
+
+    # Registrar movimentacao: novo produto
+    registrar_movimentacao(
+        empresa=dados.get("empresa", ""),
+        nome=dados.get("nome", ""),
+        tipo="novo",
+        url_fonte=dados.get("url_fonte"),
+        valor_novo=dados.get("fase"),
+        origem="inserir_empreendimento",
+    )
+
     return last_id
 
 
@@ -298,6 +327,46 @@ def atualizar_empreendimento(empresa, nome, dados):
 
     cursor.execute(
         f"UPDATE empreendimentos SET {set_clause} WHERE empresa = ? AND nome = ?",
+        valores,
+    )
+
+    conn.commit()
+    conn.close()
+
+
+def empreendimento_existe_por_url(empresa, url_fonte):
+    """Verifica se um empreendimento ja foi registrado (por empresa + url_fonte)."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT COUNT(*) FROM empreendimentos WHERE empresa = ? AND url_fonte = ?",
+        (empresa, url_fonte),
+    )
+    existe = cursor.fetchone()[0] > 0
+    conn.close()
+    return existe
+
+
+def atualizar_empreendimento_por_url(empresa, url_fonte, dados):
+    """Atualiza um empreendimento existente usando url_fonte como chave."""
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Garante colunas
+    colunas_existentes = {row[1] for row in cursor.execute("PRAGMA table_info(empreendimentos)")}
+    for col_name in dados:
+        if col_name not in colunas_existentes and col_name != "id":
+            garantir_coluna(col_name)
+
+    dados["data_atualizacao"] = datetime.now().isoformat()
+    dados.pop("id", None)
+    dados.pop("data_coleta", None)
+
+    set_clause = ", ".join(f"{col} = ?" for col in dados)
+    valores = list(dados.values()) + [empresa, url_fonte]
+
+    cursor.execute(
+        f"UPDATE empreendimentos SET {set_clause} WHERE empresa = ? AND url_fonte = ?",
         valores,
     )
 
@@ -353,7 +422,7 @@ def snapshot_empreendimentos():
 
 
 def registrar_mudanca(run_id, empresa, nome, tipo, campo=None, anterior=None, novo=None):
-    """Registra uma mudanca no changelog."""
+    """Registra uma mudanca no changelog e no historico de movimentacoes."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -366,6 +435,16 @@ def registrar_mudanca(run_id, empresa, nome, tipo, campo=None, anterior=None, no
     )
     conn.commit()
     conn.close()
+
+    # Espelhar no banco de movimentacoes
+    # Para tipo "novo" vindo de comparar_snapshots, registrar tambem
+    # (insercoes diretas ja registram via inserir_empreendimento)
+    if tipo != "novo":
+        registrar_movimentacao(
+            empresa=empresa, nome=nome, tipo=tipo,
+            campo=campo, valor_anterior=anterior, valor_novo=novo,
+            origem=run_id,
+        )
 
 
 def comparar_snapshots(antes, depois, run_id):
@@ -435,6 +514,103 @@ def obter_changelog(run_id):
         "SELECT * FROM changelog WHERE run_id = ? ORDER BY tipo, empresa, nome",
         (run_id,),
     )
+    rows = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
+def registrar_reconciliacao(empresa, tipo, url_anterior, nome_anterior=None,
+                           nome_novo=None, url_nova=None, fase_anterior=None,
+                           fase_nova=None, distancia_metros=None, observacao=None):
+    """Registra um evento de reconciliacao (renomeado, relancado, cancelado)."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO reconciliacao (data, empresa, tipo, nome_anterior, nome_novo, "
+        "url_anterior, url_nova, fase_anterior, fase_nova, distancia_metros, observacao) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (datetime.now().isoformat(), empresa, tipo, nome_anterior, nome_novo,
+         url_anterior, url_nova, fase_anterior, fase_nova, distancia_metros, observacao),
+    )
+    conn.commit()
+    conn.close()
+
+    # Espelhar no banco de movimentacoes
+    obs_parts = []
+    if nome_novo and nome_novo != nome_anterior:
+        obs_parts.append(f"nome: {nome_anterior} -> {nome_novo}")
+    if url_nova:
+        obs_parts.append(f"url: {url_nova}")
+    if distancia_metros:
+        obs_parts.append(f"dist: {distancia_metros:.0f}m")
+    if observacao:
+        obs_parts.append(observacao)
+
+    registrar_movimentacao(
+        empresa=empresa,
+        nome=nome_anterior or nome_novo or "",
+        tipo=tipo,
+        url_fonte=url_anterior,
+        campo="url_fonte" if tipo == "renomeado" else None,
+        valor_anterior=url_anterior,
+        valor_novo=url_nova,
+        observacao=" | ".join(obs_parts) if obs_parts else None,
+        origem="reconciliacao",
+    )
+
+
+def listar_empresas():
+    """Retorna lista de empresas distintas no banco."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT empresa FROM empreendimentos ORDER BY empresa")
+    empresas = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return empresas
+
+
+def buscar_empreendimentos_por_empresa(empresa):
+    """Retorna todos os empreendimentos de uma empresa com coords e dados basicos."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT nome, url_fonte, fase, latitude, longitude, cidade, bairro "
+        "FROM empreendimentos WHERE empresa = ?",
+        (empresa,),
+    )
+    rows = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
+def remover_empreendimento_por_url(empresa, url_fonte):
+    """Remove um empreendimento pelo url_fonte."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "DELETE FROM empreendimentos WHERE empresa = ? AND url_fonte = ?",
+        (empresa, url_fonte),
+    )
+    removidos = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return removidos
+
+
+def obter_reconciliacao(empresa=None, limit=100):
+    """Retorna eventos de reconciliacao, opcionalmente filtrados por empresa."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    if empresa:
+        cursor.execute(
+            "SELECT * FROM reconciliacao WHERE empresa = ? ORDER BY data DESC LIMIT ?",
+            (empresa, limit),
+        )
+    else:
+        cursor.execute(
+            "SELECT * FROM reconciliacao ORDER BY data DESC LIMIT ?",
+            (limit,),
+        )
     rows = [dict(row) for row in cursor.fetchall()]
     conn.close()
     return rows
