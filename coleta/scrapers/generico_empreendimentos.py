@@ -16,7 +16,8 @@ Empresas configuradas:
     magik_jc, kazzas, vibra, pacaembu, mundo_apto, conx, benx, metrocasa,
     novvo, novolar, emccamp, sugoi, arbore, ampla, mlar, eph, unica,
     riformato, cavazani, smart, bm7, construlike, fyp, vl, jotanunes,
-    piacentini, aclf, setai_gp, vinx, bp8
+    piacentini, aclf, setai_gp, vinx, bp8, open, stanza,
+    rev3, eme, sousa_araujo, econ
 """
 
 import os
@@ -620,6 +621,122 @@ EMPRESAS = {
             "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
         },
     },
+
+    # ============================================================
+    # NOVAS INCORPORADORAS (2026-03 batch 3)
+    # ============================================================
+
+    "open": {
+        "nome_banco": "Construtora Open",
+        "base_url": "https://construtoraopen.com.br",
+        "estado_default": "RS",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://construtoraopen.com.br/imoveis/",
+        ],
+        "padrao_link": r"construtoraopen\.com\.br/empreendimento/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida)[^,\n]+(?:,\s*\d+)?[^-\n]*"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+(?:\s*,\s*\d+)*(?:\s*e\s*\d+)?\s*dormit[oó]rios?"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "stanza": {
+        "nome_banco": "Stanza",
+        "base_url": "https://stanza.com.br",
+        "estado_default": "SE",
+        "fase_selector": "ul.list-categories li",
+        "urls_listagem": [
+            "https://stanza.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"stanza\.com\.br/empreendimentos/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1.nome-empreendimento, h2.nome-empreendimento", "attr": "text"},
+            "bairro": {"method": "css", "selector": "address.localizacao", "attr": "text"},
+            "cidade": {"method": "css", "selector": "p.cidade", "attr": "text"},
+            "endereco": {"method": "css", "selector": ".localizacao-sessao p.mb-4, .ficha-tecnica .item span.f16", "attr": "text"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+(?:\s*ou\s*\d+)?\s*quartos?(?:\s*(?:com|c/)\s*(?:su[ií]te|varanda))?"},
+            "metragens_descricao": {"method": "regex", "pattern": r"[\d.,]+\s*m[²2]"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?)"},
+        },
+    },
+
+    "rev3": {
+        "nome_banco": "Rev3",
+        "base_url": "https://rev3.com.br",
+        "estado_default": "SP",
+        "fase_selector": "div.empreendimento-capa-titulo span a[href*='estagio_da_obra']",
+        "urls_listagem": [
+            "https://rev3.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"rev3\.com\.br/empreendimento/([\w%-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "div.empreendimento-capa-titulo h1, h1", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*[\d.]+)?"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?)(?:\s*(?:com|c/)\s*(?:su[ií]te|varanda))?"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "eme": {
+        "nome_banco": "HM Engenharia",
+        "base_url": "https://eme.maishm.com.br",
+        "estado_default": "SP",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://eme.maishm.com.br/imoveis",
+            "https://eme.maishm.com.br/imoveis?status=lancamento",
+            "https://eme.maishm.com.br/imoveis?status=construcao",
+            "https://eme.maishm.com.br/imoveis?status=pronto",
+        ],
+        "padrao_link": r"eme\.maishm\.com\.br/imoveis/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h4.text-title-6", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?[^/\n]*"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"[Aa]ptos?\.?\s*(?:com|de)?\s*\d+(?:\s*(?:e|ou)\s*\d+)?\s*dorms?\.?|\d+\s*dormit[oó]rios?"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*m[²2]"},
+        },
+    },
+
+    "sousa_araujo": {
+        "nome_banco": "Sousa Araujo",
+        "base_url": "https://sousaaraujo.com.br",
+        "estado_default": "SP",
+        "fase_selector": "span.badge.align-self-start",
+        "urls_listagem": [
+            "https://sousaaraujo.com.br/empreendimentos",
+            "https://sousaaraujo.com.br/empreendimentos?status=lancamento",
+            "https://sousaaraujo.com.br/empreendimentos?status=em-construcao",
+            "https://sousaaraujo.com.br/empreendimentos?status=breve-lancamento",
+        ],
+        "padrao_link": r"sousaaraujo\.com\.br/empreendimentos/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+(?:\s*e\s*\d+)?\s*dormit[oó]rios?(?:\s*(?:com|c/)\s*(?:su[ií]te|varanda))?"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*m[²2]"},
+        },
+    },
+
+    "econ": {
+        "nome_banco": "Econ Construtora",
+        "base_url": "https://econconstrutora.com.br",
+        "estado_default": "SP",
+        "cidade_default": "São Paulo",
+        "nome_from_title": True,
+        "sitemap_url": "https://econconstrutora.com.br/sitemap.xml",
+        "urls_listagem": [],
+        "padrao_link": r"econconstrutora\.com\.br/imovel/[\w-]+/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Al\.|Alameda)[^,\n]+(?:,\s*\d+)?[^-\n]*"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*m[²2]"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?)"},
+        },
+    },
 }
 
 
@@ -666,10 +783,24 @@ def fetch_html(url, logger):
 
 
 def coletar_links_empreendimentos(config, logger):
-    """Coleta todos os links de empreendimentos das paginas de listagem."""
+    """Coleta todos os links de empreendimentos das paginas de listagem ou sitemap."""
     padrao = config["padrao_link"]
     base_url = config["base_url"]
     links = {}  # slug -> url_completa
+
+    # Se tem sitemap, buscar links de la
+    sitemap_url = config.get("sitemap_url")
+    if sitemap_url:
+        logger.info(f"Coletando links via sitemap: {sitemap_url}")
+        html = fetch_html(sitemap_url, logger)
+        if html:
+            for match in re.findall(r"<loc>\s*(https?://[^<]+?)\s*</loc>", html):
+                url_found = match.strip()
+                m = re.search(padrao, url_found)
+                if m:
+                    slug = m.group(1)
+                    url_limpa = url_found.split("?")[0].split("#")[0].rstrip("/")
+                    links[slug] = url_limpa
 
     for url_listagem in config["urls_listagem"]:
         logger.info(f"Coletando links de: {url_listagem}")

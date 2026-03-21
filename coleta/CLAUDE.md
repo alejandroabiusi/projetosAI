@@ -36,7 +36,8 @@ Coletar dados de empreendimentos imobiliários de 22+ incorporadoras brasileiras
 - `planoeplano_empreendimentos.py` — Plano&Plano via requests (páginas SSR)
 - `metrocasa_empreendimentos.py` — Metrocasa via Next.js API (`/api/properties`)
 - `vivabenx_empreendimentos.py` — Viva Benx via sitemap XML + BeautifulSoup (empreendimentos MCMV em SP)
-- `generico_empreendimentos.py` — Scraper genérico para: Pacaembu, Conx, Vibra, Magik JC, Kazzas, Mundo Apto, Novvo, Novolar, Emccamp, SUGOI, Árbore, Ampla, M.Lar, EPH, Ún1ca
+- `generico_empreendimentos.py` — Scraper genérico para: Pacaembu, Conx, Vibra, Magik JC, Kazzas, Mundo Apto, Novvo, Novolar, Emccamp, SUGOI, Árbore, Ampla, M.Lar, EPH, Ún1ca, Construtora Open, Stanza, Rev3, HM Engenharia, Sousa Araujo, Econ Construtora + mais
+- `wpapi_empreendimentos.py` — Scraper WP REST API para: ACL Incorporadora, VIC Engenharia, Vasco Construtora, Carrilho, Graal Engenharia, Grafico
 - `verificar_status.py` — Verificação de status de ~2017 URLs existentes: re-detecta fases, reconcilia URLs mortas (redirect → nome → localização → marca "Removido"). Batch para MRV/Vivaz (API), Direcional/VivaBenx (sitemap), individual para genéricos. Flag `--sem-selenium` pula Cury/Metrocasa. Resumível via JSON de progresso.
 
 ### Problema conhecido (root cause corrigido parcialmente)

@@ -10,6 +10,8 @@ Sites configurados:
     vic         — VIC Engenharia (MG/SP/RJ/DF/BA)
     vasco       — Vasco Construtora (RS)
     carrilho    — Carrilho Construtora (PE)
+    graal       — Graal Engenharia (SP Capital)
+    grafico     — Grafico Empreendimentos (BA/PE)
 
 Uso:
     python scrapers/wpapi_empreendimentos.py --empresa acl
@@ -132,6 +134,52 @@ EMPRESAS = {
             "total_unidades": {"pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?|studios?)"},
             "dormitorios_descricao": {"pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
             "metragens_descricao": {"pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "graal": {
+        "nome_banco": "Graal Engenharia",
+        "base_url": "https://graalengenharia.com.br",
+        "api_endpoint": "https://graalengenharia.com.br/wp-json/wp/v2/obra",
+        "post_type": "obra",
+        "per_page": 100,
+        "estado_default": "SP",
+        "cidade_default": "São Paulo",
+        "extrair_localizacao_classes": True,
+        "taxonomies": {
+            "status": "https://graalengenharia.com.br/wp-json/wp/v2/status",
+        },
+        "acf_fields": {
+            "dormitorios_descricao": "texto_dormitorios",
+            "metragens_descricao": "texto_metragem",
+        },
+        "status_selectors": [
+            'span.status.upper', 'span.status', '.badge', '[class*="status"]',
+        ],
+        "parsers": {
+            "endereco": {"pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Al\.|Alameda)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "numero_torres": {"pattern": r"(\d+)\s*torres?"},
+            "dormitorios_descricao": {"pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:[Dd]orms?\.?|quartos?|dormit[oó]rios?)"},
+            "metragens_descricao": {"pattern": r"[Dd]e\s*[\d.,]+\s*m[²2]\s*[Aa]\s*[\d.,]+\s*m[²2]|[\d.,]+\s*m[²2]"},
+        },
+    },
+
+    "grafico": {
+        "nome_banco": "Grafico",
+        "base_url": "https://graficoltda.com.br",
+        "api_endpoint": "https://graficoltda.com.br/wp-json/wp/v2/empreendimento",
+        "post_type": "empreendimento",
+        "per_page": 100,
+        "estado_default": "BA",
+        "extrair_localizacao_classes": True,
+        "status_selectors": [
+            'div.andamento', '.status', '.badge', '[class*="status"]',
+        ],
+        "parsers": {
+            "endereco": {"pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*[\d.]+)?"},
+            "dormitorios_descricao": {"pattern": r"\d+(?:\s*e\s*\d+)?\s*(?:quartos?|su[ií]tes?)"},
+            "metragens_descricao": {"pattern": r"[\d.,]+\s*m[²2]\s*(?:[Aa]\s*[\d.,]+\s*m[²2])?"},
         },
     },
 }

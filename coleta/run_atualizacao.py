@@ -55,6 +55,7 @@ ETAPAS = [
     {"nome": "Vivaz",          "script": os.path.join(SCRAPERS_DIR, "vivaz_empreendimentos.py"),       "args": []},
     {"nome": "Metrocasa",      "script": os.path.join(SCRAPERS_DIR, "metrocasa_empreendimentos.py"),   "args": []},
     {"nome": "Viva Benx",      "script": os.path.join(SCRAPERS_DIR, "vivabenx_empreendimentos.py"),    "args": []},
+    {"nome": "WP API",         "script": os.path.join(SCRAPERS_DIR, "wpapi_empreendimentos.py"),    "args": ["--empresa", "todas"]},
     {"nome": "Verificar Status", "script": os.path.join(SCRAPERS_DIR, "verificar_status.py"),       "args": []},
 ]
 
