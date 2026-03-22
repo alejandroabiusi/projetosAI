@@ -630,7 +630,13 @@ def _validar_coords_brasil(lat, lng):
 # ============================================================
 
 def extrair_endereco_de_pagina(soup, texto_completo):
-    """Extrai endereco de pagina HTML se ausente no DB."""
+    """Extrai endereco de pagina HTML se ausente no DB.
+
+    Estrategia:
+    1. JSON-LD structuredData
+    2. Busca contextual por label (endereco do empreendimento/obra/projeto/terreno)
+    3. Fallback: primeiro endereco encontrado no texto
+    """
 
     # 1. JSON-LD
     for script in soup.find_all("script", type="application/ld+json"):
@@ -648,20 +654,109 @@ def extrair_endereco_de_pagina(soup, texto_completo):
         except (json.JSONDecodeError, TypeError):
             pass
 
-    # 2. Regex para enderecos brasileiros
-    patterns = [
-        r"((?:Rua|R\.|Av\.|Avenida|Al\.|Alameda|Pça\.|Praça|Estrada|Rodovia|Travessa)\s+[^<\n]{10,100})",
+    # 2. Busca contextual: procurar label que indica endereco do empreendimento
+    #    e pegar o endereco que vem logo em seguida
+    LABELS_ENDERECO = [
+        r"endere[çc]o\s+d[aoe]\s+(?:empreendimento|obra|projeto|terreno|produto|im[oó]vel)",
+        r"endere[çc]o\s+d[aoe]\s+(?:constru[çc][aã]o|resid[eê]ncia)",
+        r"localiza[çc][aã]o\s+d[aoe]\s+(?:empreendimento|im[oó]vel|obra|projeto)",
+        r"endere[çc]o\s*:",
     ]
-    for pat in patterns:
-        matches = re.findall(pat, texto_completo)
-        for match in matches:
-            endereco = match.strip()
-            # Deve conter um numero para ser endereco valido
-            if re.search(r"\d", endereco):
-                # Limpar lixo no final
+    _REGEX_ENDERECO = r"(?:Rua|R\.|Av\.|Avenida|Al\.|Alameda|Pça\.|Praça|Estr\.|Estrada|Rod\.|Rodovia|Travessa)\s+[^<\n|]{10,150}"
+    for label_pat in LABELS_ENDERECO:
+        m = re.search(label_pat, texto_completo, re.IGNORECASE)
+        if m:
+            # Pegar texto apos o label (ate 500 chars)
+            trecho = texto_completo[m.end():m.end() + 500]
+            end_m = re.search(_REGEX_ENDERECO, trecho)
+            if end_m:
+                endereco = end_m.group(0).strip()
                 endereco = re.sub(r"\s*[-–|]\s*$", "", endereco).strip()
-                if len(endereco) > 10:
+                if re.search(r"\d", endereco) and len(endereco) > 10:
                     return endereco
+
+    # 3. Fallback: primeiro endereco no texto (generico)
+    matches = re.findall(_REGEX_ENDERECO, texto_completo)
+    for match in matches:
+        endereco = match.strip()
+        if re.search(r"\d", endereco):
+            endereco = re.sub(r"\s*[-–|]\s*$", "", endereco).strip()
+            if len(endereco) > 10:
+                return endereco
+
+    return None
+
+
+def inferir_cidade_de_pagina(soup, texto_completo, estado=None):
+    """Infere cidade a partir do conteudo da pagina quando cidade esta NULL.
+
+    Busca em:
+    1. <title> (ex: "Open Major - Porto Alegre - Construtora Open")
+    2. <h2> com padrao "Apartamentos em Cidade - UF"
+    3. Texto com padrao "Cidade - UF" ou "Cidade/UF" ou "Cidade, UF"
+    4. <p class="cidade"> (Stanza)
+    5. <div class="localidade"> (Grafico)
+    """
+
+    # Capitais e cidades conhecidas para validacao
+    _CIDADES_CONHECIDAS = {
+        "São Paulo", "Rio de Janeiro", "Belo Horizonte", "Porto Alegre",
+        "Curitiba", "Salvador", "Recife", "Fortaleza", "Goiânia", "Manaus",
+        "Campinas", "Guarulhos", "São Bernardo do Campo", "Santo André",
+        "Osasco", "Sorocaba", "Diadema", "Canoas", "Aracaju",
+        "São José dos Campos", "Mogi das Cruzes", "Suzano", "Itatiba",
+        "Cotia", "Taboão da Serra", "Mongaguá", "São Carlos", "Sumaré",
+        "Extrema", "Caruaru", "Petrolina", "Ilhéus", "Itabuna",
+        "Lauro de Freitas", "Vitória da Conquista", "Porto Seguro",
+    }
+
+    # 1. <title>
+    title = soup.find("title")
+    if title:
+        title_text = title.get_text()
+        # Padrao: "Nome - Cidade - Empresa" ou "Nome | Cidade"
+        for sep in [" - ", " | ", " – "]:
+            parts = title_text.split(sep)
+            for part in parts:
+                part = part.strip()
+                for c in _CIDADES_CONHECIDAS:
+                    if c.lower() == part.lower():
+                        return c
+
+    # 2. <h2> com "Apartamentos em Cidade - UF"
+    for h in soup.find_all(["h1", "h2", "h3"]):
+        h_text = h.get_text(strip=True)
+        m = re.search(r"(?:Apartamentos?|Im[oó]veis?)\s+(?:em|no|na)\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+[a-zà-ú]*\s*[A-ZÀ-Ú][a-zà-ú]+)*)", h_text)
+        if m:
+            return m.group(1).strip()
+
+    # 3. Padrao "Cidade - UF" ou "Cidade/UF" no texto — retorna todas as candidatas
+    uf_filtro = estado if estado else r"[A-Z]{2}"
+    _blacklist = {"Rua", "Avenida", "Bairro", "Vila", "Estrada", "Rodovia",
+                  "Alameda", "Travessa", "Brasil", "Registro", "Janeiro",
+                  "Mateus", "Paulo", "Carlos", "Cruz", "Maria"}
+    candidatas = []
+    vistas = set()
+    for m in re.finditer(
+        rf"((?:[A-ZÀ-Ú][a-zà-ú]+\s*)+(?:(?:de|do|da|dos|das|e)\s+(?:[A-ZÀ-Ú][a-zà-ú]+\s*)+)*)\s*[-/]\s*({uf_filtro})\b",
+        texto_completo,
+    ):
+        cidade_cand = m.group(1).strip()
+        if len(cidade_cand) > 3 and cidade_cand not in _blacklist and cidade_cand not in vistas:
+            vistas.add(cidade_cand)
+            candidatas.append(cidade_cand)
+    if candidatas:
+        return candidatas[0]  # Melhor candidata; chamador pode pedir _todas via inferir_cidades_candidatas
+
+    # 4. Seletores CSS especificos
+    for sel in ["p.cidade", "div.localidade"]:
+        el = soup.select_one(sel)
+        if el:
+            t = el.get_text(strip=True)
+            # "Salvador, Bahia" ou "Caruaru - PE"
+            m = re.match(r"([A-ZÀ-Ú][a-zà-ú]+(?:\s+[a-zà-ú]*\s*[A-ZÀ-Ú][a-zà-ú]+)*)", t)
+            if m:
+                return m.group(1).strip()
 
     return None
 
@@ -697,6 +792,70 @@ def geocodificar_por_cep(cep):
         cur = conn.cursor()
         cur.execute("SELECT latitude, longitude FROM ceps WHERE cep = ?", (cep_limpo,))
         row = cur.fetchone()
+        conn.close()
+        if row and row[0] and row[1]:
+            lat, lng = float(row[0]), float(row[1])
+            if _validar_coords_brasil(lat, lng):
+                return str(lat), str(lng)
+    except Exception:
+        pass
+    return None, None
+
+
+def geocodificar_por_logradouro(endereco, cidade, estado=None):
+    """Geocodifica por logradouro+cidade usando base local de CEPs.
+
+    Busca na tabela ceps por logradouro LIKE '%nome_rua%' filtrado por cidade.
+    Retorna coordenadas do CEP mais proximo encontrado.
+    """
+    if not endereco or not cidade or not os.path.exists(CEP_DB_PATH):
+        return None, None
+
+    # Extrair nome da rua (sem prefixo Rua/Av/etc e sem numero)
+    m = re.match(
+        r"(?:Rua|R\.|Av\.|Avenida|Al\.|Alameda|Estr\.|Estrada|Rod\.|Rodovia|Travessa|Pça\.|Praça)\s+(.+)",
+        endereco, re.IGNORECASE,
+    )
+    if not m:
+        return None, None
+    nome_rua = m.group(1).strip()
+    # Remover numero e o que vem depois (", 960 - Bairro")
+    nome_rua = re.split(r",\s*\d|\s*-\s*", nome_rua)[0].strip()
+    if len(nome_rua) < 3:
+        return None, None
+
+    # Normalizar acentos para busca (base pode nao ter acentos)
+    import unicodedata
+    def _sem_acento(s):
+        return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode("ascii")
+
+    nome_rua_norm = _sem_acento(nome_rua)
+    cidade_norm = _sem_acento(cidade)
+
+    try:
+        conn = sqlite3.connect(CEP_DB_PATH)
+        cur = conn.cursor()
+
+        # Buscar por logradouro + cidade (com e sem acentos)
+        for nr, cid in [(nome_rua, cidade), (nome_rua_norm, cidade_norm)]:
+            cur.execute(
+                "SELECT latitude, longitude FROM ceps WHERE logradouro LIKE ? AND nome_municipio LIKE ? LIMIT 1",
+                (f"%{nr}%", cid),
+            )
+            row = cur.fetchone()
+            if row:
+                break
+
+        if not row and estado:
+            for nr in [nome_rua, nome_rua_norm]:
+                cur.execute(
+                    "SELECT latitude, longitude FROM ceps WHERE logradouro LIKE ? AND sigla_uf = ? LIMIT 1",
+                    (f"%{nr}%", estado),
+                )
+                row = cur.fetchone()
+                if row:
+                    break
+
         conn.close()
         if row and row[0] and row[1]:
             lat, lng = float(row[0]), float(row[1])
@@ -812,6 +971,7 @@ def enriquecer_empresa(empresa, config, campo, forcar, limite, sem_geocoding, pr
             dados_novos = {}
             html = None
             soup = None
+            texto = ""
 
             try:
                 if tipo_acesso == "api_mrv":
@@ -869,7 +1029,29 @@ def enriquecer_empresa(empresa, config, campo, forcar, limite, sem_geocoding, pr
                     if data_ri:
                         dados_novos["data_lancamento"] = data_ri
 
-                # Geocoding fallback: CEP local > Nominatim
+                # Inferir cidade se NULL (a partir do HTML da pagina)
+                cidade_final = cidade
+                cidades_candidatas = []
+                if not cidade_final and soup:
+                    cidade_inferida = inferir_cidade_de_pagina(soup, texto, estado)
+                    if cidade_inferida:
+                        dados_novos["cidade"] = cidade_inferida
+                        cidade_final = cidade_inferida
+                        # Coletar todas as candidatas para fallback
+                        uf_filtro = estado if estado else r"[A-Z]{2}"
+                        _bl = {"Rua", "Avenida", "Bairro", "Vila", "Estrada", "Rodovia",
+                               "Alameda", "Travessa", "Brasil", "Registro"}
+                        vistas = set()
+                        for m_c in re.finditer(
+                            rf"((?:[A-ZÀ-Ú][a-zà-ú]+\s*)+(?:(?:de|do|da|dos|das|e)\s+(?:[A-ZÀ-Ú][a-zà-ú]+\s*)+)*)\s*[-/]\s*({uf_filtro})\b",
+                            texto,
+                        ):
+                            c = m_c.group(1).strip()
+                            if len(c) > 3 and c not in _bl and c not in vistas:
+                                vistas.add(c)
+                                cidades_candidatas.append(c)
+
+                # Geocoding fallback: coords HTML > CEP > logradouro+cidade > Nominatim
                 if campo in ("todos", "coordenadas"):
                     lat_final = dados_novos.get("latitude") or lat
                     if not lat_final:
@@ -884,11 +1066,38 @@ def enriquecer_empresa(empresa, config, campo, forcar, limite, sem_geocoding, pr
                                     if not rec.get("cep"):
                                         dados_novos["cep"] = cep_encontrado
 
+                    # Geocodificar por logradouro+cidade na base local de CEPs
+                    # Tenta todas as cidades candidatas ate encontrar match
+                    lat_final = dados_novos.get("latitude") or lat
+                    if not lat_final:
+                        # Re-extrair endereco limpo da pagina (o do banco pode estar poluido)
+                        end_final = None
+                        if soup:
+                            end_final = extrair_endereco_de_pagina(soup, texto)
+                        if not end_final:
+                            end_final = dados_novos.get("endereco") or endereco
+                        if end_final:
+                            cidades_para_testar = []
+                            if cidade_final:
+                                cidades_para_testar.append(cidade_final)
+                            for c in cidades_candidatas:
+                                if c != cidade_final:
+                                    cidades_para_testar.append(c)
+                            for cid in cidades_para_testar:
+                                lat_l, lng_l = geocodificar_por_logradouro(end_final, cid, estado)
+                                if lat_l and lng_l:
+                                    dados_novos["latitude"] = lat_l
+                                    dados_novos["longitude"] = lng_l
+                                    if cid != cidade_final:
+                                        dados_novos["cidade"] = cid
+                                    break
+
+                    # Ultimo fallback: Nominatim
                     lat_final = dados_novos.get("latitude") or lat
                     if not lat_final and not sem_geocoding:
                         end_final = dados_novos.get("endereco") or endereco
                         if end_final:
-                            lat_g, lng_g = geocodificar_nominatim(end_final, cidade, estado)
+                            lat_g, lng_g = geocodificar_nominatim(end_final, cidade_final, estado)
                             if lat_g and lng_g:
                                 dados_novos["latitude"] = lat_g
                                 dados_novos["longitude"] = lng_g
