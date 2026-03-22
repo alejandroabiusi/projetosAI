@@ -730,23 +730,43 @@ def inferir_cidade_de_pagina(soup, texto_completo, estado=None):
         if m:
             return m.group(1).strip()
 
-    # 3. Padrao "Cidade - UF" ou "Cidade/UF" no texto — retorna todas as candidatas
+    # 3. Padrao "Cidade - UF" ou "Cidade/UF" no texto
+    _UFS_VALIDAS = {"AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
+                    "MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC",
+                    "SP","SE","TO"}
     uf_filtro = estado if estado else r"[A-Z]{2}"
-    _blacklist = {"Rua", "Avenida", "Bairro", "Vila", "Estrada", "Rodovia",
-                  "Alameda", "Travessa", "Brasil", "Registro", "Janeiro",
-                  "Mateus", "Paulo", "Carlos", "Cruz", "Maria"}
+    _blacklist_lower = {"rua", "avenida", "bairro", "vila", "estrada", "rodovia",
+                        "alameda", "travessa", "brasil", "registro"}
     candidatas = []
     vistas = set()
+    # Regex mais restrito: 1-4 palavras capitalizadas (ou MAIUSCULAS) antes de -/UF
     for m in re.finditer(
-        rf"((?:[A-ZÀ-Ú][a-zà-ú]+\s*)+(?:(?:de|do|da|dos|das|e)\s+(?:[A-ZÀ-Ú][a-zà-ú]+\s*)+)*)\s*[-/]\s*({uf_filtro})\b",
+        rf"([A-ZÀ-Ú][A-Za-zÀ-ÿ]+(?:\s+(?:de|do|da|dos|das|e|[A-ZÀ-Ú])[A-Za-zÀ-ÿ]*)*)\s*[-/]\s*({uf_filtro})\b",
         texto_completo,
     ):
+        uf_cand = m.group(2).strip()
+        if uf_cand not in _UFS_VALIDAS:
+            continue
         cidade_cand = m.group(1).strip()
-        if len(cidade_cand) > 3 and cidade_cand not in _blacklist and cidade_cand not in vistas:
+        if cidade_cand.isupper():
+            cidade_cand = cidade_cand.title()
+        if len(cidade_cand) > 3 and cidade_cand.lower() not in _blacklist_lower and cidade_cand not in vistas:
+            vistas.add(cidade_cand)
+            candidatas.append(cidade_cand)
+    # Tentar MAIUSCULAS tambem (ex: "SÃO PAULO/SP")
+    for m in re.finditer(
+        rf"([A-ZÀ-Ú]{{2,}}(?:\s+(?:DE|DO|DA|DOS|DAS|E|[A-ZÀ-Ú]){{2,}})*)\s*[-/]\s*({uf_filtro})\b",
+        texto_completo,
+    ):
+        uf_cand = m.group(2).strip()
+        if uf_cand not in _UFS_VALIDAS:
+            continue
+        cidade_cand = m.group(1).strip().title()
+        if len(cidade_cand) > 3 and cidade_cand.lower() not in _blacklist_lower and cidade_cand not in vistas:
             vistas.add(cidade_cand)
             candidatas.append(cidade_cand)
     if candidatas:
-        return candidatas[0]  # Melhor candidata; chamador pode pedir _todas via inferir_cidades_candidatas
+        return candidatas[0]
 
     # 4. Seletores CSS especificos
     for sel in ["p.cidade", "div.localidade"]:
@@ -757,6 +777,56 @@ def inferir_cidade_de_pagina(soup, texto_completo, estado=None):
             m = re.match(r"([A-ZÀ-Ú][a-zà-ú]+(?:\s+[a-zà-ú]*\s*[A-ZÀ-Ú][a-zà-ú]+)*)", t)
             if m:
                 return m.group(1).strip()
+
+    # 5. Inferir cidade do nome do produto, consultando base de CEPs
+    #    Ex: "HM Select Extrema" -> "Extrema", "Reserva dos Ibirás" -> match com Araraquara? não
+    #    Funciona quando o nome do produto contem o nome exato de uma cidade
+    _cep_db = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "ceps_brasil.db")
+    if os.path.exists(_cep_db):
+        # Extrair nome do produto do <title> ou <h1>
+        nome_produto = ""
+        title_tag = soup.find("title")
+        if title_tag:
+            nome_produto = title_tag.get_text().split("-")[0].split("|")[0].strip()
+        if not nome_produto:
+            h1 = soup.find("h1")
+            if h1:
+                nome_produto = h1.get_text(strip=True)
+
+        if nome_produto and len(nome_produto) > 3:
+            try:
+                import unicodedata
+                def _norm(s):
+                    return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode("ascii").lower()
+
+                conn = sqlite3.connect(_cep_db)
+                cur = conn.cursor()
+                # Buscar municipios que contem palavras do nome do produto (>= 4 chars)
+                palavras = [p for p in re.split(r"[\s\-–]+", nome_produto) if len(p) >= 4]
+                uf_clause = f"AND sigla_uf = '{estado}'" if estado else ""
+                for palavra in palavras:
+                    palavra_norm = _norm(palavra)
+                    # Pular palavras genericas
+                    if palavra_norm in ("residencial", "reserva", "smart", "select", "club",
+                                        "home", "park", "maxi", "intense", "vanguard",
+                                        "jardim", "parque", "alto", "vila", "vida", "nova",
+                                        "bela", "vista", "bosque", "campo", "praca"):
+                        continue
+                    cur.execute(
+                        f"SELECT DISTINCT nome_municipio FROM ceps "
+                        f"WHERE LOWER(nome_municipio) LIKE ? {uf_clause} LIMIT 1",
+                        (f"%{palavra_norm}%",),
+                    )
+                    row = cur.fetchone()
+                    if row:
+                        cidade_encontrada = row[0]
+                        # Verificar que o match é bom (nome_municipio contem a palavra inteira)
+                        if _norm(cidade_encontrada) == palavra_norm or palavra_norm in _norm(cidade_encontrada).split():
+                            conn.close()
+                            return cidade_encontrada
+                conn.close()
+            except Exception:
+                pass
 
     return None
 
@@ -819,8 +889,8 @@ def geocodificar_por_logradouro(endereco, cidade, estado=None):
     if not m:
         return None, None
     nome_rua = m.group(1).strip()
-    # Remover numero e o que vem depois (", 960 - Bairro")
-    nome_rua = re.split(r",\s*\d|\s*-\s*", nome_rua)[0].strip()
+    # Remover numero e o que vem depois (", 960 - Bairro", ", nº 155")
+    nome_rua = re.split(r",\s*(?:n[ºo°]?\s*)?\d|\s*-\s*", nome_rua)[0].strip()
     if len(nome_rua) < 3:
         return None, None
 
