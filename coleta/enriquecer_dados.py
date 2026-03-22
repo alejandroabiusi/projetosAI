@@ -82,6 +82,15 @@ EMPRESA_CONFIG = {
     "M.Lar":             {"tipo_acesso": "requests",   "download_key": "mlar"},
     "Ún1ca":             {"tipo_acesso": "requests",   "download_key": "unica"},
     "Viva Benx":         {"tipo_acesso": "requests",   "download_key": "vivabenx"},
+    # Batch 3 (2026-03)
+    "Construtora Open":  {"tipo_acesso": "requests",   "download_key": "open"},
+    "Grafico":           {"tipo_acesso": "requests",   "download_key": "grafico"},
+    "Stanza":            {"tipo_acesso": "requests",   "download_key": "stanza"},
+    "Graal Engenharia":  {"tipo_acesso": "requests",   "download_key": "graal"},
+    "Rev3":              {"tipo_acesso": "requests",   "download_key": "rev3"},
+    "HM Engenharia":     {"tipo_acesso": "requests",   "download_key": "eme"},
+    "Sousa Araujo":      {"tipo_acesso": "requests",   "download_key": "sousa_araujo"},
+    "Econ Construtora":  {"tipo_acesso": "requests",   "download_key": "econ"},
 }
 
 HEADERS = {
@@ -468,9 +477,11 @@ def extrair_data_de_ri(registro_incorporacao):
 def extrair_coordenadas(soup, html_raw):
     """Extrai lat/lng de iframes Google Maps, JS, data-attrs, JSON-LD."""
 
-    # 1. Google Maps iframe
-    for iframe in soup.find_all("iframe", src=True):
-        src = iframe["src"]
+    # 1. Google Maps iframe (src, data-src, data-lazy-src)
+    for iframe in soup.find_all("iframe"):
+        src = iframe.get("src") or iframe.get("data-src") or iframe.get("data-lazy-src") or ""
+        if not src or "about:blank" == src:
+            continue
         if "google" in src and "map" in src.lower():
             # q=LAT,LNG
             m = re.search(r"[?&]q=(-?\d+\.?\d*),\s*(-?\d+\.?\d*)", src)
@@ -545,7 +556,45 @@ def extrair_coordenadas(soup, html_raw):
         except (json.JSONDecodeError, TypeError, ValueError):
             pass
 
-    # 5. Resolver links curtos do Google Maps (maps.app.goo.gl)
+    # 5. Hidden inputs com latitude/longitude (ex: Sousa Araujo)
+    for input_tag in soup.find_all("input", type="hidden"):
+        name = (input_tag.get("name") or "").lower()
+        if "latitude" in name:
+            lat_val = input_tag.get("value", "")
+            # Buscar input irmao com longitude
+            for sib in soup.find_all("input", type="hidden"):
+                sib_name = (sib.get("name") or "").lower()
+                if "longitude" in sib_name:
+                    lng_val = sib.get("value", "")
+                    try:
+                        lat, lng = float(lat_val), float(lng_val)
+                        if _validar_coords_brasil(lat, lng):
+                            return str(lat), str(lng)
+                    except (ValueError, TypeError):
+                        pass
+            break
+
+    # 6. Links Waze com ll=LAT%2CLNG (ex: HM Engenharia)
+    for a_tag in soup.find_all("a", href=True):
+        href = a_tag["href"]
+        if "waze.com" in href:
+            m = re.search(r"ll=(-?\d+\.?\d+)%2C(-?\d+\.?\d+)", href)
+            if m:
+                lat, lng = float(m.group(1)), float(m.group(2))
+                if _validar_coords_brasil(lat, lng):
+                    return str(lat), str(lng)
+
+    # 7. Links Google Maps <a> com query=LAT,LNG (ex: Econ)
+    for a_tag in soup.find_all("a", href=True):
+        href = a_tag["href"]
+        if "google.com/maps" in href:
+            m = re.search(r"query=(-?\d+\.?\d+),(-?\d+\.?\d+)", href)
+            if m:
+                lat, lng = float(m.group(1)), float(m.group(2))
+                if _validar_coords_brasil(lat, lng):
+                    return str(lat), str(lng)
+
+    # 8. Resolver links curtos do Google Maps (maps.app.goo.gl)
     for a_tag in soup.find_all("a", href=True):
         href = a_tag["href"]
         if "maps.app.goo.gl" in href or "goo.gl/maps" in href:
