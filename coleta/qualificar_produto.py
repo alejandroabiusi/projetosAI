@@ -647,31 +647,46 @@ def _extrair_tipologia_de_alt(alt_text):
     return None
 
 
-def classificar_imagens_empreendimento(empresa, slug, download_key, soup, dry_run=False):
+def classificar_imagens_empreendimento(empresa, slug, download_key, soup, dry_run=False, forcar=False):
     """Classifica imagens ja em disco por heuristica de nome/alt-text."""
     imagens_dir = os.path.join(DOWNLOADS_DIR, download_key, "imagens", slug)
 
     if not os.path.exists(imagens_dir):
         return False
 
-    # Listar arquivos de imagem (flat — nao entrar em subpastas ja organizadas)
+    # Listar arquivos de imagem — tanto flat quanto dentro de subpastas
     conteudo = os.listdir(imagens_dir)
     tem_subpastas = any(
         os.path.isdir(os.path.join(imagens_dir, item))
         for item in conteudo
     )
 
-    # Se ja tem subpastas, assumir que ja foi organizado
-    if tem_subpastas:
+    # Se ja tem subpastas e nao esta forcando, pular
+    if tem_subpastas and not forcar:
         logger.debug(f"    {slug}: ja tem subpastas, pulando reorganizacao")
         return True
 
     arquivos_img = []
-    for f in conteudo:
-        fp = os.path.join(imagens_dir, f)
-        if os.path.isfile(fp) and f.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
-            if os.path.getsize(fp) > 5000:
-                arquivos_img.append(f)
+
+    if tem_subpastas:
+        # Coletar imagens de dentro das subpastas (trazendo de volta pro root)
+        for item in conteudo:
+            sub_path = os.path.join(imagens_dir, item)
+            if os.path.isdir(sub_path):
+                for f in os.listdir(sub_path):
+                    fp = os.path.join(sub_path, f)
+                    if os.path.isfile(fp) and f.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+                        if os.path.getsize(fp) > 5000:
+                            arquivos_img.append((f, sub_path))  # (filename, current_dir)
+            elif os.path.isfile(sub_path) and item.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+                if os.path.getsize(sub_path) > 5000:
+                    arquivos_img.append((item, imagens_dir))
+    else:
+        for f in conteudo:
+            fp = os.path.join(imagens_dir, f)
+            if os.path.isfile(fp) and f.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+                if os.path.getsize(fp) > 5000:
+                    arquivos_img.append((f, imagens_dir))
 
     if not arquivos_img:
         return False
@@ -688,12 +703,14 @@ def classificar_imagens_empreendimento(empresa, slug, download_key, soup, dry_ru
                 if src_filename:
                     alt_map[src_filename.lower()] = alt
 
-    # Classificar cada arquivo
-    classificacao = {}  # cat → [filenames]
-    for f in arquivos_img:
+    # Classificar cada arquivo — arquivos_img e lista de (filename, current_dir)
+    classificacao = {}  # cat → [(filename, current_dir)]
+    for f, cur_dir in arquivos_img:
         alt = alt_map.get(f.lower(), "")
         cat = _classificar_arquivo(f, alt)
-        classificacao.setdefault(cat, []).append(f)
+        classificacao.setdefault(cat, []).append((f, cur_dir))
+
+    total_imgs = sum(len(fs) for fs in classificacao.values())
 
     if dry_run:
         logger.info(f"    [DRY-RUN] {slug}: {', '.join(f'{c}={len(fs)}' for c, fs in classificacao.items())}")
@@ -703,18 +720,26 @@ def classificar_imagens_empreendimento(empresa, slug, download_key, soup, dry_ru
     for cat, files in classificacao.items():
         cat_dir = os.path.join(imagens_dir, cat)
         os.makedirs(cat_dir, exist_ok=True)
-        for f in files:
-            src_path = os.path.join(imagens_dir, f)
+        for f, cur_dir in files:
+            src_path = os.path.join(cur_dir, f)
             dst_path = os.path.join(cat_dir, f)
+            if src_path == dst_path:
+                continue  # ja esta no lugar certo
             if os.path.exists(src_path) and not os.path.exists(dst_path):
                 shutil.move(src_path, dst_path)
+
+    # Limpar subpastas vazias
+    for item in os.listdir(imagens_dir):
+        item_path = os.path.join(imagens_dir, item)
+        if os.path.isdir(item_path) and not os.listdir(item_path):
+            os.rmdir(item_path)
 
     # Atualizar colunas imagens_* no banco
     dados_update = {}
     for cat, files in classificacao.items():
         col = f"imagens_{cat}"
         rel_paths = []
-        for f in files[:20]:
+        for f, _ in files[:20]:
             rel = os.path.join(download_key, "imagens", slug, cat, f).replace("\\", "/")
             rel_paths.append(rel)
         if rel_paths:
@@ -724,7 +749,7 @@ def classificar_imagens_empreendimento(empresa, slug, download_key, soup, dry_ru
 
     atualizar_empreendimento(empresa, slug_para_nome(slug), dados_update)
 
-    logger.info(f"    {slug}: classificadas {len(arquivos_img)} imgs em {len(classificacao)} categorias")
+    logger.info(f"    {slug}: classificadas {total_imgs} imgs em {len(classificacao)} categorias")
     return True
 
 
@@ -872,7 +897,8 @@ def processar_empresa(empresa, config, args, progresso):
                 if not args.sem_imagens:
                     if args.forcar or not row_dict.get("imagens_classificadas"):
                         ok = classificar_imagens_empreendimento(
-                            empresa, slug, download_key, soup, dry_run=args.dry_run
+                            empresa, slug, download_key, soup,
+                            dry_run=args.dry_run, forcar=args.forcar
                         )
                         if ok:
                             imgs_class += 1
@@ -928,7 +954,8 @@ def _processar_apenas_imagens(empresa, download_key, args, progresso):
             continue
 
         ok = classificar_imagens_empreendimento(
-            empresa, slug, download_key, None, dry_run=args.dry_run
+            empresa, slug, download_key, None,
+            dry_run=args.dry_run, forcar=args.forcar
         )
         if ok:
             imgs += 1
