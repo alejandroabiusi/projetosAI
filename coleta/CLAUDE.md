@@ -51,6 +51,7 @@ Coletar dados de empreendimentos imobiliários de 22+ incorporadoras brasileiras
 |--------|--------|
 | `enriquecer_dados.py` | Geocodificação via base local de CEPs, APIs (Vivaz, MRV), extração de dados das páginas |
 | `enriquecer_unidades.py` | Extração de total_unidades, vagas, amenidades via requests/Selenium/APIs |
+| `qualificar_produto.py` | Qualificação profunda: tipologias detalhadas, modelo de vaga, itens lazer raw, marketizáveis, classificação de imagens |
 | `enriquecer_selenium_batch.py` | Selenium headless para Kazzas, Conx (SPAs) |
 | `corrigir_nomes.py` | Correção de nomes via `<title>` das páginas e APIs |
 | `validar_coordenadas.py` | Validação de coords vs cidade cadastrada (distância haversine) |
@@ -63,7 +64,7 @@ Substitui `run_coleta.py` para uso recorrente. **NÃO apaga o banco**. Fluxo:
 1. Backup do banco atual (`data/backups/`)
 2. Snapshot do estado atual (empresa+nome → campos rastreados)
 3. Roda todos os 9 scrapers + verificação de status (com timeout de 30min cada, retry 1x se falhar)
-4. Roda enriquecimento (enriquecer_dados, enriquecer_unidades, corrigir_nomes, validar_coordenadas)
+4. Roda enriquecimento (enriquecer_dados, enriquecer_unidades, qualificar_produto, corrigir_nomes, validar_coordenadas)
 5. Snapshot novo → compara → popula `changelog`
 6. Gera mapa atualizado
 7. Envia email com resumo (se destinatários configurados)
@@ -167,6 +168,7 @@ python scrapers/verificar_status.py --limite 5           # Max 5 por empresa (te
 # === Enriquecimento manual ===
 python enriquecer_dados.py
 python enriquecer_unidades.py tudo
+python qualificar_produto.py
 python corrigir_nomes.py
 python validar_coordenadas.py
 

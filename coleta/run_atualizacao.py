@@ -62,6 +62,7 @@ ETAPAS = [
 ETAPAS_ENRIQUECIMENTO = [
     {"nome": "Enriquecer dados",    "script": os.path.join(PROJECT_ROOT, "enriquecer_dados.py"),      "args": []},
     {"nome": "Enriquecer unidades", "script": os.path.join(PROJECT_ROOT, "enriquecer_unidades.py"),   "args": ["tudo"]},
+    {"nome": "Qualificar produtos", "script": os.path.join(PROJECT_ROOT, "qualificar_produto.py"),    "args": []},
     {"nome": "Corrigir nomes",      "script": os.path.join(PROJECT_ROOT, "corrigir_nomes.py"),        "args": []},
     {"nome": "Validar coordenadas", "script": os.path.join(PROJECT_ROOT, "validar_coordenadas.py"),   "args": []},
 ]
