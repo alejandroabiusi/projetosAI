@@ -42,7 +42,8 @@ from data.database import (
 # ============================================================
 
 EMPRESA_CONFIG = {
-    "MRV":               {"tipo_acesso": "requests",   "download_key": "mrv"},
+    # --- Empresas com imagens existentes ---
+    "MRV":               {"tipo_acesso": "api_mrv",    "download_key": "mrv"},
     "Vivaz":             {"tipo_acesso": "api_vivaz",   "download_key": "vivaz"},
     "Plano&Plano":       {"tipo_acesso": "requests",   "download_key": "planoeplano"},
     "Direcional":        {"tipo_acesso": "requests",   "download_key": "direcional"},
@@ -55,6 +56,38 @@ EMPRESA_CONFIG = {
     "Benx":              {"tipo_acesso": "requests",   "download_key": "benx"},
     "Cury":              {"tipo_acesso": "selenium",   "download_key": "cury"},
     "Metrocasa":         {"tipo_acesso": "selenium",   "download_key": "metrocasa"},
+    # --- Empresas sem imagens (requests) ---
+    "VIC Engenharia":    {"tipo_acesso": "requests",   "download_key": "vic"},
+    "HM Engenharia":     {"tipo_acesso": "selenium",   "download_key": "eme"},
+    "Grafico":           {"tipo_acesso": "requests",   "download_key": "grafico"},
+    "Econ Construtora":  {"tipo_acesso": "requests",   "download_key": "econ"},
+    "Novolar":           {"tipo_acesso": "requests",   "download_key": "novolar"},
+    "Graal Engenharia":  {"tipo_acesso": "requests",   "download_key": "graal"},
+    "Árbore":            {"tipo_acesso": "requests",   "download_key": "arbore"},
+    "Viva Benx":         {"tipo_acesso": "requests",   "download_key": "vivabenx"},
+    "Vasco Construtora": {"tipo_acesso": "requests",   "download_key": "vasco"},
+    "Vinx":              {"tipo_acesso": "requests",   "download_key": "vinx"},
+    "Riformato":         {"tipo_acesso": "requests",   "download_key": "riformato"},
+    "SUGOI":             {"tipo_acesso": "requests",   "download_key": "sugoi"},
+    "ACLF":              {"tipo_acesso": "requests",   "download_key": "aclf"},
+    "Emccamp":           {"tipo_acesso": "requests",   "download_key": "emccamp"},
+    "BM7":               {"tipo_acesso": "requests",   "download_key": "bm7"},
+    "FYP Engenharia":    {"tipo_acesso": "requests",   "download_key": "fyp"},
+    "Stanza":            {"tipo_acesso": "requests",   "download_key": "stanza"},
+    "Sousa Araujo":      {"tipo_acesso": "requests",   "download_key": "sousa_araujo"},
+    "Smart Construtora": {"tipo_acesso": "requests",   "download_key": "smart"},
+    "EPH":               {"tipo_acesso": "requests",   "download_key": "eph"},
+    "Jotanunes":         {"tipo_acesso": "requests",   "download_key": "jotanunes"},
+    "Cavazani":          {"tipo_acesso": "requests",   "download_key": "cavazani"},
+    "Rev3":              {"tipo_acesso": "requests",   "download_key": "rev3"},
+    "Carrilho":          {"tipo_acesso": "requests",   "download_key": "carrilho"},
+    "BP8":               {"tipo_acesso": "requests",   "download_key": "bp8"},
+    "ACL Incorporadora": {"tipo_acesso": "requests",   "download_key": "acl"},
+    "Ampla":             {"tipo_acesso": "requests",   "download_key": "ampla"},
+    "Novvo":             {"tipo_acesso": "requests",   "download_key": "novvo"},
+    "M.Lar":             {"tipo_acesso": "requests",   "download_key": "mlar"},
+    "Construtora Open":  {"tipo_acesso": "requests",   "download_key": "open"},
+    "Ún1ca":             {"tipo_acesso": "requests",   "download_key": "unica"},
 }
 
 CATEGORIAS = ["plantas", "fachada", "areas_comuns", "decorado", "geral", "obra"]
@@ -144,6 +177,171 @@ def criar_driver():
 # ============================================================
 # API VIVAZ - IMAGENS
 # ============================================================
+
+# ============================================================
+# API MRV - IMAGENS
+# ============================================================
+
+MRV_API_BASE = (
+    "https://mrv.com.br/graphql/execute.json/mrv/search-result-card"
+    ";basePath=/content/dam/mrv/content-fragments/detalhe-empreendimento/{estado}/"
+)
+
+MRV_ESTADOS = [
+    "sao-paulo", "minas-gerais", "rio-de-janeiro", "parana", "santa-catarina",
+    "rio-grande-do-sul", "goias", "bahia", "pernambuco", "ceara", "espirito-santo",
+    "mato-grosso-do-sul", "mato-grosso", "para", "maranhao", "paraiba",
+    "rio-grande-do-norte", "sergipe", "alagoas", "amazonas", "piaui",
+    "distrito-federal", "tocantins",
+]
+
+MRV_TIPO_MAP = {
+    "perspectivas de fachada": "fachada",
+    "fachada": "fachada",
+    "perspectiva": "fachada",
+    "planta": "plantas",
+    "plantas": "plantas",
+    "implantação": "plantas",
+    "implantacao": "plantas",
+    "decorado": "decorado",
+    "interiores": "decorado",
+    "lazer": "areas_comuns",
+    "área comum": "areas_comuns",
+    "areas comuns": "areas_comuns",
+    "obra": "obra",
+    "andamento": "obra",
+}
+
+
+def _mrv_categorizar(tipo_titulo):
+    """Categoriza imagem MRV pelo tipoTitulo da API."""
+    if not tipo_titulo:
+        return "geral"
+    t = tipo_titulo.lower().strip()
+    for key, cat in MRV_TIPO_MAP.items():
+        if key in t:
+            return cat
+    return "geral"
+
+
+def baixar_imagens_mrv_api(session, max_imgs, progresso):
+    """Baixa imagens de todos os empreendimentos MRV via API GraphQL."""
+    import sqlite3
+    from html import unescape
+
+    conn = get_connection()
+    # Mapear nome -> slug do banco
+    rows = conn.execute(
+        "SELECT nome, slug, imagem_url FROM empreendimentos WHERE empresa = 'MRV'"
+    ).fetchall()
+    conn.close()
+
+    db_map = {}
+    for row in rows:
+        db_map[row["nome"]] = {"slug": row["slug"], "tem_img": bool(row["imagem_url"])}
+
+    total_baixadas = 0
+
+    for estado in MRV_ESTADOS:
+        url = MRV_API_BASE.format(estado=estado)
+        try:
+            r = session.get(url, headers={"Accept": "application/json"}, timeout=30)
+            if r.status_code != 200:
+                continue
+            data = r.json()
+            items = data.get("data", {}).get("empreendimentosList", {}).get("items", [])
+        except Exception as e:
+            logger.warning(f"  MRV API erro {estado}: {e}")
+            continue
+
+        for item in items:
+            nome = unescape(item.get("nomeImovel", "")).strip()
+            if not nome or nome not in db_map:
+                continue
+            if db_map[nome]["tem_img"]:
+                continue
+
+            slug = db_map[nome]["slug"]
+            chave = f"MRV:{slug}"
+            if chave in progresso.get("processados", []):
+                continue
+
+            # Extrair imagens da API
+            imagens = []
+            for grupo in (item.get("imagens") or []):
+                for key, val in grupo.items():
+                    if isinstance(val, list):
+                        for img in val:
+                            img_url = img.get("urlImagem")
+                            if not img_url:
+                                continue
+                            alt = unescape(img.get("alt", "") or "")
+                            tipo = unescape(img.get("tipoTitulo", "") or "")
+                            cat = _mrv_categorizar(tipo)
+                            imagens.append({"url": img_url, "alt": alt or tipo, "categoria": cat})
+
+            if not imagens:
+                progresso.setdefault("processados", []).append(chave)
+                continue
+
+            selecionadas = filtrar_e_priorizar(imagens, max_imgs)
+            slug_pasta = normalizar_slug(slug) if slug else normalizar_slug(nome)
+            pasta_base = os.path.join(DOWNLOADS_DIR, "mrv", "imagens", slug_pasta)
+
+            baixadas = 0
+            dados_db = {}
+
+            for img in selecionadas:
+                cat = img["categoria"]
+                pasta_cat = os.path.join(pasta_base, cat)
+
+                ext = ".jpg"
+                url_lower = img["url"].lower()
+                for e in [".png", ".webp", ".jpeg"]:
+                    if e in url_lower:
+                        ext = e
+                        break
+
+                url_hash = hashlib.md5(img["url"].encode()).hexdigest()[:8]
+                desc = _gerar_descricao_arquivo(img.get("alt", ""), cat)
+                nome_arquivo = f"{slug_pasta}_{cat}_{desc}_{url_hash}{ext}" if desc else f"{slug_pasta}_{cat}_{url_hash}{ext}"
+                if len(nome_arquivo) > 120:
+                    nome_arquivo = f"{slug_pasta}_{cat}_{url_hash}{ext}"
+                caminho = os.path.join(pasta_cat, nome_arquivo)
+
+                if os.path.exists(caminho):
+                    baixadas += 1
+                    continue
+
+                if baixar_imagem(img["url"], caminho, session):
+                    baixadas += 1
+                    col = f"imagens_{cat}"
+                    rel_path = os.path.relpath(caminho, os.path.dirname(DOWNLOADS_DIR)).replace("\\", "/")
+                    dados_db.setdefault(col, []).append(rel_path)
+
+            if dados_db:
+                update = {}
+                for col, paths in dados_db.items():
+                    garantir_coluna(col, "TEXT")
+                    update[col] = " | ".join(paths)
+                for prioridade in CATEGORIAS:
+                    key = f"imagens_{prioridade}"
+                    if key in dados_db and dados_db[key]:
+                        update["imagem_url"] = dados_db[key][0]
+                        break
+                atualizar_empreendimento("MRV", nome, update)
+
+            if baixadas > 0:
+                total_baixadas += baixadas
+                logger.info(f"    {nome}: {baixadas} imagens")
+
+            progresso.setdefault("processados", []).append(chave)
+            db_map[nome]["tem_img"] = True
+
+        time.sleep(1)
+
+    return total_baixadas
+
 
 VIVAZ_API_HEADERS = {
     "User-Agent": REQ_CONFIG["headers"]["User-Agent"],
@@ -415,26 +613,71 @@ def popular_db_de_disco(empresa, download_key, inventario):
 # FASE 3: DOWNLOAD DE IMAGENS FALTANTES
 # ============================================================
 
-def categorizar_imagem(src, alt=""):
-    """Categoriza imagem pelo URL e alt text."""
-    texto = (alt + " " + src).lower()
+def categorizar_imagem(src, alt="", context=""):
+    """Categoriza imagem pelo URL, alt text e contexto HTML (section/heading proxima)."""
+    texto = (alt + " " + src + " " + context).lower()
 
-    if any(t in texto for t in ["planta", "implanta", "floor"]):
+    if any(t in texto for t in ["planta", "implanta", "floor", "layout", "tipologia"]):
         return "plantas"
-    elif any(t in texto for t in ["fachada", "portaria", "exterior"]):
+    elif any(t in texto for t in ["fachada", "portaria", "exterior", "perspectiva",
+                                    "external", "frente", "entrada"]):
         return "fachada"
     elif any(t in texto for t in ["decorado", "cozinha", "living", "dormitorio",
-                                    "dormitório", "banho", "quarto", "sala", "interior"]):
+                                    "dormitório", "banho", "quarto", "sala", "interior",
+                                    "suíte", "suite", "lavabo", "varanda", "terraço",
+                                    "terraco", "sacada"]):
         return "decorado"
-    elif any(t in texto for t in ["obra", "constru", "andamento"]):
+    elif any(t in texto for t in ["obra", "constru", "andamento", "evoluc", "acompanhe"]):
         return "obra"
     elif any(t in texto for t in ["churrasqueira", "fitness", "piscina", "playground",
                                     "brinquedoteca", "salao", "salão", "pet", "coworking",
                                     "bicicletario", "bicicletário", "quadra", "lazer",
-                                    "area comum", "área comum", "leisure"]):
+                                    "area comum", "área comum", "leisure", "academia",
+                                    "sauna", "rooftop", "gourmet", "cinema", "game",
+                                    "lounge", "espaco", "espaço", "garden"]):
         return "areas_comuns"
 
     return "geral"
+
+
+def _extrair_contexto_html(elem):
+    """Extrai contexto do elemento HTML: section id/class, heading mais proximo, etc."""
+    contexto_parts = []
+    # Subir nos pais procurando section/div com id ou class relevante
+    for parent in elem.parents:
+        if parent.name in ("section", "div"):
+            pid = parent.get("id", "")
+            pclass = " ".join(parent.get("class", []))
+            if pid:
+                contexto_parts.append(pid)
+            if pclass:
+                contexto_parts.append(pclass)
+            if pid or pclass:
+                break
+    # Heading mais proximo anterior
+    prev_heading = elem.find_previous(["h1", "h2", "h3", "h4"])
+    if prev_heading:
+        contexto_parts.append(prev_heading.get_text(strip=True))
+    return " ".join(contexto_parts)[:200]
+
+
+def _gerar_descricao_arquivo(alt_text, categoria):
+    """Gera descricao curta para o nome do arquivo a partir do alt-text."""
+    if not alt_text or len(alt_text.strip()) < 3:
+        return ""
+    # Limpar e normalizar
+    desc = alt_text.strip().lower()
+    desc = re.sub(r'[^\w\s-]', '', desc)
+    desc = re.sub(r'\s+', '_', desc)
+    # Remover palavras genéricas
+    for word in ["imagem", "foto", "image", "photo", "de", "do", "da", "dos", "das",
+                 "para", "com", "em", "no", "na", "um", "uma"]:
+        desc = re.sub(rf'\b{word}\b_?', '', desc)
+    desc = re.sub(r'_+', '_', desc).strip('_')
+    # Limitar
+    if len(desc) > 40:
+        desc = desc[:40].rsplit('_', 1)[0]
+    return desc
 
 
 def extrair_urls_imagens(soup, url_fonte):
@@ -452,20 +695,24 @@ def extrair_urls_imagens(soup, url_fonte):
             if not src:
                 continue
             alt = img.get("alt", "")
+            context = _extrair_contexto_html(img)
             src = _normalizar_url(src, base_url)
             if src and src not in seen and _url_valida(src):
                 seen.add(src)
-                imgs.append({"url": src, "alt": alt, "categoria": categorizar_imagem(src, alt)})
+                imgs.append({"url": src, "alt": alt, "context": context,
+                             "categoria": categorizar_imagem(src, alt, context)})
 
     # div[data-bg], div[data-image], etc.
     for attr in ["data-bg", "data-image", "data-src"]:
         for elem in soup.find_all(True, attrs={attr: True}):
             src = elem[attr]
             alt = elem.get("alt", "")
+            context = _extrair_contexto_html(elem)
             src = _normalizar_url(src, base_url)
             if src and src not in seen and _url_valida(src):
                 seen.add(src)
-                imgs.append({"url": src, "alt": alt, "categoria": categorizar_imagem(src, alt)})
+                imgs.append({"url": src, "alt": alt, "context": context,
+                             "categoria": categorizar_imagem(src, alt, context)})
 
     # <source srcset="..."> (lazy loading via <picture>)
     for source in soup.find_all("source", srcset=True):
@@ -490,10 +737,12 @@ def extrair_urls_imagens(soup, url_fonte):
                 img_tag = alt_elem.find("img")
                 if img_tag:
                     alt = img_tag.get("alt", "")
+            context = _extrair_contexto_html(source)
             src = _normalizar_url(src, base_url)
             if src and src not in seen and _url_valida(src):
                 seen.add(src)
-                imgs.append({"url": src, "alt": alt, "categoria": categorizar_imagem(src, alt)})
+                imgs.append({"url": src, "alt": alt, "context": context,
+                             "categoria": categorizar_imagem(src, alt, context)})
 
     # background-image em style inline
     for elem in soup.find_all(True, style=True):
@@ -503,7 +752,9 @@ def extrair_urls_imagens(soup, url_fonte):
             src = _normalizar_url(m.group(1), base_url)
             if src and src not in seen and _url_valida(src):
                 seen.add(src)
-                imgs.append({"url": src, "alt": "", "categoria": "geral"})
+                context = _extrair_contexto_html(elem)
+                imgs.append({"url": src, "alt": "", "context": context,
+                             "categoria": categorizar_imagem(src, "", context)})
 
     return imgs
 
@@ -526,13 +777,26 @@ def _url_valida(src):
     """Verifica se URL e de imagem valida (nao logo/icon/etc)."""
     src_lower = src.lower()
 
-    # Deve ser formato de imagem
-    if not any(ext in src_lower for ext in [".jpg", ".jpeg", ".png", ".webp"]):
-        return False
+    # CDNs de imagem com formato dinâmico (Cloudinary, imgix, etc.)
+    is_cdn_image = any(cdn in src_lower for cdn in [
+        "cloudinary.com/", "imgix.net/", "imagekit.io/",
+    ])
+
+    # Deve ser formato de imagem OU CDN de imagem
+    if not is_cdn_image:
+        if not any(ext in src_lower for ext in [".jpg", ".jpeg", ".png", ".webp"]):
+            return False
 
     # Nao deve conter termos de skip
     for term in SKIP_TERMS:
         if term in src_lower:
+            return False
+
+    # Para CDNs, filtrar imagens muito pequenas (thumbnails, logos)
+    if is_cdn_image:
+        # Cloudinary: c_limit,w_120 = muito pequeno
+        m = re.search(r'w_(\d+)', src_lower)
+        if m and int(m.group(1)) < 200:
             return False
 
     return True
@@ -566,6 +830,24 @@ def filtrar_e_priorizar(imagens, max_total=10):
                 restante -= 1
 
     return selecionadas
+
+
+def _detectar_extensao(url, content_type=""):
+    """Detecta extensão da imagem pela URL ou Content-Type."""
+    url_lower = url.lower()
+    for ext in [".png", ".webp", ".jpeg", ".jpg"]:
+        if ext in url_lower:
+            return ext
+    # CDN com formato dinâmico — usar content-type
+    if content_type:
+        ct = content_type.lower()
+        if "png" in ct:
+            return ".png"
+        if "webp" in ct:
+            return ".webp"
+        if "jpeg" in ct or "jpg" in ct:
+            return ".jpg"
+    return ".jpg"
 
 
 def baixar_imagem(url, caminho_destino, session):
@@ -632,17 +914,16 @@ def baixar_imagens_empreendimento(nome, slug, url_fonte, download_key, max_imgs,
         cat = img["categoria"]
         pasta_cat = os.path.join(pasta_base, cat)
 
-        # Determinar extensao
-        ext = ".jpg"
-        url_lower = img["url"].lower()
-        for e in [".png", ".webp", ".jpeg"]:
-            if e in url_lower:
-                ext = e
-                break
+        # Determinar extensao (suporta CDNs com formato dinâmico)
+        ext = _detectar_extensao(img["url"])
 
-        # Nome unico baseado no hash da URL
-        url_hash = hashlib.md5(img["url"].encode()).hexdigest()[:10]
-        nome_arquivo = f"{slug_pasta}_{url_hash}{ext}"
+        # Nome descritivo: slug_categoria_descricao_hash.ext
+        url_hash = hashlib.md5(img["url"].encode()).hexdigest()[:8]
+        desc = _gerar_descricao_arquivo(img.get("alt", ""), cat)
+        nome_arquivo = f"{slug_pasta}_{cat}_{desc}_{url_hash}{ext}" if desc else f"{slug_pasta}_{cat}_{url_hash}{ext}"
+        # Limitar tamanho do nome
+        if len(nome_arquivo) > 120:
+            nome_arquivo = f"{slug_pasta}_{cat}_{url_hash}{ext}"
         caminho = os.path.join(pasta_cat, nome_arquivo)
 
         if os.path.exists(caminho):
@@ -702,6 +983,14 @@ def processar_empresa(empresa, config, atualizar, limite, max_imgs,
 
     # Fase 3: Download de faltantes
     logger.info(f"  [Fase 3] Baixando imagens faltantes...")
+
+    # MRV usa API GraphQL dedicada
+    if tipo_acesso == "api_mrv":
+        session = requests.Session()
+        session.headers.update(HEADERS)
+        n = baixar_imagens_mrv_api(session, max_imgs, progresso)
+        salvar_progresso(progresso)
+        return {"disco": atualizados_disco, "baixados": n, "erros": 0, "sem_imgs": 0}
 
     conn = get_connection()
     registros = conn.execute(
@@ -806,8 +1095,8 @@ def main():
                         help="Apenas inventariar disco e popular DB (sem baixar)")
     parser.add_argument("--sem-download", action="store_true",
                         help="Nao baixar novas imagens")
-    parser.add_argument("--max-por-empreendimento", type=int, default=10,
-                        help="Max imagens por empreendimento (default: 10)")
+    parser.add_argument("--max-por-empreendimento", type=int, default=20,
+                        help="Max imagens por empreendimento (default: 20)")
     parser.add_argument("--reset-progresso", action="store_true",
                         help="Resetar progresso de downloads")
     args = parser.parse_args()
@@ -836,9 +1125,10 @@ def main():
         if args.empresa in EMPRESA_CONFIG:
             empresas = [(args.empresa, EMPRESA_CONFIG[args.empresa])]
         else:
-            logger.error(f"Empresa desconhecida: {args.empresa}")
-            logger.info(f"Disponiveis: {', '.join(EMPRESA_CONFIG.keys())}")
-            return
+            # Auto-detect: empresa no banco mas nao no config
+            key = re.sub(r'[^\w]', '_', args.empresa).lower().strip('_')
+            logger.info(f"Empresa nao configurada, usando download_key='{key}' com requests")
+            empresas = [(args.empresa, {"tipo_acesso": "requests", "download_key": key})]
 
     total_disco = 0
     total_baixados = 0
