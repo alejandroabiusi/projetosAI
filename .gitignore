@@ -12,6 +12,7 @@
 *.xls
 !analise_releases/planilhas/*.xlsx
 !analise_releases/schema_sugestao*.xlsx
+!analise_totvs/downloads/**/*.xlsx
 
 # Cache e temporários
 __pycache__/
@@ -26,8 +27,10 @@ __pycache__/
 
 # Downloads, backups, logs
 **/downloads/
+!analise_totvs/downloads/
 **/backups/
 **/logs/
+!analise_totvs/logs/
 
 # HTML gerado
 **/mapa_empreendimentos.html

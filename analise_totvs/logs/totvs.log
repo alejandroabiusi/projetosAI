@@ -1,0 +1,905 @@
+2026-03-18 10:54:58 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 10:54:58 | scraper.TOTVS | INFO | SCRAPER TOTVS - RELEASE
+2026-03-18 10:54:58 | scraper.TOTVS | INFO | URL: https://ri.totvs.com/informacoes-financeiras/central-de-resultados/
+2026-03-18 10:54:58 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 10:54:58 | scraper.TOTVS | INFO | Iniciando navegador Chrome...
+2026-03-18 10:55:04 | scraper.TOTVS | INFO | Navegador iniciado com sucesso.
+2026-03-18 10:55:14 | scraper.TOTVS | INFO | Titulo: Central de Resultados - TOTVS RI
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2025
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2024
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2023
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2022
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2021
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2020
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2019
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2018
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2017
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2016
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2015
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2014
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2013
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2012
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2011
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2010
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2009
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2008
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2007
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2006
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2005
+2026-03-18 10:55:14 | scraper.TOTVS | INFO |   Ano disponivel: 2004
+2026-03-18 10:55:14 | scraper.TOTVS | INFO | Select #fano: 22 anos encontrados.
+2026-03-18 10:55:14 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2025 ---
+2026-03-18 10:55:14 | scraper.TOTVS | INFO | Ano 2025 selecionado via Select #fano.
+2026-03-18 10:55:17 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |   Linha de release: 'Release de Resultados'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |     ACEITO: 1T25 | alt='1T25 - Release de Resultados'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |     ACEITO: 2T25 | alt='2T25 - Release de Resultados'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |     ACEITO: 3T25 | alt='3T25 - Release de Resultados'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |     ACEITO: 4T25 | alt='4T25 - Release de Resultados'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 10:55:17 | scraper.TOTVS | INFO | Documentos para 2025: 4
+2026-03-18 10:55:17 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_1T2025.pdf
+2026-03-18 10:55:17 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/97104816-6cc8-2cbd-5c55-386c62e6e210?origin=2
+2026-03-18 10:56:18 | scraper.TOTVS | ERROR |   Erro no download: HTTPSConnectionPool(host='api.mziq.com', port=443): Read timed out. (read timeout=60)
+2026-03-18 10:56:21 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_2T2025.pdf
+2026-03-18 10:56:21 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/b3134ec0-7cf8-0c12-cfd5-bbd9e89602f1?origin=2
+2026-03-18 10:56:23 | scraper.TOTVS | INFO |   Download concluido: 2775.9 KB
+2026-03-18 10:56:26 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_3T2025.pdf
+2026-03-18 10:56:26 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/5cae179c-1707-de0e-5b30-52f68d09d3d5?origin=2
+2026-03-18 10:57:26 | scraper.TOTVS | ERROR |   Erro no download: HTTPSConnectionPool(host='api.mziq.com', port=443): Read timed out. (read timeout=60)
+2026-03-18 10:57:29 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_4T2025.pdf
+2026-03-18 10:57:29 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/d1388902-d6a3-5fd5-a0cd-981ebe14253c?origin=2
+2026-03-18 10:57:33 | scraper.TOTVS | INFO |   Download concluido: 3495.8 KB
+2026-03-18 10:57:36 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2024 ---
+2026-03-18 10:57:36 | scraper.TOTVS | INFO | Ano 2024 selecionado via Select #fano.
+2026-03-18 10:57:39 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |   Linha de release: 'Release de Resultados'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |     ACEITO: 1T24 | alt='1T24 - Release de Resultados'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |     ACEITO: 2T24 | alt='2T24 - Release de Resultados'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |     ACEITO: 3T24 | alt='3T24 - Release de Resultados'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |     ACEITO: 4T24 | alt='4T24 - Release de Resultados'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 10:57:39 | scraper.TOTVS | INFO | Documentos para 2024: 4
+2026-03-18 10:57:39 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_1T2024.pdf
+2026-03-18 10:57:39 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/d437681a-f537-9fbe-5757-b3a2d554d607?origin=2
+2026-03-18 10:57:42 | scraper.TOTVS | INFO |   Download concluido: 1381.4 KB
+2026-03-18 10:57:45 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_2T2024.pdf
+2026-03-18 10:57:45 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/8d3d5725-ab47-c8d1-0263-d5b9e3bcd417?origin=2
+2026-03-18 10:57:47 | scraper.TOTVS | INFO |   Download concluido: 2040.9 KB
+2026-03-18 10:57:50 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_3T2024.pdf
+2026-03-18 10:57:50 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/c6c328da-bac7-7867-bedb-3f6eb5c6cb67?origin=2
+2026-03-18 10:57:52 | scraper.TOTVS | INFO |   Download concluido: 1616.9 KB
+2026-03-18 10:57:55 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_4T2024.pdf
+2026-03-18 10:57:55 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/4fcecbcc-1943-ab5a-2791-7e26e86fe547?origin=2
+2026-03-18 10:57:58 | scraper.TOTVS | INFO |   Download concluido: 2042.9 KB
+2026-03-18 10:58:01 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2023 ---
+2026-03-18 10:58:01 | scraper.TOTVS | INFO | Ano 2023 selecionado via Select #fano.
+2026-03-18 10:58:04 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 10:58:04 | scraper.TOTVS | INFO |   Linha de release: 'Release de Resultados'
+2026-03-18 10:58:04 | scraper.TOTVS | INFO |     ACEITO: 1T23 | alt='1T23 - Release de Resultados'
+2026-03-18 10:58:04 | scraper.TOTVS | INFO |     ACEITO: 2T23 | alt='2T23 - Release de Resultados'
+2026-03-18 10:58:05 | scraper.TOTVS | INFO |     ACEITO: 3T23 | alt='3T23 - Release de Resultados'
+2026-03-18 10:58:05 | scraper.TOTVS | INFO |     ACEITO: 4T23 | alt='4T23 - Release de Resultados'
+2026-03-18 10:58:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 10:58:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 10:58:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 10:58:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 10:58:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 10:58:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 10:58:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 10:58:05 | scraper.TOTVS | INFO | Documentos para 2023: 4
+2026-03-18 10:58:05 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_1T2023.pdf
+2026-03-18 10:58:05 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/d2830cef-970a-47c9-6070-2e8a56989dd9?origin=2
+2026-03-18 10:58:08 | scraper.TOTVS | INFO |   Download concluido: 4151.3 KB
+2026-03-18 10:58:11 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_2T2023.pdf
+2026-03-18 10:58:11 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/c0bd8639-5fc1-3027-039e-844c307d72c5?origin=2
+2026-03-18 10:58:15 | scraper.TOTVS | INFO |   Download concluido: 5098.2 KB
+2026-03-18 10:58:18 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_3T2023.pdf
+2026-03-18 10:58:18 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/840cdc16-f118-3004-dfd7-90dfb345112a?origin=2
+2026-03-18 10:58:22 | scraper.TOTVS | INFO |   Download concluido: 4361.5 KB
+2026-03-18 10:58:25 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_4T2023.pdf
+2026-03-18 10:58:25 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/6a8ccb4f-6bf2-ea89-8f2b-cb28d0e7c124?origin=2
+2026-03-18 10:58:29 | scraper.TOTVS | INFO |   Download concluido: 4290.4 KB
+2026-03-18 10:58:32 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2022 ---
+2026-03-18 10:58:32 | scraper.TOTVS | INFO | Ano 2022 selecionado via Select #fano.
+2026-03-18 10:58:35 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 10:58:35 | scraper.TOTVS | INFO |   Linha de release: 'Release de Resultados'
+2026-03-18 10:58:35 | scraper.TOTVS | INFO |     ACEITO: 1T22 | alt='1T22 - Release de Resultados'
+2026-03-18 10:58:35 | scraper.TOTVS | INFO |     ACEITO: 2T22 | alt='2T22 - Release de Resultados'
+2026-03-18 10:58:36 | scraper.TOTVS | INFO |     ACEITO: 3T22 | alt=' 3T22 - Release de Resultados'
+2026-03-18 10:58:36 | scraper.TOTVS | INFO |     ACEITO: 4T22 | alt='4T22 - Release de Resultados'
+2026-03-18 10:58:36 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 10:58:36 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 10:58:36 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 10:58:36 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 10:58:36 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 10:58:36 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 10:58:36 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 10:58:36 | scraper.TOTVS | INFO | Documentos para 2022: 4
+2026-03-18 10:58:36 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_1T2022.pdf
+2026-03-18 10:58:36 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/3bcddb54-9112-22ad-ec8e-a674c2d9f0fc?origin=2
+2026-03-18 10:58:38 | scraper.TOTVS | INFO |   Download concluido: 1633.0 KB
+2026-03-18 10:58:41 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_2T2022.pdf
+2026-03-18 10:58:41 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/17785ebc-896b-4273-b94a-809fe8735120?origin=2
+2026-03-18 10:58:44 | scraper.TOTVS | INFO |   Download concluido: 2007.9 KB
+2026-03-18 10:58:47 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_3T2022.pdf
+2026-03-18 10:58:47 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/6db35581-6c1c-57c2-1602-6827b6b219d0?origin=2
+2026-03-18 10:58:49 | scraper.TOTVS | INFO |   Download concluido: 1399.0 KB
+2026-03-18 10:58:52 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_4T2022.pdf
+2026-03-18 10:58:52 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/869d5796-85c8-b611-9848-0c83c62af9a4?origin=2
+2026-03-18 10:58:54 | scraper.TOTVS | INFO |   Download concluido: 1477.6 KB
+2026-03-18 10:58:59 | scraper.TOTVS | INFO | Navegador fechado.
+2026-03-18 10:58:59 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 10:58:59 | scraper.TOTVS | INFO | RELATORIO DE EXECUCAO - TOTVS
+2026-03-18 10:58:59 | scraper.TOTVS | INFO | Data: 2026-03-18 10:58:59
+2026-03-18 10:58:59 | scraper.TOTVS | INFO | Novos downloads: 14
+2026-03-18 10:58:59 | scraper.TOTVS | INFO | Ja existentes (pulados): 0
+2026-03-18 10:58:59 | scraper.TOTVS | INFO | Erros: 2
+2026-03-18 10:58:59 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 10:59:07 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 10:59:07 | scraper.TOTVS | INFO | SCRAPER TOTVS - RELEASE
+2026-03-18 10:59:07 | scraper.TOTVS | INFO | URL: https://ri.totvs.com/informacoes-financeiras/central-de-resultados/
+2026-03-18 10:59:07 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 10:59:07 | scraper.TOTVS | INFO | Iniciando navegador Chrome...
+2026-03-18 10:59:10 | scraper.TOTVS | INFO | Navegador iniciado com sucesso.
+2026-03-18 10:59:17 | scraper.TOTVS | INFO | Titulo: Central de Resultados - TOTVS RI
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2025
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2024
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2023
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2022
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2021
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2020
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2019
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2018
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2017
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2016
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2015
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2014
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2013
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2012
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2011
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2010
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2009
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2008
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2007
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2006
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2005
+2026-03-18 10:59:17 | scraper.TOTVS | INFO |   Ano disponivel: 2004
+2026-03-18 10:59:17 | scraper.TOTVS | INFO | Select #fano: 22 anos encontrados.
+2026-03-18 10:59:17 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2025 ---
+2026-03-18 10:59:17 | scraper.TOTVS | INFO | Ano 2025 selecionado via Select #fano.
+2026-03-18 10:59:20 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 10:59:20 | scraper.TOTVS | INFO |   Linha de release: 'Release de Resultados'
+2026-03-18 10:59:20 | scraper.TOTVS | INFO |     ACEITO: 1T25 | alt='1T25 - Release de Resultados'
+2026-03-18 10:59:20 | scraper.TOTVS | INFO |     ACEITO: 2T25 | alt='2T25 - Release de Resultados'
+2026-03-18 10:59:20 | scraper.TOTVS | INFO |     ACEITO: 3T25 | alt='3T25 - Release de Resultados'
+2026-03-18 10:59:20 | scraper.TOTVS | INFO |     ACEITO: 4T25 | alt='4T25 - Release de Resultados'
+2026-03-18 10:59:20 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 10:59:20 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 10:59:20 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 10:59:21 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 10:59:21 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 10:59:21 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 10:59:21 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 10:59:21 | scraper.TOTVS | INFO | Documentos para 2025: 4
+2026-03-18 10:59:21 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_1T2025.pdf
+2026-03-18 10:59:21 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/97104816-6cc8-2cbd-5c55-386c62e6e210?origin=2
+2026-03-18 10:59:25 | scraper.TOTVS | INFO |   Download concluido: 5758.7 KB
+2026-03-18 10:59:28 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_2T2025.pdf
+2026-03-18 10:59:28 | scraper.TOTVS | INFO | Baixando: TOTVS_Release_3T2025.pdf
+2026-03-18 10:59:28 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/5cae179c-1707-de0e-5b30-52f68d09d3d5?origin=2
+2026-03-18 10:59:31 | scraper.TOTVS | INFO |   Download concluido: 2896.4 KB
+2026-03-18 10:59:34 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_4T2025.pdf
+2026-03-18 10:59:34 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2024 ---
+2026-03-18 10:59:34 | scraper.TOTVS | INFO | Ano 2024 selecionado via Select #fano.
+2026-03-18 10:59:37 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |   Linha de release: 'Release de Resultados'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |     ACEITO: 1T24 | alt='1T24 - Release de Resultados'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |     ACEITO: 2T24 | alt='2T24 - Release de Resultados'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |     ACEITO: 3T24 | alt='3T24 - Release de Resultados'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |     ACEITO: 4T24 | alt='4T24 - Release de Resultados'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 10:59:37 | scraper.TOTVS | INFO | Documentos para 2024: 4
+2026-03-18 10:59:37 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_1T2024.pdf
+2026-03-18 10:59:37 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_2T2024.pdf
+2026-03-18 10:59:37 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_3T2024.pdf
+2026-03-18 10:59:37 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_4T2024.pdf
+2026-03-18 10:59:37 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2023 ---
+2026-03-18 10:59:38 | scraper.TOTVS | INFO | Ano 2023 selecionado via Select #fano.
+2026-03-18 10:59:41 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |   Linha de release: 'Release de Resultados'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |     ACEITO: 1T23 | alt='1T23 - Release de Resultados'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |     ACEITO: 2T23 | alt='2T23 - Release de Resultados'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |     ACEITO: 3T23 | alt='3T23 - Release de Resultados'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |     ACEITO: 4T23 | alt='4T23 - Release de Resultados'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 10:59:41 | scraper.TOTVS | INFO | Documentos para 2023: 4
+2026-03-18 10:59:41 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_1T2023.pdf
+2026-03-18 10:59:41 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_2T2023.pdf
+2026-03-18 10:59:41 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_3T2023.pdf
+2026-03-18 10:59:41 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_4T2023.pdf
+2026-03-18 10:59:41 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2022 ---
+2026-03-18 10:59:41 | scraper.TOTVS | INFO | Ano 2022 selecionado via Select #fano.
+2026-03-18 10:59:44 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |   Linha de release: 'Release de Resultados'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |     ACEITO: 1T22 | alt='1T22 - Release de Resultados'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |     ACEITO: 2T22 | alt='2T22 - Release de Resultados'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |     ACEITO: 3T22 | alt=' 3T22 - Release de Resultados'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |     ACEITO: 4T22 | alt='4T22 - Release de Resultados'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 10:59:44 | scraper.TOTVS | INFO | Documentos para 2022: 4
+2026-03-18 10:59:44 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_1T2022.pdf
+2026-03-18 10:59:44 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_2T2022.pdf
+2026-03-18 10:59:44 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_3T2022.pdf
+2026-03-18 10:59:44 | scraper.TOTVS | INFO | Ja existe: TOTVS_Release_4T2022.pdf
+2026-03-18 10:59:46 | scraper.TOTVS | INFO | Navegador fechado.
+2026-03-18 10:59:46 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 10:59:46 | scraper.TOTVS | INFO | RELATORIO DE EXECUCAO - TOTVS
+2026-03-18 10:59:46 | scraper.TOTVS | INFO | Data: 2026-03-18 10:59:46
+2026-03-18 10:59:46 | scraper.TOTVS | INFO | Novos downloads: 2
+2026-03-18 10:59:46 | scraper.TOTVS | INFO | Ja existentes (pulados): 14
+2026-03-18 10:59:46 | scraper.TOTVS | INFO | Erros: 0
+2026-03-18 10:59:46 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 10:59:52 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 10:59:52 | scraper.TOTVS | INFO | SCRAPER TOTVS - TRANSCRICAO
+2026-03-18 10:59:52 | scraper.TOTVS | INFO | URL: https://ri.totvs.com/informacoes-financeiras/central-de-resultados/
+2026-03-18 10:59:52 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 10:59:52 | scraper.TOTVS | INFO | Iniciando navegador Chrome...
+2026-03-18 10:59:54 | scraper.TOTVS | INFO | Navegador iniciado com sucesso.
+2026-03-18 11:00:01 | scraper.TOTVS | INFO | Titulo: Central de Resultados - TOTVS RI
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2025
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2024
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2023
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2022
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2021
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2020
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2019
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2018
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2017
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2016
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2015
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2014
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2013
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2012
+2026-03-18 11:00:01 | scraper.TOTVS | INFO |   Ano disponivel: 2011
+2026-03-18 11:00:02 | scraper.TOTVS | INFO |   Ano disponivel: 2010
+2026-03-18 11:00:02 | scraper.TOTVS | INFO |   Ano disponivel: 2009
+2026-03-18 11:00:02 | scraper.TOTVS | INFO |   Ano disponivel: 2008
+2026-03-18 11:00:02 | scraper.TOTVS | INFO |   Ano disponivel: 2007
+2026-03-18 11:00:02 | scraper.TOTVS | INFO |   Ano disponivel: 2006
+2026-03-18 11:00:02 | scraper.TOTVS | INFO |   Ano disponivel: 2005
+2026-03-18 11:00:02 | scraper.TOTVS | INFO |   Ano disponivel: 2004
+2026-03-18 11:00:02 | scraper.TOTVS | INFO | Select #fano: 22 anos encontrados.
+2026-03-18 11:00:02 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2025 ---
+2026-03-18 11:00:02 | scraper.TOTVS | INFO | Ano 2025 selecionado via Select #fano.
+2026-03-18 11:00:05 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |   Linha de transcricao: 'Transcrição da Videoconferência'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |     ACEITO: 1T25 | alt='Transcrição da Videoconferência 1T25'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |     ACEITO: 2T25 | alt='Transcrição da Videoconferência 2T25'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |     ACEITO: 3T25 | alt='Transcrição da Videoconferência 3T25'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |     ACEITO: 4T25 | alt='Transcrição da Videoconferência 4T25'
+2026-03-18 11:00:05 | scraper.TOTVS | INFO | Documentos para 2025: 4
+2026-03-18 11:00:05 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_1T2025.pdf
+2026-03-18 11:00:05 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/82475ec4-16a1-f66d-ad8a-e403369a9f3f?origin=2
+2026-03-18 11:00:07 | scraper.TOTVS | INFO |   Download concluido: 301.5 KB
+2026-03-18 11:00:10 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_2T2025.pdf
+2026-03-18 11:00:10 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/66a919f7-6a21-2d78-82de-b32f2ea0a834?origin=2
+2026-03-18 11:00:12 | scraper.TOTVS | INFO |   Download concluido: 299.2 KB
+2026-03-18 11:00:15 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_3T2025.pdf
+2026-03-18 11:00:15 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/e3d070ee-4823-b71a-1457-2315b42353a5?origin=2
+2026-03-18 11:00:16 | scraper.TOTVS | INFO |   Download concluido: 320.2 KB
+2026-03-18 11:00:19 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_4T2025.pdf
+2026-03-18 11:00:19 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/a8d575d4-76b9-43bb-34dc-a5515c1e4f25?origin=2
+2026-03-18 11:00:20 | scraper.TOTVS | INFO |   Download concluido: 397.7 KB
+2026-03-18 11:00:23 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2024 ---
+2026-03-18 11:00:24 | scraper.TOTVS | INFO | Ano 2024 selecionado via Select #fano.
+2026-03-18 11:00:27 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |   Linha de transcricao: 'Transcrição da Videoconferência'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |     ACEITO: 1T24 | alt='Transcrição da Videoconferência 1T24'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |     ACEITO: 2T24 | alt='Transcrição da Videoconferência 2T24'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |     ACEITO: 3T24 | alt='Transcrição da Videoconferência 3T24'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |     ACEITO: 4T24 | alt='Transcrição da Videoconferência 4T24'
+2026-03-18 11:00:27 | scraper.TOTVS | INFO | Documentos para 2024: 4
+2026-03-18 11:00:27 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_1T2024.pdf
+2026-03-18 11:00:27 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/0ee88049-3588-9f20-d5a7-fa66b77f74e3?origin=2
+2026-03-18 11:00:28 | scraper.TOTVS | INFO |   Download concluido: 181.3 KB
+2026-03-18 11:00:31 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_2T2024.pdf
+2026-03-18 11:00:31 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/dc208055-6934-c37c-a92b-f247085217c1?origin=2
+2026-03-18 11:01:32 | scraper.TOTVS | ERROR |   Erro no download: HTTPSConnectionPool(host='api.mziq.com', port=443): Read timed out. (read timeout=60)
+2026-03-18 11:01:35 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_3T2024.pdf
+2026-03-18 11:01:35 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/8c5153c3-d138-39b8-b366-1bcf4129a980?origin=2
+2026-03-18 11:01:36 | scraper.TOTVS | INFO |   Download concluido: 219.4 KB
+2026-03-18 11:01:39 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_4T2024.pdf
+2026-03-18 11:01:39 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/07521025-e4c6-6838-e01f-6f10c6c20641?origin=2
+2026-03-18 11:01:40 | scraper.TOTVS | INFO |   Download concluido: 365.7 KB
+2026-03-18 11:01:43 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2023 ---
+2026-03-18 11:01:44 | scraper.TOTVS | INFO | Ano 2023 selecionado via Select #fano.
+2026-03-18 11:01:47 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |   Linha de transcricao: 'Transcrição da Videoconferência'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |     ACEITO: 1T23 | alt='Transcrição da Videoconferência_1T23'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |     ACEITO: 2T23 | alt='Transcrição da Videoconferência_2T23'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |     ACEITO: 3T23 | alt='Transcrição da Videoconferência_3T23'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |     ACEITO: 4T23 | alt='Transcrição da Videoconferência 4T23'
+2026-03-18 11:01:47 | scraper.TOTVS | INFO | Documentos para 2023: 4
+2026-03-18 11:01:47 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_1T2023.pdf
+2026-03-18 11:01:47 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/c8b45961-489c-a203-2613-094676d91a1c?origin=2
+2026-03-18 11:01:49 | scraper.TOTVS | INFO |   Download concluido: 405.0 KB
+2026-03-18 11:01:52 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_2T2023.pdf
+2026-03-18 11:01:52 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/0f0a778a-499b-6fff-b507-404e6aad25e8?origin=2
+2026-03-18 11:01:53 | scraper.TOTVS | INFO |   Download concluido: 354.2 KB
+2026-03-18 11:01:56 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_3T2023.pdf
+2026-03-18 11:01:56 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/59cca32a-6b83-860c-5d5d-0bb0d3e1d1c6?origin=2
+2026-03-18 11:01:58 | scraper.TOTVS | INFO |   Download concluido: 229.1 KB
+2026-03-18 11:02:01 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_4T2023.pdf
+2026-03-18 11:02:01 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/a68dae52-a1a8-c024-2461-79626f0841db?origin=2
+2026-03-18 11:02:03 | scraper.TOTVS | INFO |   Download concluido: 258.9 KB
+2026-03-18 11:02:06 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2022 ---
+2026-03-18 11:02:06 | scraper.TOTVS | INFO | Ano 2022 selecionado via Select #fano.
+2026-03-18 11:02:09 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |   Linha de transcricao: 'Transcrição da Videoconferência'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |     ACEITO: 1T22 | alt='TOTS3_1T22_PT'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |     ACEITO: 2T22 | alt='Transcrição da Videoconferência_2T22'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |     ACEITO: 3T22 | alt='Transcrição da Videoconferência_3T22'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |     ACEITO: 4T22 | alt='Transcrição da Videoconferência_4T22'
+2026-03-18 11:02:09 | scraper.TOTVS | INFO | Documentos para 2022: 4
+2026-03-18 11:02:09 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_1T2022.pdf
+2026-03-18 11:02:09 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/98d2cc22-a1cd-5493-f704-ebb1bb40bdea?origin=2
+2026-03-18 11:02:11 | scraper.TOTVS | INFO |   Download concluido: 800.1 KB
+2026-03-18 11:02:14 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_2T2022.pdf
+2026-03-18 11:02:14 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/d008cd77-af7e-4ba7-9e6e-c3c0cc88acea?origin=2
+2026-03-18 11:02:19 | scraper.TOTVS | INFO |   Download concluido: 8567.0 KB
+2026-03-18 11:02:22 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_3T2022.pdf
+2026-03-18 11:02:22 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/6fa541fe-3f61-d1de-a836-9b54a1a7d1f4?origin=2
+2026-03-18 11:02:24 | scraper.TOTVS | INFO |   Download concluido: 242.9 KB
+2026-03-18 11:02:27 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_4T2022.pdf
+2026-03-18 11:02:27 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/f3cf4190-e0bd-bca6-87b2-b25d81038511?origin=2
+2026-03-18 11:02:28 | scraper.TOTVS | INFO |   Download concluido: 284.8 KB
+2026-03-18 11:02:33 | scraper.TOTVS | INFO | Navegador fechado.
+2026-03-18 11:02:33 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:02:33 | scraper.TOTVS | INFO | RELATORIO DE EXECUCAO - TOTVS
+2026-03-18 11:02:33 | scraper.TOTVS | INFO | Data: 2026-03-18 11:02:33
+2026-03-18 11:02:33 | scraper.TOTVS | INFO | Novos downloads: 15
+2026-03-18 11:02:33 | scraper.TOTVS | INFO | Ja existentes (pulados): 0
+2026-03-18 11:02:33 | scraper.TOTVS | INFO | Erros: 1
+2026-03-18 11:02:33 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:02:38 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:02:38 | scraper.TOTVS | INFO | SCRAPER TOTVS - ITR/DFP
+2026-03-18 11:02:38 | scraper.TOTVS | INFO | URL: https://ri.totvs.com/informacoes-financeiras/central-de-resultados/
+2026-03-18 11:02:38 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:02:38 | scraper.TOTVS | INFO | Iniciando navegador Chrome...
+2026-03-18 11:02:41 | scraper.TOTVS | INFO | Navegador iniciado com sucesso.
+2026-03-18 11:02:48 | scraper.TOTVS | INFO | Titulo: Central de Resultados - TOTVS RI
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2025
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2024
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2023
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2022
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2021
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2020
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2019
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2018
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2017
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2016
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2015
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2014
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2013
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2012
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2011
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2010
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2009
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2008
+2026-03-18 11:02:48 | scraper.TOTVS | INFO |   Ano disponivel: 2007
+2026-03-18 11:02:49 | scraper.TOTVS | INFO |   Ano disponivel: 2006
+2026-03-18 11:02:49 | scraper.TOTVS | INFO |   Ano disponivel: 2005
+2026-03-18 11:02:49 | scraper.TOTVS | INFO |   Ano disponivel: 2004
+2026-03-18 11:02:49 | scraper.TOTVS | INFO | Select #fano: 22 anos encontrados.
+2026-03-18 11:02:49 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2025 ---
+2026-03-18 11:02:49 | scraper.TOTVS | INFO | Ano 2025 selecionado via Select #fano.
+2026-03-18 11:02:52 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |   Linha de itr_dfp: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |     ACEITO: 1T25 | alt='ITR - 1T25'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |     ACEITO: 2T25 | alt='ITR - 2T25'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |     ACEITO: 3T25 | alt='ITR - 3T25'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |     ACEITO: 4T25 | alt='DFP/ITR - 4T25'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 11:02:52 | scraper.TOTVS | INFO | Documentos para 2025: 4
+2026-03-18 11:02:52 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_1T2025.pdf
+2026-03-18 11:02:52 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/9545305f-3e09-c8c6-293e-645e6ae83965?origin=2
+2026-03-18 11:02:59 | scraper.TOTVS | INFO |   Download concluido: 5610.4 KB
+2026-03-18 11:03:02 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_2T2025.pdf
+2026-03-18 11:03:02 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/0e386022-ddda-bd7d-16cb-9060e0969199?origin=2
+2026-03-18 11:03:06 | scraper.TOTVS | INFO |   Download concluido: 3881.6 KB
+2026-03-18 11:03:09 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_3T2025.pdf
+2026-03-18 11:03:09 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/656aaf94-a33c-451d-d5cb-77f85f2af11c?origin=2
+2026-03-18 11:03:14 | scraper.TOTVS | INFO |   Download concluido: 3739.9 KB
+2026-03-18 11:03:17 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_4T2025.pdf
+2026-03-18 11:03:17 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/d25a1b26-4069-b597-7534-80baf98d4543?origin=2
+2026-03-18 11:04:17 | scraper.TOTVS | ERROR |   Erro no download: HTTPSConnectionPool(host='api.mziq.com', port=443): Read timed out. (read timeout=60)
+2026-03-18 11:04:20 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2024 ---
+2026-03-18 11:04:21 | scraper.TOTVS | INFO | Ano 2024 selecionado via Select #fano.
+2026-03-18 11:04:24 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |   Linha de itr_dfp: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |     ACEITO: 1T24 | alt='ITR - 1T24'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |     ACEITO: 2T24 | alt='ITR - 2T24'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |     ACEITO: 3T24 | alt='ITR - 3T24'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |     ACEITO: 4T24 | alt='4T24 - DFP'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 11:04:24 | scraper.TOTVS | INFO | Documentos para 2024: 4
+2026-03-18 11:04:24 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_1T2024.pdf
+2026-03-18 11:04:24 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/3719fdda-ba2d-7f98-54ad-5274e34f7a64?origin=2
+2026-03-18 11:04:27 | scraper.TOTVS | INFO |   Download concluido: 1285.1 KB
+2026-03-18 11:04:30 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_2T2024.pdf
+2026-03-18 11:04:30 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/f6625339-e1cc-731d-5a20-cdafa3fa556a?origin=2
+2026-03-18 11:04:32 | scraper.TOTVS | INFO |   Download concluido: 3627.6 KB
+2026-03-18 11:04:35 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_3T2024.pdf
+2026-03-18 11:04:35 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/aa02983e-224a-4268-96e8-456971debc6c?origin=2
+2026-03-18 11:04:37 | scraper.TOTVS | INFO |   Download concluido: 3836.3 KB
+2026-03-18 11:04:40 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_4T2024.pdf
+2026-03-18 11:04:40 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/50b3f62c-4a03-63a6-accc-651c9bae412f?origin=2
+2026-03-18 11:04:44 | scraper.TOTVS | INFO |   Download concluido: 8192.0 KB
+2026-03-18 11:04:47 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2023 ---
+2026-03-18 11:04:47 | scraper.TOTVS | INFO | Ano 2023 selecionado via Select #fano.
+2026-03-18 11:04:50 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |   Linha de itr_dfp: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |     ACEITO: 1T23 | alt='1T23 - ITR'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |     ACEITO: 2T23 | alt='ITR - 2T23'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |     ACEITO: 3T23 | alt='ITR - 3T23'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |     ACEITO: 4T23 | alt='4T23 - DFP'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 11:04:50 | scraper.TOTVS | INFO | Documentos para 2023: 4
+2026-03-18 11:04:50 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_1T2023.pdf
+2026-03-18 11:04:50 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/722eb3e3-ca22-85a0-9a40-d83334c19128?origin=2
+2026-03-18 11:04:52 | scraper.TOTVS | INFO |   Download concluido: 1159.5 KB
+2026-03-18 11:04:55 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_2T2023.pdf
+2026-03-18 11:04:55 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/61a23997-9e50-009b-4b2d-799e81955d69?origin=2
+2026-03-18 11:04:57 | scraper.TOTVS | INFO |   Download concluido: 1179.1 KB
+2026-03-18 11:05:00 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_3T2023.pdf
+2026-03-18 11:05:00 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/25a3a532-26ac-2754-55ee-63d035fefab1?origin=2
+2026-03-18 11:05:03 | scraper.TOTVS | INFO |   Download concluido: 1179.9 KB
+2026-03-18 11:05:06 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_4T2023.pdf
+2026-03-18 11:05:06 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/a808b10c-d6ec-938b-5345-84c9b7d9d1a3?origin=2
+2026-03-18 11:05:08 | scraper.TOTVS | INFO |   Download concluido: 2048.0 KB
+2026-03-18 11:05:11 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2022 ---
+2026-03-18 11:05:11 | scraper.TOTVS | INFO | Ano 2022 selecionado via Select #fano.
+2026-03-18 11:05:14 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |   Linha de itr_dfp: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |     ACEITO: 1T22 | alt='1T22 - ITR'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |     ACEITO: 2T22 | alt='2T22 - ITR'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |     ACEITO: 3T22 | alt='3T22 - ITR'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |     ACEITO: 4T22 | alt='4T22 - DFP'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 11:05:15 | scraper.TOTVS | INFO | Documentos para 2022: 4
+2026-03-18 11:05:15 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_1T2022.pdf
+2026-03-18 11:05:15 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/3d7b1f41-30bb-f430-f38b-51b12bda72e6?origin=2
+2026-03-18 11:05:16 | scraper.TOTVS | INFO |   Download concluido: 1790.0 KB
+2026-03-18 11:05:19 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_2T2022.pdf
+2026-03-18 11:05:19 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/53af95d4-0925-d89e-113e-e0af6edd8949?origin=2
+2026-03-18 11:05:21 | scraper.TOTVS | INFO |   Download concluido: 1579.5 KB
+2026-03-18 11:05:24 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_3T2022.pdf
+2026-03-18 11:05:24 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/d2097413-0321-002a-0cd2-6a464ee85881?origin=2
+2026-03-18 11:05:26 | scraper.TOTVS | INFO |   Download concluido: 1477.2 KB
+2026-03-18 11:05:29 | scraper.TOTVS | INFO | Baixando: TOTVS_ITR_4T2022.pdf
+2026-03-18 11:05:29 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/125f45b8-92b9-7e94-8782-151356217e81?origin=2
+2026-03-18 11:05:31 | scraper.TOTVS | INFO |   Download concluido: 4096.0 KB
+2026-03-18 11:05:36 | scraper.TOTVS | INFO | Navegador fechado.
+2026-03-18 11:05:36 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:05:36 | scraper.TOTVS | INFO | RELATORIO DE EXECUCAO - TOTVS
+2026-03-18 11:05:36 | scraper.TOTVS | INFO | Data: 2026-03-18 11:05:36
+2026-03-18 11:05:36 | scraper.TOTVS | INFO | Novos downloads: 15
+2026-03-18 11:05:36 | scraper.TOTVS | INFO | Ja existentes (pulados): 0
+2026-03-18 11:05:36 | scraper.TOTVS | INFO | Erros: 1
+2026-03-18 11:05:36 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:05:45 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:05:45 | scraper.TOTVS | INFO | SCRAPER TOTVS - DEMONSTRACOES
+2026-03-18 11:05:45 | scraper.TOTVS | INFO | URL: https://ri.totvs.com/informacoes-financeiras/central-de-resultados/
+2026-03-18 11:05:45 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:05:45 | scraper.TOTVS | INFO | Iniciando navegador Chrome...
+2026-03-18 11:05:48 | scraper.TOTVS | INFO | Navegador iniciado com sucesso.
+2026-03-18 11:05:55 | scraper.TOTVS | INFO | Titulo: Central de Resultados - TOTVS RI
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2025
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2024
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2023
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2022
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2021
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2020
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2019
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2018
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2017
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2016
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2015
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2014
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2013
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2012
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2011
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2010
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2009
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2008
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2007
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2006
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2005
+2026-03-18 11:05:55 | scraper.TOTVS | INFO |   Ano disponivel: 2004
+2026-03-18 11:05:55 | scraper.TOTVS | INFO | Select #fano: 22 anos encontrados.
+2026-03-18 11:05:55 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2025 ---
+2026-03-18 11:05:56 | scraper.TOTVS | INFO | Ano 2025 selecionado via Select #fano.
+2026-03-18 11:05:59 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |     ACEITO: 1T25 | alt='1T25 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |     ACEITO: 2T25 | alt='2T25 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |     ACEITO: 3T25 | alt='3T25 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |     ACEITO: 4T25 | alt='2025 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |     ACEITO: 4T25 | alt='2025 - Demonstrações Financeiras em Padrões Internacionais '
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |     ACEITO: 1T25 | alt='ITR - 1T25'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |     ACEITO: 2T25 | alt='ITR - 2T25'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |     ACEITO: 3T25 | alt='ITR - 3T25'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |     ACEITO: 4T25 | alt='DFP/ITR - 4T25'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 11:05:59 | scraper.TOTVS | INFO | Documentos para 2025: 9
+2026-03-18 11:05:59 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_1T2025.pdf
+2026-03-18 11:05:59 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/646b49de-0c09-4e5f-dc0f-b9098373162c?origin=2
+2026-03-18 11:06:01 | scraper.TOTVS | INFO |   Download concluido: 2813.8 KB
+2026-03-18 11:06:04 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_2T2025.pdf
+2026-03-18 11:06:04 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/251dad0f-83bd-184a-5db8-492e0e8ea7df?origin=2
+2026-03-18 11:06:06 | scraper.TOTVS | INFO |   Download concluido: 3123.8 KB
+2026-03-18 11:06:09 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_3T2025.pdf
+2026-03-18 11:06:09 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/a884f8ca-21f2-03c9-d61f-80fff1977cd4?origin=2
+2026-03-18 11:06:12 | scraper.TOTVS | INFO |   Download concluido: 3069.7 KB
+2026-03-18 11:06:15 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_4T2025.pdf
+2026-03-18 11:06:15 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/b94eb41b-6d4e-86fa-c61e-e6d0cfa6efe3?origin=2
+2026-03-18 11:06:17 | scraper.TOTVS | INFO |   Download concluido: 4509.7 KB
+2026-03-18 11:06:20 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_4T2025.pdf
+2026-03-18 11:06:20 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_1T2025.pdf
+2026-03-18 11:06:20 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_2T2025.pdf
+2026-03-18 11:06:20 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_3T2025.pdf
+2026-03-18 11:06:20 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_4T2025.pdf
+2026-03-18 11:06:20 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2024 ---
+2026-03-18 11:06:20 | scraper.TOTVS | INFO | Ano 2024 selecionado via Select #fano.
+2026-03-18 11:06:23 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |     ACEITO: 1T24 | alt='1T24 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |     ACEITO: 2T24 | alt='2T24 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |     ACEITO: 3T24 | alt='3T24 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |     ACEITO: 4T24 | alt='2024 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |     ACEITO: 4T24 | alt='Demonstrações Financeiras em Padrões Internacionais - Versão em Português'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |     ACEITO: 1T24 | alt='ITR - 1T24'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |     ACEITO: 2T24 | alt='ITR - 2T24'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |     ACEITO: 3T24 | alt='ITR - 3T24'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |     ACEITO: 4T24 | alt='4T24 - DFP'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 11:06:23 | scraper.TOTVS | INFO | Documentos para 2024: 9
+2026-03-18 11:06:23 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_1T2024.pdf
+2026-03-18 11:06:23 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/29de2214-db65-0ed3-01ef-ebfed76b21f8?origin=2
+2026-03-18 11:06:25 | scraper.TOTVS | INFO |   Download concluido: 1056.7 KB
+2026-03-18 11:06:28 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_2T2024.pdf
+2026-03-18 11:06:28 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/10bf854d-a365-cab1-4565-ee33cd8ec031?origin=2
+2026-03-18 11:06:30 | scraper.TOTVS | INFO |   Download concluido: 928.8 KB
+2026-03-18 11:06:33 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_3T2024.pdf
+2026-03-18 11:06:33 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/618a78de-0475-0e3a-bad0-b01c5539fdd9?origin=2
+2026-03-18 11:06:35 | scraper.TOTVS | INFO |   Download concluido: 1005.4 KB
+2026-03-18 11:06:38 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_4T2024.pdf
+2026-03-18 11:06:38 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/bd440a7f-0380-a43d-0c70-f4ced682729f?origin=2
+2026-03-18 11:06:40 | scraper.TOTVS | INFO |   Download concluido: 2197.6 KB
+2026-03-18 11:06:43 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_4T2024.pdf
+2026-03-18 11:06:43 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_1T2024.pdf
+2026-03-18 11:06:43 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_2T2024.pdf
+2026-03-18 11:06:43 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_3T2024.pdf
+2026-03-18 11:06:43 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_4T2024.pdf
+2026-03-18 11:06:43 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2023 ---
+2026-03-18 11:06:43 | scraper.TOTVS | INFO | Ano 2023 selecionado via Select #fano.
+2026-03-18 11:06:46 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:06:46 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:06:46 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:06:46 | scraper.TOTVS | INFO |     ACEITO: 1T23 | alt='1T23 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |     ACEITO: 2T23 | alt='2T23 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |     ACEITO: 3T23 | alt='3T23 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |     ACEITO: 4T23 | alt='Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |     ACEITO: 4T23 | alt='Demonstrações Financeiras em Padrões Internacionais - Versão em Português'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |     ACEITO: 1T23 | alt='1T23 - ITR'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |     ACEITO: 2T23 | alt='ITR - 2T23'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |     ACEITO: 3T23 | alt='ITR - 3T23'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |     ACEITO: 4T23 | alt='4T23 - DFP'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 11:06:47 | scraper.TOTVS | INFO | Documentos para 2023: 9
+2026-03-18 11:06:47 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_1T2023.pdf
+2026-03-18 11:06:47 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/579c5827-078f-70ce-48b6-f7283f7a4f6f?origin=2
+2026-03-18 11:06:48 | scraper.TOTVS | INFO |   Download concluido: 1283.3 KB
+2026-03-18 11:06:51 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_2T2023.pdf
+2026-03-18 11:06:51 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/14c2174b-c0a6-9c42-e7e6-f58248ccd1e8?origin=2
+2026-03-18 11:06:53 | scraper.TOTVS | INFO |   Download concluido: 1086.6 KB
+2026-03-18 11:06:56 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_3T2023.pdf
+2026-03-18 11:06:56 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/103de17d-014f-0961-f05e-58bdf9abefa9?origin=2
+2026-03-18 11:06:59 | scraper.TOTVS | INFO |   Download concluido: 1116.3 KB
+2026-03-18 11:07:02 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_4T2023.pdf
+2026-03-18 11:07:02 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/fc5c66a6-f86d-bad5-5fd1-208b007ddc9a?origin=2
+2026-03-18 11:07:04 | scraper.TOTVS | INFO |   Download concluido: 1331.4 KB
+2026-03-18 11:07:07 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_4T2023.pdf
+2026-03-18 11:07:07 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_1T2023.pdf
+2026-03-18 11:07:07 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_2T2023.pdf
+2026-03-18 11:07:07 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_3T2023.pdf
+2026-03-18 11:07:07 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_4T2023.pdf
+2026-03-18 11:07:07 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2022 ---
+2026-03-18 11:07:08 | scraper.TOTVS | INFO | Ano 2022 selecionado via Select #fano.
+2026-03-18 11:07:11 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |     ACEITO: 1T22 | alt='1T22 - Demonstrações Financeiras em Padrões Internacionais - Versão Inglês'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |     ACEITO: 2T22 | alt='2T22 - Demonstrações Financeiras em Padrões Internacionais - Versão Inglês'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |     ACEITO: 3T22 | alt='3T22 - Demonstrações Financeiras em Padrões Internacionais - Versão Inglês'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |     ACEITO: 4T22 | alt='2022 - Demonstrações Financeiras em Padrões Internacionais - Versão em Inglês'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |     ACEITO: 4T22 | alt='2022 - Demonstrações Financeiras Anuais Completas'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |   Linha de demonstracoes: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |     ACEITO: 1T22 | alt='1T22 - ITR'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |     ACEITO: 2T22 | alt='2T22 - ITR'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |     ACEITO: 3T22 | alt='3T22 - ITR'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |     ACEITO: 4T22 | alt='4T22 - DFP'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |   Linha ignorada: 'Transcrição da Videoconferência'
+2026-03-18 11:07:11 | scraper.TOTVS | INFO | Documentos para 2022: 9
+2026-03-18 11:07:11 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_1T2022.pdf
+2026-03-18 11:07:11 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/7d3a079f-ea1c-6714-0532-59a0a4e33734?origin=2
+2026-03-18 11:07:13 | scraper.TOTVS | INFO |   Download concluido: 1221.5 KB
+2026-03-18 11:07:16 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_2T2022.pdf
+2026-03-18 11:07:16 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/ff0d7c3d-702d-2074-39be-f71d25ed8c2e?origin=2
+2026-03-18 11:07:17 | scraper.TOTVS | INFO |   Download concluido: 1122.6 KB
+2026-03-18 11:07:20 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_3T2022.pdf
+2026-03-18 11:07:20 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/4b77cad7-5308-34cc-d162-e91c22d291c0?origin=2
+2026-03-18 11:07:22 | scraper.TOTVS | INFO |   Download concluido: 1072.3 KB
+2026-03-18 11:07:25 | scraper.TOTVS | INFO | Baixando: TOTVS_DF_4T2022.pdf
+2026-03-18 11:07:25 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/e918570e-a656-6d86-401e-7c4453742864?origin=2
+2026-03-18 11:07:27 | scraper.TOTVS | INFO |   Download concluido: 1453.4 KB
+2026-03-18 11:07:30 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_4T2022.pdf
+2026-03-18 11:07:30 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_1T2022.pdf
+2026-03-18 11:07:30 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_2T2022.pdf
+2026-03-18 11:07:30 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_3T2022.pdf
+2026-03-18 11:07:30 | scraper.TOTVS | INFO | Ja existe: TOTVS_DF_4T2022.pdf
+2026-03-18 11:07:32 | scraper.TOTVS | INFO | Navegador fechado.
+2026-03-18 11:07:32 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:07:32 | scraper.TOTVS | INFO | RELATORIO DE EXECUCAO - TOTVS
+2026-03-18 11:07:32 | scraper.TOTVS | INFO | Data: 2026-03-18 11:07:32
+2026-03-18 11:07:32 | scraper.TOTVS | INFO | Novos downloads: 16
+2026-03-18 11:07:32 | scraper.TOTVS | INFO | Ja existentes (pulados): 20
+2026-03-18 11:07:32 | scraper.TOTVS | INFO | Erros: 0
+2026-03-18 11:07:32 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:07:36 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:07:36 | scraper.TOTVS | INFO | SCRAPER TOTVS - PLANILHA
+2026-03-18 11:07:36 | scraper.TOTVS | INFO | URL: https://ri.totvs.com/informacoes-financeiras/planilhas-interativas/
+2026-03-18 11:07:36 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:07:36 | scraper.TOTVS | INFO | Iniciando navegador Chrome...
+2026-03-18 11:07:39 | scraper.TOTVS | INFO | Navegador iniciado com sucesso.
+2026-03-18 11:07:47 | scraper.TOTVS | INFO | Titulo: Planilhas Interativas - TOTVS RI
+2026-03-18 11:07:47 | scraper.TOTVS | INFO |   Ano disponivel: 2025
+2026-03-18 11:07:47 | scraper.TOTVS | INFO |   Ano disponivel: 2024
+2026-03-18 11:07:47 | scraper.TOTVS | INFO |   Ano disponivel: 2023
+2026-03-18 11:07:47 | scraper.TOTVS | INFO |   Ano disponivel: 2022
+2026-03-18 11:07:47 | scraper.TOTVS | INFO | Select #fano: 4 anos encontrados.
+2026-03-18 11:07:47 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2025 ---
+2026-03-18 11:07:48 | scraper.TOTVS | INFO | Ano 2025 selecionado via Select #fano.
+2026-03-18 11:07:51 | scraper.TOTVS | INFO | Tabela tb-central nao encontrada, usando scan de links...
+2026-03-18 11:07:51 | scraper.TOTVS | INFO | Total de links na pagina: 135
+2026-03-18 11:07:52 | scraper.TOTVS | INFO | Documentos para 2025: 0
+2026-03-18 11:07:52 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2024 ---
+2026-03-18 11:07:52 | scraper.TOTVS | INFO | Ano 2024 selecionado via Select #fano.
+2026-03-18 11:07:55 | scraper.TOTVS | INFO | Tabela tb-central nao encontrada, usando scan de links...
+2026-03-18 11:07:55 | scraper.TOTVS | INFO | Total de links na pagina: 135
+2026-03-18 11:07:56 | scraper.TOTVS | INFO | Documentos para 2024: 0
+2026-03-18 11:07:56 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2023 ---
+2026-03-18 11:07:56 | scraper.TOTVS | INFO | Ano 2023 selecionado via Select #fano.
+2026-03-18 11:07:59 | scraper.TOTVS | INFO | Tabela tb-central nao encontrada, usando scan de links...
+2026-03-18 11:07:59 | scraper.TOTVS | INFO | Total de links na pagina: 135
+2026-03-18 11:08:00 | scraper.TOTVS | INFO | Documentos para 2023: 0
+2026-03-18 11:08:00 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2022 ---
+2026-03-18 11:08:00 | scraper.TOTVS | INFO | Ano 2022 selecionado via Select #fano.
+2026-03-18 11:08:03 | scraper.TOTVS | INFO | Tabela tb-central nao encontrada, usando scan de links...
+2026-03-18 11:08:04 | scraper.TOTVS | INFO | Total de links na pagina: 135
+2026-03-18 11:08:04 | scraper.TOTVS | INFO | Documentos para 2022: 0
+2026-03-18 11:08:07 | scraper.TOTVS | INFO | Navegador fechado.
+2026-03-18 11:08:07 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:08:07 | scraper.TOTVS | INFO | RELATORIO DE EXECUCAO - TOTVS
+2026-03-18 11:08:07 | scraper.TOTVS | INFO | Data: 2026-03-18 11:08:07
+2026-03-18 11:08:07 | scraper.TOTVS | INFO | Novos downloads: 0
+2026-03-18 11:08:07 | scraper.TOTVS | INFO | Ja existentes (pulados): 0
+2026-03-18 11:08:07 | scraper.TOTVS | INFO | Erros: 0
+2026-03-18 11:08:07 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:08:34 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:08:34 | scraper.TOTVS | INFO | SCRAPER TOTVS - TRANSCRICAO
+2026-03-18 11:08:34 | scraper.TOTVS | INFO | URL: https://ri.totvs.com/informacoes-financeiras/central-de-resultados/
+2026-03-18 11:08:34 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:08:34 | scraper.TOTVS | INFO | Iniciando navegador Chrome...
+2026-03-18 11:08:36 | scraper.TOTVS | INFO | Navegador iniciado com sucesso.
+2026-03-18 11:08:43 | scraper.TOTVS | INFO | Titulo: Central de Resultados - TOTVS RI
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2025
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2024
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2023
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2022
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2021
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2020
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2019
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2018
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2017
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2016
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2015
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2014
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2013
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2012
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2011
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2010
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2009
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2008
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2007
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2006
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2005
+2026-03-18 11:08:43 | scraper.TOTVS | INFO |   Ano disponivel: 2004
+2026-03-18 11:08:43 | scraper.TOTVS | INFO | Select #fano: 22 anos encontrados.
+2026-03-18 11:08:43 | scraper.TOTVS | INFO | 
+--- TOTVS - Ano 2024 ---
+2026-03-18 11:08:44 | scraper.TOTVS | INFO | Ano 2024 selecionado via Select #fano.
+2026-03-18 11:08:47 | scraper.TOTVS | INFO | Tabelas tb-central encontradas: 1
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Release de Resultados'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão ING)'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras em Padrões Internacionais (Versão PT)'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Demonstrações Financeiras Padronizadas (DFP) / Informações Trimestrais (ITR)'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Apresentação de Resultados'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Videoconferência dos Resultados'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |   Linha ignorada: 'Áudio da Videoconferência dos Resultados'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |   Linha de transcricao: 'Transcrição da Videoconferência'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |     ACEITO: 1T24 | alt='Transcrição da Videoconferência 1T24'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |     ACEITO: 2T24 | alt='Transcrição da Videoconferência 2T24'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |     ACEITO: 3T24 | alt='Transcrição da Videoconferência 3T24'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |     ACEITO: 4T24 | alt='Transcrição da Videoconferência 4T24'
+2026-03-18 11:08:47 | scraper.TOTVS | INFO | Documentos para 2024: 4
+2026-03-18 11:08:47 | scraper.TOTVS | INFO | Ja existe: TOTVS_Transcricao_1T2024.pdf
+2026-03-18 11:08:47 | scraper.TOTVS | INFO | Baixando: TOTVS_Transcricao_2T2024.pdf
+2026-03-18 11:08:47 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/dc208055-6934-c37c-a92b-f247085217c1?origin=2
+2026-03-18 11:08:48 | scraper.TOTVS | INFO |   Download concluido: 218.6 KB
+2026-03-18 11:08:51 | scraper.TOTVS | INFO | Ja existe: TOTVS_Transcricao_3T2024.pdf
+2026-03-18 11:08:51 | scraper.TOTVS | INFO | Ja existe: TOTVS_Transcricao_4T2024.pdf
+2026-03-18 11:08:54 | scraper.TOTVS | INFO | Navegador fechado.
+2026-03-18 11:08:54 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 11:08:54 | scraper.TOTVS | INFO | RELATORIO DE EXECUCAO - TOTVS
+2026-03-18 11:08:54 | scraper.TOTVS | INFO | Data: 2026-03-18 11:08:54
+2026-03-18 11:08:54 | scraper.TOTVS | INFO | Novos downloads: 1
+2026-03-18 11:08:54 | scraper.TOTVS | INFO | Ja existentes (pulados): 3
+2026-03-18 11:08:54 | scraper.TOTVS | INFO | Erros: 0
+2026-03-18 11:08:54 | scraper.TOTVS | INFO | ============================================================
+2026-03-18 12:42:47 | scraper.TOTVS | INFO | Iniciando navegador Chrome...
+2026-03-18 12:42:50 | scraper.TOTVS | INFO | Navegador iniciado com sucesso.
+2026-03-18 12:43:04 | scraper.TOTVS | INFO | Navegador fechado.
+2026-03-18 13:32:55 | scraper.TOTVS | INFO | Iniciando navegador Chrome...
+2026-03-18 13:32:57 | scraper.TOTVS | INFO | Navegador iniciado com sucesso.
+2026-03-18 13:33:12 | scraper.TOTVS | INFO | Baixando: TOTVS_Planilha_04d91ed8.xlsx
+2026-03-18 13:33:12 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/04d91ed8-af53-145f-5d89-4cab81716337?origin=2
+2026-03-18 13:33:15 | scraper.TOTVS | INFO |   Download concluido: 46082.2 KB
+2026-03-18 13:33:16 | scraper.TOTVS | INFO | Baixando: TOTVS_Planilha_4T25.xlsx
+2026-03-18 13:33:16 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/2b4a253a-8f42-27c0-5f34-679f3b12a284?origin=2
+2026-03-18 13:33:18 | scraper.TOTVS | INFO |   Download concluido: 473.7 KB
+2026-03-18 13:33:19 | scraper.TOTVS | INFO | Baixando: TOTVS_Planilha_2T25.xlsx
+2026-03-18 13:33:19 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/887f6f02-5652-f7bf-8be2-f5fb0e4b68b1?origin=2
+2026-03-18 13:33:20 | scraper.TOTVS | INFO |   Download concluido: 832.9 KB
+2026-03-18 13:33:22 | scraper.TOTVS | INFO | Baixando: TOTVS_Planilha_3T25.xlsx
+2026-03-18 13:33:22 | scraper.TOTVS | INFO |   URL: https://api.mziq.com/mzfilemanager/v2/d/d3be5d49-62e7-4def-a3e1-ab25ff09f153/e6481b9b-e187-e548-addf-d4e6468b55fe?origin=2
+2026-03-18 13:33:23 | scraper.TOTVS | INFO |   Download concluido: 452.4 KB
+2026-03-18 13:33:25 | scraper.TOTVS | INFO | Navegador fechado.
