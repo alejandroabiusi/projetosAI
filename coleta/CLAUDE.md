@@ -1,13 +1,13 @@
 # Projeto Coleta — Scrapers de Empreendimentos Imobiliários
 
 ## Objetivo
-Coletar dados de empreendimentos imobiliários de 22+ incorporadoras brasileiras, enriquecer com geocodificação e dados adicionais, gerar mapa interativo HTML, e manter a base atualizada automaticamente com detecção de mudanças.
+Coletar dados de empreendimentos imobiliários de 43 incorporadoras brasileiras, enriquecer com geocodificação e dados adicionais, gerar mapa interativo HTML, e manter a base atualizada automaticamente com detecção de mudanças.
 
 ## Banco de Dados
-- **Arquivo**: `data/empreendimentos.db` (SQLite, ~3MB)
+- **Arquivo**: `data/empreendimentos.db` (SQLite, ~5.6MB)
 - **Tabela principal**: `empreendimentos` (~90 colunas)
-- **~2017 registros** de 22 empresas, **~99,6% com coordenadas**
-- MRV (435), Cury (272), Plano&Plano (157), Magik JC (112), Direcional (110), Metrocasa (109), Vivaz (106), Pacaembu (54), Vibra Residencial (50), Kazzas (40), Conx (35), Novolar (30), Árbore (29), Viva Benx (27), Mundo Apto (23), SUGOI (20), Emccamp (17), EPH (13), Ampla (8), Novvo (5), M.Lar (5), Ún1ca (2)
+- **2.290 registros** de 43 empresas, **~99,6% com coordenadas**
+- MRV (441), Cury (272), VIC Engenharia (185), Plano&Plano (157), Magik JC (112), Direcional (111), Metrocasa (109), Vivaz (106), HM Engenharia (62), Grafico (60), Pacaembu (54), Econ Construtora (51), Vibra Residencial (50), Kazzas (40), Conx (39), Novolar (30), Graal Engenharia (30), Árbore (29), Viva Benx (27), Vasco Construtora (25), Mundo Apto (23), Vinx (22), Riformato (21), SUGOI (20), ACLF (20), Emccamp (17), BM7 (17), FYP Engenharia (16), Stanza (15), Sousa Araujo (15), Smart Construtora (13), EPH (13), Jotanunes (12), Cavazani (11), Rev3 (10), Carrilho (10), BP8 (10), ACL Incorporadora (10), Ampla (8), Novvo (5), M.Lar (5), Construtora Open (5), Ún1ca (2)
 
 ### Tabelas de controle (change tracking)
 - **`runs`** — registro de cada execução (id, inicio, fim, status, contadores)
