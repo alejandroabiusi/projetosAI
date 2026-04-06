@@ -182,6 +182,124 @@ EMPRESAS = {
             "metragens_descricao": {"pattern": r"[\d.,]+\s*m[²2]\s*(?:[Aa]\s*[\d.,]+\s*m[²2])?"},
         },
     },
+
+    # ============================================================
+    # NOVAS INCORPORADORAS (2026-04)
+    # ============================================================
+
+    "cac_wp": {
+        "nome_banco": "CAC",
+        "base_url": "https://www.cacengenharia.com.br",
+        "api_endpoint": "https://www.cacengenharia.com.br/wp-json/wp/v2/empreendimento",
+        "post_type": "empreendimento",
+        "per_page": 100,
+        "estado_default": "MG",
+        "status_selectors": [
+            '.status', '.badge', '[class*="status"]', '[class*="fase"]',
+        ],
+        "parsers": {
+            "endereco": {"pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)"},
+            "metragens_descricao": {"pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "domma_wp": {
+        "nome_banco": "Domma",
+        "base_url": "https://dommainc.com.br",
+        "api_endpoint": "https://dommainc.com.br/wp-json/wp/v2/empreendimento",
+        "post_type": "empreendimento",
+        "per_page": 100,
+        "estado_default": "RJ",
+        "status_selectors": [
+            '.status', '.badge', '[class*="status"]', '[class*="fase"]',
+        ],
+        "parsers": {
+            "endereco": {"pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)"},
+            "metragens_descricao": {"pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "ebm": {
+        "nome_banco": "EBM",
+        "base_url": "https://ebm.com.br",
+        "api_endpoint": "https://ebm.com.br/wp-json/wp/v2/produtos",
+        "post_type": "produtos",
+        "per_page": 100,
+        "estado_default": "GO",
+        "extrair_localizacao_classes": True,
+        "status_selectors": [
+            '.status', '.badge', '[class*="status"]', '[class*="estagio"]',
+        ],
+        "parsers": {
+            "endereco": {"pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia|Al\.|Alameda)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?|casas?)"},
+            "dormitorios_descricao": {"pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)"},
+            "metragens_descricao": {"pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "vega": {
+        "nome_banco": "Vega",
+        "base_url": "https://vcinc.com.br",
+        "api_endpoint": "https://vcinc.com.br/wp-json/wp/v2/imoveis",
+        "post_type": "imoveis",
+        "per_page": 50,
+        "estado_default": "GO",
+        "status_selectors": [
+            '.status', '.badge', '[class*="status"]', '[class*="estagio"]',
+        ],
+        "parsers": {
+            "endereco": {"pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)"},
+            "metragens_descricao": {"pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "exata_wp": {
+        "nome_banco": "Exata",
+        "base_url": "https://exataengenharia.com.br",
+        "api_endpoint": "https://exataengenharia.com.br/wp-json/wp/v2/portfolio",
+        "post_type": "portfolio",
+        "per_page": 100,
+        "estado_default": "PE",
+        "cidade_default": "Recife",
+        "status_selectors": [
+            '.status', '.badge', '[class*="status"]', '[class*="fase"]',
+        ],
+        "parsers": {
+            "endereco": {"pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)"},
+            "metragens_descricao": {"pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "bora_wp": {
+        "nome_banco": "Bora",
+        "base_url": "https://borainc.com.br",
+        "api_endpoint": "https://borainc.com.br/wp-json/wp/v2/empreendimentos",
+        "post_type": "empreendimentos",
+        "per_page": 50,
+        "estado_default": "PE",
+        "cidade_default": "Recife",
+        "taxonomies": {
+            "etapa": "https://borainc.com.br/wp-json/wp/v2/etapa",
+        },
+        "status_selectors": [
+            '.status', '.badge', '[class*="status"]', '[class*="etapa"]',
+        ],
+        "parsers": {
+            "endereco": {"pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)|\bstudios?\b"},
+            "metragens_descricao": {"pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
 }
 
 
@@ -212,6 +330,66 @@ def setup_logger(empresa_key):
 # ============================================================
 # FUNCOES AUXILIARES (importadas do generico)
 # ============================================================
+
+def _extrair_metragens_plantas(soup, texto_completo, metragens_descricao):
+    """Extrai metragens priorizando seções de plantas/tipologias."""
+    FAIXA_MCMV = (15.0, 80.0)
+    FAIXA_AMPLA = (15.0, 120.0)
+
+    EXCLUIR = re.compile(
+        r'(?:terreno|lote|gleba|[aá]rea\s+(?:total|do\s+terreno|constru[ií]da|comum)|'
+        r'garagem|estacionamento|vaga|torre|condom[ií]nio|empreendimento)\s*[:=]?\s*'
+        r'[\d.,]+\s*m[²2]', re.IGNORECASE
+    )
+
+    def _parse_nums(texto, faixa):
+        nums = []
+        for m in re.finditer(r'(\d+(?:[.,]\d+)?)\s*[Aa]\s*(\d+(?:[.,]\d+)?)\s*m[²2]', texto):
+            for g in [m.group(1), m.group(2)]:
+                v = float(g.replace(",", "."))
+                if faixa[0] <= v <= faixa[1]:
+                    nums.append(v)
+        for m in re.finditer(r'(\d+(?:[.,]\d+)?)\s*m[²2]', texto):
+            v = float(m.group(1).replace(",", "."))
+            if faixa[0] <= v <= faixa[1]:
+                nums.append(v)
+        return nums
+
+    if soup:
+        secoes = soup.find_all(attrs={"class": re.compile(
+            r'tipolog|planta|ficha|tipo|plant|floor|especif|metragem', re.I)})
+        secoes += soup.find_all(attrs={"id": re.compile(
+            r'tipolog|planta|ficha|tipo|plant|floor|especif|metragem', re.I)})
+        if secoes:
+            texto_secao = " ".join(s.get_text(separator=" ", strip=True) for s in secoes)
+            texto_secao = EXCLUIR.sub("", texto_secao)
+            nums = _parse_nums(texto_secao, FAIXA_MCMV)
+            if nums:
+                return nums
+
+    pattern_dorm = re.compile(
+        r'(?:studio|loft|\d+\s*(?:dorm|quarto|su[ií]te))[^\d]{0,20}(\d+(?:[.,]\d+)?)\s*m[²2]', re.I)
+    matches = pattern_dorm.findall(texto_completo[:5000])
+    if matches:
+        nums = [float(m.replace(",", ".")) for m in matches if FAIXA_MCMV[0] <= float(m.replace(",", ".")) <= FAIXA_MCMV[1]]
+        if nums:
+            return nums
+
+    if metragens_descricao:
+        texto_limpo = EXCLUIR.sub("", metragens_descricao)
+        nums = _parse_nums(texto_limpo, FAIXA_MCMV)
+        if nums:
+            return nums
+        nums = _parse_nums(texto_limpo, FAIXA_AMPLA)
+        if nums:
+            return nums
+
+    texto_limpo = EXCLUIR.sub("", texto_completo[:3000])
+    nums = _parse_nums(texto_limpo, FAIXA_MCMV)
+    if nums:
+        return nums
+    return _parse_nums(texto_limpo, FAIXA_AMPLA)
+
 
 def extrair_preco(texto):
     matches = re.findall(r"R\$\s*([\d.,]+)", texto)
@@ -314,7 +492,7 @@ def extrair_itens_lazer(texto):
         "piscina", "churrasqueira", "fitness", "academia", "playground",
         "brinquedoteca", "salão de festas", "salao de festas", "pet care",
         "pet place", "coworking", "bicicletário", "bicicletario", "quadra",
-        "delivery", "horta", "lavanderia", "rooftop", "sauna", "spa",
+        "delivery", "horta", "lavanderia", "rooftop", "sauna",
         "gourmet", "salão de jogos", "salao de jogos",
     ]
     itens = set()
@@ -499,22 +677,11 @@ def extrair_dados_pagina(html, url, config, logger):
         dados["cidade"] = cidade_estado[0]
         dados["estado"] = cidade_estado[1]
 
-    # Metragens numericas
-    metragens = dados.get("metragens_descricao", "")
-    if metragens:
-        nums = []
-        for match in re.finditer(r"(\d+(?:[.,]\d+)?)\s*[Aa]\s*(\d+(?:[.,]\d+)?)\s*m[²2]", metragens):
-            for g in [match.group(1), match.group(2)]:
-                v = float(g.replace(",", "."))
-                if 15.0 <= v <= 500.0:
-                    nums.append(v)
-        for match in re.finditer(r"(\d+(?:[.,]\d+)?)\s*m[²2]", metragens):
-            v = float(match.group(1).replace(",", "."))
-            if 15.0 <= v <= 500.0:
-                nums.append(v)
-        if nums:
-            dados["area_min_m2"] = min(nums)
-            dados["area_max_m2"] = max(nums)
+    # Metragens numericas — priorizar seções de plantas, excluir terreno/garagem
+    nums = _extrair_metragens_plantas(soup, texto, dados.get("metragens_descricao", ""))
+    if nums:
+        dados["area_min_m2"] = min(nums)
+        dados["area_max_m2"] = max(nums)
 
     # Itens de lazer
     itens = extrair_itens_lazer(texto)

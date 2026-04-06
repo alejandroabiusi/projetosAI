@@ -56,6 +56,10 @@ COLUNAS_DESCRITIVAS = [
     ("decoracao", "TEXT"),                # Escritorio de decoracao
     ("itens_lazer", "TEXT"),              # Lista completa de itens de lazer, separados por |
     ("registro_incorporacao", "TEXT"),    # Registro de incorporacao (se disponivel)
+    ("latitude", "TEXT"),                # Coordenada latitude
+    ("longitude", "TEXT"),               # Coordenada longitude
+    ("cep", "TEXT"),                     # CEP do empreendimento
+    ("cluster_mpr", "TEXT"),             # Cluster MPR (ex: SP1, RMSP3, BA2)
     ("data_coleta", "TEXT NOT NULL"),     # ISO format
     ("data_atualizacao", "TEXT"),         # ISO format
 ]
@@ -79,11 +83,11 @@ ATRIBUTOS_LAZER = {
     "lazer_redario": ["redário", "redario"],
     "lazer_rooftop": ["rooftop", "cobertura"],
     "lazer_sauna": ["sauna"],
-    "lazer_spa": ["spa"],
+    "lazer_spa": ["r:(?<![a-zà-ú])spa(?![a-zà-ú])"],
     "lazer_piquenique": ["piquenique", "picnic"],
-    "lazer_sport_bar": ["sport bar", "sportbar", "bar"],
-    "lazer_cine": ["cine", "cinema", "cine open"],
-    "lazer_easy_market": ["easy market", "market", "mercado"],
+    "lazer_sport_bar": ["sport bar", "sportbar"],
+    "lazer_cine": ["cinema", "cine open", "cine "],
+    "lazer_easy_market": ["easy market", "mini market", "mini mercado"],
     "lazer_espaco_beleza": ["espaço beleza", "espaco beleza", "beleza"],
     "lazer_sala_estudos": ["sala de estudos", "estudos"],
     "lazer_espaco_gourmet": ["gourmet", "espaço gourmet"],
@@ -94,7 +98,8 @@ ATRIBUTOS_LAZER = {
 
 # Atributos binarios do APARTAMENTO (0/1)
 ATRIBUTOS_APARTAMENTO = {
-    "apto_1_dorm": ["1 dorm", "01 dorm", "1 quarto", "01 quarto", "1 e 2 dorm", "1 e 2 quarto", "studio", "studios"],
+    "apto_studio": ["studio", "studios"],
+    "apto_1_dorm": ["1 dorm", "01 dorm", "1 quarto", "01 quarto", "1 e 2 dorm", "1 e 2 quarto"],
     "apto_2_dorms": ["2 dorm", "02 dorm", "2 quarto", "02 quarto", "1 e 2 dorm", "1 e 2 quarto", "2 e 3 dorm", "2 e 3 quarto"],
     "apto_3_dorms": ["3 dorm", "03 dorm", "3 quarto", "03 quarto", "2 e 3 dorm", "2 e 3 quarto"],
     "apto_4_dorms": ["4 dorm", "04 dorm", "4 quarto", "04 quarto"],
@@ -230,14 +235,20 @@ def detectar_atributos_binarios(texto_completo):
     """
     Recebe um texto (concatenacao de todos os textos da pagina do empreendimento)
     e retorna dict com atributos binarios detectados.
+    Termos prefixados com 'r:' sao tratados como regex (para word boundary).
     """
+    import re as _re
     texto_lower = texto_completo.lower()
     resultado = {}
 
     for col_name, termos in TODOS_ATRIBUTOS_BINARIOS.items():
         resultado[col_name] = 0
         for termo in termos:
-            if termo.lower() in texto_lower:
+            if termo.startswith("r:"):
+                if _re.search(termo[2:], texto_lower):
+                    resultado[col_name] = 1
+                    break
+            elif termo.lower() in texto_lower:
                 resultado[col_name] = 1
                 break
 

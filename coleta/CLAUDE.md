@@ -1,13 +1,14 @@
 # Projeto Coleta — Scrapers de Empreendimentos Imobiliários
 
 ## Objetivo
-Coletar dados de empreendimentos imobiliários de 43 incorporadoras brasileiras, enriquecer com geocodificação e dados adicionais, gerar mapa interativo HTML, e manter a base atualizada automaticamente com detecção de mudanças.
+Coletar dados de empreendimentos imobiliários de 77 incorporadoras brasileiras, enriquecer com geocodificação e dados adicionais, gerar mapa interativo HTML e dashboard Streamlit, e manter a base atualizada automaticamente com detecção de mudanças.
 
 ## Banco de Dados
-- **Arquivo**: `data/empreendimentos.db` (SQLite, ~5.6MB)
-- **Tabela principal**: `empreendimentos` (~90 colunas)
-- **2.290 registros** de 43 empresas, **~99,6% com coordenadas**
-- MRV (441), Cury (272), VIC Engenharia (185), Plano&Plano (157), Magik JC (112), Direcional (111), Metrocasa (109), Vivaz (106), HM Engenharia (62), Grafico (60), Pacaembu (54), Econ Construtora (51), Vibra Residencial (50), Kazzas (40), Conx (39), Novolar (30), Graal Engenharia (30), Árbore (29), Viva Benx (27), Vasco Construtora (25), Mundo Apto (23), Vinx (22), Riformato (21), SUGOI (20), ACLF (20), Emccamp (17), BM7 (17), FYP Engenharia (16), Stanza (15), Sousa Araujo (15), Smart Construtora (13), EPH (13), Jotanunes (12), Cavazani (11), Rev3 (10), Carrilho (10), BP8 (10), ACL Incorporadora (10), Ampla (8), Novvo (5), M.Lar (5), Construtora Open (5), Ún1ca (2)
+- **Arquivo**: `data/empreendimentos.db` (SQLite)
+- **Tabela principal**: `empreendimentos` (~120 colunas)
+- **~3.470 registros** de **77 empresas**, **~98% com coordenadas**
+- **Base de CEPs local**: `data/ceps_brasil.db` (905k CEPs com lat/lon, fonte: basedosdados.org)
+- Tenda (469), MRV (441), Cury (272), VIC Engenharia (185), Plano&Plano (157), Vitta Residencial (155), Magik JC (112), Direcional (111), Metrocasa (109), Vivaz (106), EBM (81), Trisul (65), HM Engenharia (62), Grafico (60), Pacaembu (54), Econ Construtora (51), Vibra Residencial (50), CAC (42), Kazzas (40), Conx (39), MGF (36), Vega (30), Canopus (30), Novolar (30), Graal Engenharia (30), Árbore (29), Viva Benx (27), Quartzo (26), Vasco Construtora (25), Mundo Apto (23), Vinx (22), SR Engenharia (21), Canopus Construções (21), Riformato (21), AP Ponto (20), SUGOI (20), ACLF (20), Exata (19), Somos (16), Emccamp (17), BM7 (17), FYP Engenharia (16), Stanza (15), Sousa Araujo (15), Vila Brasil (14), Smart Construtora (13), EPH (13), Cosbat (12), Belmais (12), Jotanunes (12), Cavazani (11), Victa Engenharia (10), SOL Construtora (10), Morana (10), Lotus (10), House Inc (10), ART Construtora (10), Rev3 (10), Carrilho (10), BP8 (10), ACL Incorporadora (10), Maccris (9), Ampla (8), Tenório Simões (8), Grupo Delta (6), Domma (6), Dimensional (5), Mirantes (5), Torreão Villarim (5), Bora (5), Novvo (5), Você (5), M.Lar (5), Construtora Open (5), Ún1ca (2), Versati (1), Sertenge (1)
 
 ### Tabelas de controle (change tracking)
 - **`runs`** — registro de cada execução (id, inicio, fim, status, contadores)
@@ -137,16 +138,36 @@ python gerar_relatorio_pptx.py --saida custom.pptx    # Caminho customizado
 - numero_vagas: ~39%
 
 ## Geocodificação
-- **Base local de CEPs**: `C:\Users\aabiusi\ProjetosAI\data\ceps_brasil.db` (SQLite, 905k CEPs com lat/lon)
+- **Base local de CEPs**: `data/ceps_brasil.db` (SQLite, 905k CEPs com lat/lon)
 - Fonte: basedosdados.org (BigQuery `basedosdados.br_bd_diretorios_brasil.cep`)
 - Estratégia: CEP direto > logradouro+cidade > centroide de bairro (com offset ~100m) > NULL (nunca usar coordenada genérica)
+- **NUNCA usar Nominatim como primeira opção** — sempre a base local de CEPs primeiro
+- Validação por bounding box do estado para evitar coordenadas em estados errados
 
 ## Mapa HTML
 - `mapa_empreendimentos.html` (gerado por `gerar_mapa.py`, não versionado)
-- Leaflet.js + MarkerCluster, ~2000 pins, 22 empresas
-- Filtros dinâmicos cruzados por status e empresa (status desabilita empresas sem match e vice-versa)
+- Leaflet.js, ~3.400 pins, 77 empresas
+- Filtros dinâmicos cruzados por status, empresa e cluster MPR
 - Popup com link "Ver no site" para cada empreendimento
 - Resumo dinâmico da área visível (contagem por empresa + total unidades)
+- Clusters MPR via KML (12 arquivos, 61 clusters: SP, RMSP, BA, CE, CPS, GO, JP, MG, PE, PR, RJ, RS)
+- Campo `cluster_mpr` no banco — recalcular sempre que coordenadas mudam
+
+## Dashboard Streamlit
+- `dashboard/app.py` — plataforma de inteligência competitiva
+- Rodar: `cd coleta && python -m streamlit run dashboard/app.py`
+- **Módulos**: Mapa, Visão Geral, Tipologias, Lazer, Preços, Lançamentos
+- **Filtros globais**: Regional, UF, Cidade, Empresa, Fase + checkboxes MCMV e Tenda
+- **Regionais**: SP+SPRM, Nordeste, Sul+MG, RJ+CO+CPS, SP Interior, Outros
+- Mapa gera HTML dinâmico no mesmo formato do mapa estático, com filtro de cluster MPR
+- Tabela resumo por empresa: Produtos, Lçtos, Breve Lçtos, Área média, Tipologia frequente, %1D, %3D
+- Tabela resumo por cluster MPR (quando regional filtrada)
+
+## Regras de negócio
+- Todo empreendimento novo é **MCMV por default** (prog_mcmv=1)
+- Só marcar prog_mcmv=0 se preço > R$600k ou informado pelo Alejandro
+- Empresas NÃO-MCMV conhecidas: Canopus, Trisul, Cosbat, Sertenge, ART Construtora
+- Atributos binários (tipologia, lazer, vaga) devem ser extraídos de **seções relevantes** da página, não do texto completo (evitar falso positivo de menus/footers)
 
 ## Como rodar
 

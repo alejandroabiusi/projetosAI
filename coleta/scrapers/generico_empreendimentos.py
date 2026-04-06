@@ -737,6 +737,488 @@ EMPRESAS = {
             "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?)"},
         },
     },
+
+    # ============================================================
+    # NOVAS INCORPORADORAS (2026-04)
+    # ============================================================
+
+    "canopus": {
+        "nome_banco": "Canopus",
+        "base_url": "https://canopus.com.br",
+        "estado_default": "SP",
+        "cidade_default": "São Paulo",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://canopus.com.br/empreendimentos",
+        ],
+        "padrao_link": r"canopus\.com\.br/(today[\w-]+|arq[\w-]+|soul|be[\w-]+|theplace|pulse|history[\w-]+|cidade-jardim[\w-]+|infinity|constelacao)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Al\.|Alameda)[^,\n]+(?:,\s*\d+)?"},
+            "bairro": {"method": "regex", "pattern": r"(?:Bairro|bairro):\s*(.+?)(?:\n|$)"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?|studios?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "sertenge": {
+        "nome_banco": "Sertenge",
+        "base_url": "https://www.sertenge.com.br",
+        "estado_default": "BA",
+        "cidade_default": "Salvador",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://www.sertenge.com.br/imovel/lancamentos/bahia",
+            "https://www.sertenge.com.br/imovel/em-obras/bahia",
+            "https://www.sertenge.com.br/imovel/pronto/bahia",
+        ],
+        "padrao_link": r"sertenge\.com\.br/imovel/[\w-]+/bahia/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "sol": {
+        "nome_banco": "SOL Construtora",
+        "base_url": "https://solconstrutora.com",
+        "estado_default": "SP",
+        "cidade_default": "Guarulhos",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://solconstrutora.com/",
+        ],
+        "padrao_link": r"solconstrutora\.com/((?:sol-|residencial-|edificio-|gran-|excelence|via-)[^\s/]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "numero_torres": {"method": "regex", "pattern": r"(\d+)\s*torres?"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "victa": {
+        "nome_banco": "Victa Engenharia",
+        "base_url": "https://www.victa.eng.br",
+        "estado_default": "CE",
+        "cidade_default": "Fortaleza",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://www.victa.eng.br/nossos-imoveis/",
+        ],
+        "padrao_link": r"victa\.eng\.br/nossosimoveis/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "bairro": {"method": "regex", "pattern": r"(?:Bairro|bairro):\s*(.+?)(?:\n|$)"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?|casas?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?|su[ií]tes?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "sr_engenharia": {
+        "nome_banco": "SR Engenharia",
+        "base_url": "https://srengenharia.com",
+        "estado_default": "CE",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://srengenharia.com/",
+        ],
+        "padrao_link": r"srengenharia\.com/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "maccris": {
+        "nome_banco": "Maccris",
+        "base_url": "https://www.maccrisconstrutora.com.br",
+        "estado_default": "SP",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://www.maccrisconstrutora.com.br/lancamentos/",
+            "https://www.maccrisconstrutora.com.br/em-obras/",
+            "https://www.maccrisconstrutora.com.br/entregues/",
+        ],
+        "padrao_link": r"maccrisconstrutora\.com\.br/portfolio/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "house_inc": {
+        "nome_banco": "House Inc",
+        "base_url": "https://houseincorporacoes.com.br",
+        "estado_default": "BA",
+        "cidade_default": "Salvador",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://houseincorporacoes.com.br/",
+        ],
+        "padrao_link": r"houseincorporacoes\.com\.br/empreendimento/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Pç\.|Praça)[^,\n]+(?:,\s*\d+)?"},
+            "bairro": {"method": "regex", "pattern": r"(?:Bairro|bairro):\s*(.+?)(?:\n|$)"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?|studios?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "belmais": {
+        "nome_banco": "Belmais",
+        "base_url": "https://belmais.com.br",
+        "estado_default": "RS",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://belmais.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"belmais\.com\.br/empreendimento/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "morana": {
+        "nome_banco": "Morana",
+        "base_url": "https://morana.net",
+        "estado_default": "RS",
+        "cidade_default": "Porto Alegre",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://morana.net/",
+        ],
+        "padrao_link": r"morana\.net/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "lotus": {
+        "nome_banco": "Lotus",
+        "base_url": "https://lotusincorporadora.com.br",
+        "estado_default": "RS",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://lotusincorporadora.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"lotusincorporadora\.com\.br/empreendimentos/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "mgf": {
+        "nome_banco": "MGF",
+        "base_url": "https://www.mgfincorporadora.com.br",
+        "estado_default": "RS",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://www.mgfincorporadora.com.br/busca-imoveis/",
+        ],
+        "padrao_link": r"mgfincorporadora\.com\.br/imovel/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "quartzo": {
+        "nome_banco": "Quartzo",
+        "base_url": "https://vivaquartzo.com.br",
+        "estado_default": "MG",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://vivaquartzo.com.br/imoveis-a-venda/",
+            "https://vivaquartzo.com.br/imoveis-a-venda/?_sft_status=lancamento",
+            "https://vivaquartzo.com.br/imoveis-a-venda/?_sft_status=em-construcao",
+            "https://vivaquartzo.com.br/imoveis-a-venda/?_sft_status=entregue",
+        ],
+        "padrao_link": r"vivaquartzo\.com\.br/empreendimentos/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "brava": {
+        "nome_banco": "Brava",
+        "base_url": "https://somosbrava.com.br",
+        "estado_default": "CE",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://somosbrava.com.br/incorporacao/",
+        ],
+        "padrao_link": r"somosbrava\.com\.br/incorporacao/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "bairro": {"method": "regex", "pattern": r"(?:Bairro|bairro):\s*(.+?)(?:\n|$)"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?|casas?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "tenorio_simoes": {
+        "nome_banco": "Tenório Simões",
+        "base_url": "https://tenoriosimoes.com.br",
+        "estado_default": "PE",
+        "cidade_default": "Recife",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://tenoriosimoes.com.br/",
+            "https://tenoriosimoes.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"tenoriosimoes\.com\.br/empreendimento[s]?/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "exata": {
+        "nome_banco": "Exata",
+        "base_url": "https://exataengenharia.com.br",
+        "estado_default": "PE",
+        "cidade_default": "Recife",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://exataengenharia.com.br/",
+            "https://exataengenharia.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"exataengenharia\.com\.br/empreendimento[s]?/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "bora_inc": {
+        "nome_banco": "Bora",
+        "base_url": "https://borainc.com.br",
+        "estado_default": "PE",
+        "cidade_default": "Recife",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://borainc.com.br/",
+        ],
+        "padrao_link": r"borainc\.com\.br/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "grupo_delta": {
+        "nome_banco": "Grupo Delta",
+        "base_url": "https://grupodeltapb.com.br",
+        "estado_default": "PB",
+        "cidade_default": "João Pessoa",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://grupodeltapb.com.br/",
+            "https://grupodeltapb.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"grupodeltapb\.com\.br/empreendimento[s]?/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "voce": {
+        "nome_banco": "Você",
+        "base_url": "https://www.construtoravoce.com.br",
+        "estado_default": "RJ",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://www.construtoravoce.com.br/",
+        ],
+        "padrao_link": r"construtoravoce\.com\.br/imovel/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "cac": {
+        "nome_banco": "CAC",
+        "base_url": "https://www.cacengenharia.com.br",
+        "estado_default": "MG",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://www.cacengenharia.com.br/",
+        ],
+        "padrao_link": r"cacengenharia\.com\.br/empreendimento/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "domma": {
+        "nome_banco": "Domma",
+        "base_url": "https://dommainc.com.br",
+        "estado_default": "RJ",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://dommainc.com.br/",
+            "https://dommainc.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"dommainc\.com\.br/empreendimento[s]?/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "ap_ponto": {
+        "nome_banco": "AP Ponto",
+        "base_url": "https://apponto.com.br",
+        "estado_default": "MG",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://apponto.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"apponto\.com\.br/empreendimentos/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2.elementor-heading-title", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "vila_brasil": {
+        "nome_banco": "Vila Brasil",
+        "base_url": "https://vilabr.com.br",
+        "estado_default": "GO",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://vilabr.com.br/empreendimentos/todos/",
+        ],
+        "padrao_link": r"vilabr\.com\.br/empreendimento/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada|Rod\.|Rodovia)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?|casas?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "torreao": {
+        "nome_banco": "Torreão Villarim",
+        "base_url": "https://torreaovillarim.com.br",
+        "estado_default": "PB",
+        "cidade_default": "João Pessoa",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://torreaovillarim.com.br/",
+        ],
+        "padrao_link": r"torreaovillarim\.com\.br/([\w-]+)\.html",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "somos_di": {
+        "nome_banco": "Somos",
+        "base_url": "https://somosdi.com.br",
+        "estado_default": "GO",
+        "cidade_default": "Goiânia",
+        "nome_from_title": True,
+        "sitemap_url": "https://somosdi.com.br/produto-sitemap.xml",
+        "urls_listagem": [],
+        "padrao_link": r"somosdi\.com\.br/produto/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Al\.|Alameda)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|su[ií]tes?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
+
+    "versati": {
+        "nome_banco": "Versati",
+        "base_url": "https://grupoversati.com.br",
+        "estado_default": "SP",
+        "nome_from_title": True,
+        "urls_listagem": [
+            "https://grupoversati.com.br/",
+            "https://grupoversati.com.br/empreendimentos/",
+        ],
+        "padrao_link": r"grupoversati\.com\.br/empreendimento[s]?/([\w-]+)",
+        "parsers": {
+            "nome": {"method": "css", "selector": "h1, h2", "attr": "text"},
+            "endereco": {"method": "regex", "pattern": r"(?:R\.|Rua|Av\.|Avenida|Estr\.|Estrada)[^,\n]+(?:,\s*\d+)?"},
+            "total_unidades": {"method": "regex", "pattern": r"(\d+)\s*(?:unidades?|apartamentos?|aptos?)"},
+            "dormitorios_descricao": {"method": "regex", "pattern": r"\d+\s*(?:e\s*\d+\s*)?(?:dorms?\.?|quartos?|dormit[oó]rios?)|\bstudios?\b"},
+            "metragens_descricao": {"method": "regex", "pattern": r"\d+(?:[.,]\d+)?\s*(?:[Aa]\s*\d+(?:[.,]\d+)?)?\s*m[²2]"},
+        },
+    },
 }
 
 
@@ -1026,25 +1508,11 @@ def extrair_dados_empreendimento(html, url, config, logger):
     if preco:
         dados["preco_a_partir"] = preco
 
-    # Extrair metragens numericas
-    metragens = dados.get("metragens_descricao", "")
-    if metragens:
-        # Captura intervalos "X a Y m2" e valores isolados, com virgula ou ponto decimal
-        nums = []
-        # Primeiro captura intervalos completos: "24 a 41 m²"
-        for match in re.finditer(r"(\d+(?:[.,]\d+)?)\s*[Aa]\s*(\d+(?:[.,]\d+)?)\s*m[²2²]?", metragens):
-            for g in [match.group(1), match.group(2)]:
-                v = float(g.replace(",", "."))
-                if 15.0 <= v <= 150.0:
-                    nums.append(v)
-        # Depois captura valores isolados
-        for match in re.finditer(r"(\d+(?:[.,]\d+)?)\s*m[²2²]", metragens):
-            v = float(match.group(1).replace(",", "."))
-            if 15.0 <= v <= 150.0:
-                nums.append(v)
-        if nums:
-            dados["area_min_m2"] = min(nums)
-            dados["area_max_m2"] = max(nums)
+    # Extrair metragens numericas — priorizar seções de plantas/tipologias
+    nums = _extrair_metragens_plantas(soup, texto_completo, dados.get("metragens_descricao", ""))
+    if nums:
+        dados["area_min_m2"] = min(nums)
+        dados["area_max_m2"] = max(nums)
 
     # Extrair itens de lazer do texto completo
     itens_lazer = extrair_itens_lazer(soup, texto_completo)
@@ -1218,6 +1686,91 @@ def extrair_preco(texto):
     return None
 
 
+def _extrair_metragens_plantas(soup, texto_completo, metragens_descricao):
+    """Extrai metragens priorizando seções de plantas/tipologias.
+
+    Ordem de prioridade:
+    1. Seções HTML com classe/id de 'planta', 'tipologia', 'ficha'
+    2. Metragens associadas a dormitórios (ex: "2 dorms - 42m²")
+    3. metragens_descricao (campo já extraído pelo parser)
+    4. Fallback: texto completo, excluindo contextos de terreno/garagem
+
+    Filtro: 15-80m² para valores confiáveis de apartamento MCMV.
+    Se nenhum valor nessa faixa, aceita até 120m² (pode ser médio padrão).
+    """
+    FAIXA_MCMV = (15.0, 80.0)
+    FAIXA_AMPLA = (15.0, 120.0)
+
+    # Contextos a EXCLUIR (metragem não é de planta de apartamento)
+    EXCLUIR = re.compile(
+        r'(?:terreno|lote|gleba|[aá]rea\s+(?:total|do\s+terreno|constru[ií]da|comum|privativa\s+total)|'
+        r'garagem|estacionamento|vaga|torre|condom[ií]nio|empreendimento)\s*[:=]?\s*'
+        r'[\d.,]+\s*m[²2]', re.IGNORECASE
+    )
+
+    def _parse_nums(texto, faixa):
+        nums = []
+        # Intervalos "X a Y m²"
+        for m in re.finditer(r'(\d+(?:[.,]\d+)?)\s*[Aa]\s*(\d+(?:[.,]\d+)?)\s*m[²2]', texto):
+            for g in [m.group(1), m.group(2)]:
+                v = float(g.replace(",", "."))
+                if faixa[0] <= v <= faixa[1]:
+                    nums.append(v)
+        # Valores isolados "Xm²"
+        for m in re.finditer(r'(\d+(?:[.,]\d+)?)\s*m[²2]', texto):
+            v = float(m.group(1).replace(",", "."))
+            if faixa[0] <= v <= faixa[1]:
+                nums.append(v)
+        return nums
+
+    # 1. Seções de plantas/tipologias no HTML
+    if soup:
+        secoes = soup.find_all(attrs={"class": re.compile(
+            r'tipolog|planta|ficha|tipo|plant|floor|especif|metragem|dimension', re.I)})
+        secoes += soup.find_all(attrs={"id": re.compile(
+            r'tipolog|planta|ficha|tipo|plant|floor|especif|metragem', re.I)})
+        if secoes:
+            texto_secao = " ".join(s.get_text(separator=" ", strip=True) for s in secoes)
+            # Remover contextos de terreno/garagem
+            texto_secao = EXCLUIR.sub("", texto_secao)
+            nums = _parse_nums(texto_secao, FAIXA_MCMV)
+            if nums:
+                return nums
+
+    # 2. Metragens associadas a dormitórios
+    pattern_dorm_area = re.compile(
+        r'(?:studio|loft|\d+\s*(?:dorm|quarto|su[ií]te))[^\d]{0,20}(\d+(?:[.,]\d+)?)\s*m[²2]',
+        re.IGNORECASE
+    )
+    matches = pattern_dorm_area.findall(texto_completo[:5000])
+    if matches:
+        nums = [float(m.replace(",", ".")) for m in matches if FAIXA_MCMV[0] <= float(m.replace(",", ".")) <= FAIXA_MCMV[1]]
+        if nums:
+            return nums
+
+    # 3. metragens_descricao (já extraído pelo parser config)
+    if metragens_descricao:
+        # Limpar contextos de terreno
+        texto_limpo = EXCLUIR.sub("", metragens_descricao)
+        nums = _parse_nums(texto_limpo, FAIXA_MCMV)
+        if nums:
+            return nums
+        # Tentar faixa ampla
+        nums = _parse_nums(texto_limpo, FAIXA_AMPLA)
+        if nums:
+            return nums
+
+    # 4. Fallback: texto completo (primeiros 3000 chars, excluindo terreno/garagem)
+    texto_limpo = EXCLUIR.sub("", texto_completo[:3000])
+    nums = _parse_nums(texto_limpo, FAIXA_MCMV)
+    if nums:
+        return nums
+
+    # Último recurso: faixa ampla no texto completo
+    nums = _parse_nums(texto_limpo, FAIXA_AMPLA)
+    return nums if nums else []
+
+
 def extrair_itens_lazer(soup, texto):
     """Extrai lista de itens de lazer."""
     itens = set()
@@ -1228,7 +1781,7 @@ def extrair_itens_lazer(soup, texto):
         "brinquedoteca", "salão de festas", "salao de festas", "pet care",
         "pet place", "coworking", "bicicletário", "bicicletario", "quadra",
         "delivery", "horta", "lavanderia", "redário", "redario", "rooftop",
-        "sauna", "spa", "sport bar", "cinema", "cine", "mini mercado",
+        "sauna", "sport bar", "cinema", "mini mercado",
         "market", "espaço beleza", "espaco beleza", "gourmet", "salão de jogos",
         "salao de jogos", "luau", "deck", "solarium", "solário",
         "portaria", "hall social", "espaço luau", "mini quadra",
