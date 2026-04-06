@@ -164,10 +164,47 @@ python gerar_relatorio_pptx.py --saida custom.pptx    # Caminho customizado
 - Tabela resumo por cluster MPR (quando regional filtrada)
 
 ## Regras de negócio
+
+### MCMV
 - Todo empreendimento novo é **MCMV por default** (prog_mcmv=1)
 - Só marcar prog_mcmv=0 se preço > R$600k ou informado pelo Alejandro
 - Empresas NÃO-MCMV conhecidas: Canopus, Trisul, Cosbat, Sertenge, ART Construtora
+
+### Extração de dados das páginas
 - Atributos binários (tipologia, lazer, vaga) devem ser extraídos de **seções relevantes** da página, não do texto completo (evitar falso positivo de menus/footers)
+- **Metragens**: priorizar seções de "planta"/"tipologia"/"ficha técnica". Excluir contextos de terreno/garagem. MCMV: 15-80m²
+- **Tipologias** (dormitórios): basear no `dormitorios_descricao` extraído da ficha, não do texto completo. Menus/filtros do site contaminam os dados
+- **Lazer**: varrer página sem nav/footer. Cada item é distinto — **NÃO unificar sem validação do Alejandro** (Pet Place ≠ Pet Care, Beach Tennis ≠ Quadra, Academia ≠ Fitness ≠ Fitness Externo)
+- **Cobertura, Duplex, Garden, Suíte**: basear no `dormitorios_descricao` ou seções de tipologia, não no texto completo
+- **Vaga**: buscar em seções relevantes. "Edifício garagem" é item específico e importante
+
+### Geocodificação
+- **SEMPRE usar base local de CEPs** (`data/ceps_brasil.db`) — NUNCA Nominatim como primeira opção
+- Validar coordenadas por **bounding box do estado** após geocodificar
+- Recalcular `cluster_mpr` sempre que coordenadas mudarem
+
+### Clusters MPR
+- Campo `cluster_mpr` no banco — calculado via point-in-polygon com KMLs de `data/*.kml`
+- Ao inserir empreendimento com coordenadas → calcular cluster_mpr
+- Ao alterar latitude/longitude → recalcular cluster_mpr
+
+### Regionais (lógica Tenda)
+- Ordem: SP+SPRM, Nordeste, Sul+MG, RJ+CO+CPS (inclui Campinas), SP Interior, Outros
+- Campinas (Campinas, Hortolândia, Valinhos, Vinhedo) está dentro de RJ+CO+CPS
+- DF está em "Outros"
+- SP sem cidade reconhecida → SP Interior (não SPRM)
+
+### Qualidade de dados — 3 frentes
+1. **Coleta massificada** — scrapers capturam todos os produtos de uma vez
+2. **Qualificação individual** — entrar página por página para corrigir dados específicos quando a coleta massificada gera falsos positivos
+3. **Auditoria amostral periódica** — 5-10 empreendimentos aleatórios por player, verificar inconsistências, gerar relatório para decisão conjunta
+
+### Postura esperada do Claude
+- Agir como **dono do projeto**: resolver lacunas óbvias sem perguntar, não apenas reportar
+- Se algo "não está configurado" e eu tenho a informação para configurar → **configurar**
+- Processos autônomos devem ser **à prova de falha**: cada etapa independente, testar timeout antes de lançar para madrugada
+- Processar em **batches de 200** para evitar timeouts
+- **Uma task de cada vez**, com calma
 
 ## Como rodar
 
