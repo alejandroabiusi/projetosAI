@@ -28,9 +28,15 @@ from data.database import (
     inserir_empreendimento,
     empreendimento_existe,
     atualizar_empreendimento,
+    empreendimento_existe_por_url,
+    atualizar_empreendimento_por_url,
     detectar_atributos_binarios,
     contar_empreendimentos,
+    buscar_empreendimentos_por_empresa,
+    registrar_reconciliacao,
+    remover_empreendimento_por_url,
 )
+from math import radians, sin, cos, sqrt, atan2
 
 EMPRESA = "Direcional"
 BASE_URL = "https://www.direcional.com.br"
@@ -393,19 +399,27 @@ def main():
                 nome = slug.replace("-", " ").title()
                 dados["nome"] = nome
 
-            existe = empreendimento_existe(EMPRESA, nome)
+            # Direcional: usar url_fonte como chave de deduplicacao
+            # (nomes podem mudar com acentos entre coletas, ex: "Patio" -> "Pátio")
+            existe = empreendimento_existe_por_url(EMPRESA, url)
 
             if existe and not args.atualizar:
                 logger.info(f"  Ja existe, pulando.")
                 pulados += 1
             elif existe and args.atualizar:
-                atualizar_empreendimento(EMPRESA, nome, dados)
+                atualizar_empreendimento_por_url(EMPRESA, url, dados)
                 atualizados += 1
                 logger.info(f"  Atualizado.")
             else:
-                inserir_empreendimento(dados)
-                novos += 1
-                logger.info(f"  Inserido: {nome} | {dados.get('fase', 'N/A')} | {dados.get('cidade', 'N/A')}-{dados.get('estado', 'N/A')}")
+                # Verificar tambem por nome (compatibilidade com registros antigos sem url)
+                if empreendimento_existe(EMPRESA, nome):
+                    atualizar_empreendimento(EMPRESA, nome, dados)
+                    atualizados += 1
+                    logger.info(f"  Atualizado (por nome).")
+                else:
+                    inserir_empreendimento(dados)
+                    novos += 1
+                    logger.info(f"  Inserido: {nome} | {dados.get('fase', 'N/A')} | {dados.get('cidade', 'N/A')}-{dados.get('estado', 'N/A')}")
 
             progresso["processados"].append(url)
             salvar_progresso(progresso)
@@ -418,6 +432,12 @@ def main():
 
         time.sleep(DELAY)
 
+    # Fase 3: Reconciliacao (somente no modo --atualizar)
+    if args.atualizar:
+        # Reusa os links do sitemap coletados na Fase 1
+        todas_urls_sitemap = coletar_links_sitemap()
+        reconciliar(todas_urls_sitemap)
+
     # Relatorio final
     logger.info("\n" + "=" * 60)
     logger.info("RELATORIO FINAL - DIRECIONAL")
@@ -427,6 +447,166 @@ def main():
     logger.info(f"  Erros: {erros}")
     logger.info(f"  Total no banco: {contar_empreendimentos(EMPRESA)}")
     logger.info("=" * 60)
+
+
+def haversine_metros(lat1, lon1, lat2, lon2):
+    """Distancia em metros entre dois pontos (lat/lon em graus)."""
+    R = 6_371_000  # raio da Terra em metros
+    rlat1, rlat2 = radians(lat1), radians(lat2)
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+    a = sin(dlat / 2) ** 2 + cos(rlat1) * cos(rlat2) * sin(dlon / 2) ** 2
+    return R * 2 * atan2(sqrt(a), sqrt(1 - a))
+
+
+# Ordem de progressao de fases (indice maior = mais avancado)
+ORDEM_FASES = {
+    "breve lançamento": 0,
+    "lançamento": 1,
+    "em construção": 2,
+    "pronto": 3,
+    "100% vendido": 4,
+}
+
+
+def reconciliar(urls_sitemap):
+    """
+    Fase 3: Reconciliacao — detecta empreendimentos que sumiram do sitemap.
+
+    Classifica cada URL orfã em:
+      - renomeado:  URL redireciona para outra URL ja conhecida
+      - relancado:  URL morreu mas existe produto novo nas mesmas coordenadas (<200m)
+                    com fase igual ou mais avancada
+      - cancelado:  URL morreu e nao ha substituto (projeto provavelmente inviabilizado)
+    """
+    logger.info("\n" + "=" * 60)
+    logger.info("[FASE 3] Reconciliacao de URLs orfas...")
+
+    registros = buscar_empreendimentos_por_empresa(EMPRESA)
+    urls_banco = {r["url_fonte"] for r in registros}
+    urls_sitemap_set = set(urls_sitemap)
+
+    # URLs no banco que nao estao mais no sitemap
+    orfas = urls_banco - urls_sitemap_set
+    if not orfas:
+        logger.info("  Nenhuma URL orfa encontrada.")
+        return
+
+    logger.info(f"  {len(orfas)} URL(s) orfa(s) encontrada(s)")
+
+    # Indexar registros por URL e por coordenadas
+    por_url = {r["url_fonte"]: r for r in registros}
+    # Registros COM coordenadas que estao no sitemap (candidatos a match)
+    candidatos = [
+        r for r in registros
+        if r["url_fonte"] in urls_sitemap_set
+        and r["latitude"] is not None
+        and r["longitude"] is not None
+    ]
+
+    renomeados = 0
+    relancados = 0
+    cancelados = 0
+
+    for url_orfa in sorted(orfas):
+        reg = por_url.get(url_orfa)
+        if not reg:
+            continue
+        nome_ant = reg["nome"]
+        fase_ant = reg["fase"]
+
+        logger.info(f"\n  Orfa: {nome_ant} ({fase_ant})")
+        logger.info(f"    URL: {url_orfa}")
+
+        # --- Tentativa 1: Testar se a URL redireciona ---
+        url_nova = None
+        try:
+            r = requests.get(url_orfa, headers=HEADERS, timeout=15, allow_redirects=True)
+            if r.url != url_orfa and "/empreendimentos/" in r.url and r.status_code == 200:
+                url_nova = r.url
+        except Exception:
+            pass
+
+        if url_nova and url_nova in urls_sitemap_set:
+            reg_novo = por_url.get(url_nova)
+            if reg_novo:
+                logger.info(f"    -> RENOMEADO para: {reg_novo['nome']} ({reg_novo['fase']})")
+                logger.info(f"       Nova URL: {url_nova}")
+                registrar_reconciliacao(
+                    EMPRESA, "renomeado", url_orfa,
+                    nome_anterior=nome_ant, nome_novo=reg_novo["nome"],
+                    url_nova=url_nova,
+                    fase_anterior=fase_ant, fase_nova=reg_novo["fase"],
+                    observacao="URL redirecionou para produto existente",
+                )
+                remover_empreendimento_por_url(EMPRESA, url_orfa)
+                renomeados += 1
+                continue
+
+        # --- Tentativa 2: Buscar produto novo nas mesmas coordenadas ---
+        lat_orfa = reg.get("latitude")
+        lon_orfa = reg.get("longitude")
+        melhor_match = None
+        melhor_dist = float("inf")
+
+        if lat_orfa is not None and lon_orfa is not None:
+            try:
+                lat_orfa = float(lat_orfa)
+                lon_orfa = float(lon_orfa)
+            except (ValueError, TypeError):
+                lat_orfa = None
+
+        if lat_orfa is not None and lon_orfa is not None:
+            for cand in candidatos:
+                if cand["url_fonte"] == url_orfa:
+                    continue
+                try:
+                    clat, clon = float(cand["latitude"]), float(cand["longitude"])
+                except (ValueError, TypeError):
+                    continue
+                dist = haversine_metros(lat_orfa, lon_orfa, clat, clon)
+                if dist < 200 and dist < melhor_dist:
+                    melhor_dist = dist
+                    melhor_match = cand
+
+        if melhor_match:
+            fase_nova = melhor_match["fase"]
+            fase_ant_idx = ORDEM_FASES.get((fase_ant or "").lower(), -1)
+            fase_nova_idx = ORDEM_FASES.get((fase_nova or "").lower(), -1)
+
+            if fase_nova_idx >= fase_ant_idx:
+                tipo = "relancado"
+                obs = f"Novo produto a {melhor_dist:.0f}m com fase igual ou mais avancada"
+            else:
+                tipo = "relancado"
+                obs = f"Novo produto a {melhor_dist:.0f}m (fase retrocedeu: {fase_ant} -> {fase_nova})"
+
+            logger.info(f"    -> RELANCADO como: {melhor_match['nome']} ({fase_nova})")
+            logger.info(f"       Nova URL: {melhor_match['url_fonte']} | Distancia: {melhor_dist:.0f}m")
+            registrar_reconciliacao(
+                EMPRESA, tipo, url_orfa,
+                nome_anterior=nome_ant, nome_novo=melhor_match["nome"],
+                url_nova=melhor_match["url_fonte"],
+                fase_anterior=fase_ant, fase_nova=fase_nova,
+                distancia_metros=round(melhor_dist, 1),
+                observacao=obs,
+            )
+            remover_empreendimento_por_url(EMPRESA, url_orfa)
+            relancados += 1
+            continue
+
+        # --- Nenhum match: cancelado ---
+        logger.info(f"    -> CANCELADO (sem substituto encontrado)")
+        registrar_reconciliacao(
+            EMPRESA, "cancelado", url_orfa,
+            nome_anterior=nome_ant, fase_anterior=fase_ant,
+            observacao="URL sumiu do sitemap sem redirect nem produto proximo",
+        )
+        remover_empreendimento_por_url(EMPRESA, url_orfa)
+        cancelados += 1
+
+    logger.info("\n  " + "-" * 40)
+    logger.info(f"  Reconciliacao: {renomeados} renomeado(s), {relancados} relancado(s), {cancelados} cancelado(s)")
 
 
 if __name__ == "__main__":
