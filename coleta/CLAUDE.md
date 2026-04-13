@@ -28,7 +28,7 @@ Coletar dados de empreendimentos imobiliários de 77 incorporadoras brasileiras,
 
 ## Arquitetura dos Scrapers
 
-### Scrapers específicos (em `scrapers/`)
+### Scrapers de empreendimentos (em `scrapers/`)
 - `mrv_empreendimentos.py` — MRV via API REST (`/api/search`)
 - `mrv_detalhes.py` — MRV detalhes por empreendimento
 - `cury_empreendimentos.py` — Cury via API GraphQL interna
@@ -40,6 +40,8 @@ Coletar dados de empreendimentos imobiliários de 77 incorporadoras brasileiras,
 - `generico_empreendimentos.py` — Scraper genérico para: Pacaembu, Conx, Vibra, Magik JC, Kazzas, Mundo Apto, Novvo, Novolar, Emccamp, SUGOI, Árbore, Ampla, M.Lar, EPH, Ún1ca, Construtora Open, Stanza, Rev3, HM Engenharia, Sousa Araujo, Econ Construtora + mais
 - `wpapi_empreendimentos.py` — Scraper WP REST API para: ACL Incorporadora, VIC Engenharia, Vasco Construtora, Carrilho, Graal Engenharia, Grafico
 - `verificar_status.py` — Verificação de status de ~2017 URLs existentes: re-detecta fases, reconcilia URLs mortas (redirect → nome → localização → marca "Removido"). Batch para MRV/Vivaz (API), Direcional/VivaBenx (sitemap), individual para genéricos. Flag `--sem-selenium` pula Cury/Metrocasa. Resumível via JSON de progresso.
+
+**NOTA**: Os scrapers de RI (mzgroup_ri.py, tenda_ri.py, planoeplano_ri.py) foram movidos para `../analise_releases/scrapers/`. Os downloads de docs de RI (releases, ITRs, apresentações, transcrições) estão em `../analise_releases/downloads/`. A pasta `downloads/` deste projeto contém apenas imagens de empreendimentos.
 
 ### Problema conhecido (root cause corrigido parcialmente)
 - `generico_empreendimentos.py` linha 331 hardcodava `cidade="São Paulo"` para TODAS as empresas genéricas

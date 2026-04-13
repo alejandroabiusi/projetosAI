@@ -1,0 +1,20 @@
+{
+  "etapas_completas": [
+    1
+  ],
+  "inicio": "2026-04-04T00:18:55.398539",
+  "snapshot_antes": {
+    "total": 3476,
+    "empresas": 78,
+    "com_latitude": 2332,
+    "com_cidade": 3105,
+    "com_fase": 3269,
+    "com_dormitorios_descricao": 2930,
+    "com_endereco": 3053,
+    "com_preco_a_partir": 767,
+    "com_total_unidades": 1153,
+    "com_itens_lazer": 2498,
+    "com_area_min_m2": 1848,
+    "total_imagens": 36048
+  }
+}
