@@ -542,11 +542,24 @@ def extrair_itens_lazer_raw(soup, texto):
                     if txt and len(txt) < 60:
                         _add(txt)
 
-    # 4. Fallback: keywords no texto completo
+    # 4. JSON-LD: amenityFeature (MRV e outros SPAs com schema.org)
     if len(itens) < 3:
-        texto_lower = texto.lower()
+        for script in soup.find_all("script"):
+            script_text = script.string or ""
+            if "amenityFeature" in script_text:
+                names = re.findall(r'"amenityFeature"\s*:\s*\[.*?\]', script_text, re.DOTALL)
+                for block in names:
+                    for name_match in re.finditer(r'"name"\s*:\s*"([^"]+)"', block):
+                        _add(name_match.group(1))
+
+    # 5. Fallback: keywords no texto completo + HTML raw (para SPAs com JSON inline)
+    if len(itens) < 3:
+        # Combinar texto parseado + HTML raw para cobrir SPAs
+        texto_busca = texto.lower()
+        html_raw = str(soup).lower() if len(texto) < 200 else ""  # só usa raw se texto for muito curto (SPA)
+        busca = texto_busca + " " + html_raw
         for kw in LAZER_KEYWORDS:
-            if kw in texto_lower:
+            if kw in busca:
                 _add(kw.title())
 
     return " | ".join(itens) if itens else None
@@ -765,6 +778,44 @@ def slug_para_nome(slug):
 
 
 # ============================================================
+# VIVAZ — extração via API dedicada
+# ============================================================
+
+def extrair_lazer_vivaz_api(url_fonte, session):
+    """Extrai lazer da Vivaz via endpoints POST /imovel/informacoes/ + /imovel/lazer/."""
+    base = "https://www.meuvivaz.com.br"
+    # Extrair slug da URL
+    slug = url_fonte.rstrip("/").split("/empreendimentos/")[-1]
+    if not slug:
+        return None
+
+    try:
+        # 1. Pegar imovelId
+        r = session.post(f"{base}/imovel/informacoes/", json={"Url": slug}, timeout=30)
+        if r.status_code != 200:
+            return None
+        imovel = r.json().get("imovel", {})
+        imovel_id = imovel.get("imovelId")
+        if not imovel_id:
+            return None
+
+        # 2. Pegar lazer
+        r2 = session.post(f"{base}/imovel/lazer/", json={"IdImovel": imovel_id}, timeout=30)
+        if r2.status_code != 200:
+            return None
+        lazer_items = r2.json().get("Lazer", [])
+        if not lazer_items:
+            return None
+
+        nomes = [item.get("Descricao", "").strip() for item in lazer_items if item.get("Descricao")]
+        return " | ".join(nomes) if nomes else None
+
+    except Exception as e:
+        logger.warning(f"  Erro API Vivaz: {e}")
+        return None
+
+
+# ============================================================
 # PROCESSAMENTO POR EMPRESA
 # ============================================================
 
@@ -773,12 +824,15 @@ def processar_empresa(empresa, config, args, progresso):
     tipo_acesso = config.get("tipo_acesso", "requests")
     download_key = config.get("download_key", empresa.lower())
 
-    # APIs nao tem HTML para extrair — pular extracao HTML
-    if tipo_acesso.startswith("api_") and not args.apenas_imagens:
-        logger.info(f"  {empresa}: tipo API ({tipo_acesso}), sem HTML para qualificar")
-        if not args.sem_imagens:
-            return _processar_apenas_imagens(empresa, download_key, args, progresso)
-        return {"atualizados": 0, "erros": 0, "imgs": 0}
+    # Vivaz: API dedicada para lazer (SPA puro, sem HTML útil)
+    if tipo_acesso == "api_vivaz":
+        logger.info(f"  {empresa}: usando API dedicada Vivaz para lazer")
+        return _processar_vivaz_api(empresa, args, progresso)
+
+    # Outras APIs: registros tem url_fonte com paginas HTML reais, qualificar via requests
+    if tipo_acesso.startswith("api_"):
+        logger.info(f"  {empresa}: tipo API ({tipo_acesso}), qualificando via requests nas url_fonte")
+        tipo_acesso = "requests"  # override local para buscar HTML das URLs
 
     rows, cols = buscar_registros(empresa, args.forcar, args.limite)
     if not rows:
@@ -923,6 +977,63 @@ def processar_empresa(empresa, config, args, progresso):
             logger.info(f"  Chrome fechado para {empresa}")
 
     return {"atualizados": atualizados, "erros": erros, "imgs": imgs_class}
+
+
+def _processar_vivaz_api(empresa, args, progresso):
+    """Processa Vivaz via API dedicada (POST /imovel/lazer/)."""
+    rows, cols = buscar_registros(empresa, args.forcar, args.limite)
+    if not rows:
+        logger.info(f"  {empresa}: nenhum registro para qualificar")
+        return {"atualizados": 0, "erros": 0, "imgs": 0}
+
+    logger.info(f"  {empresa}: {len(rows)} registros para qualificar via API Vivaz")
+
+    import requests as req_lib
+    session = req_lib.Session()
+    session.headers.update(HEADERS)
+
+    atualizados = 0
+    erros = 0
+
+    for row in rows:
+        row_dict = dict(row)
+        nome = row_dict["nome"]
+        url = row_dict["url_fonte"]
+        chave = f"{empresa}|{nome}"
+
+        if chave in progresso["processados"]:
+            continue
+
+        try:
+            dados_novos = {}
+
+            if not args.apenas_imagens and url:
+                if args.forcar or not row_dict.get("itens_lazer_raw"):
+                    val = extrair_lazer_vivaz_api(url, session)
+                    if val:
+                        dados_novos["itens_lazer_raw"] = val
+
+            if dados_novos and not args.dry_run:
+                atualizar_empreendimento(empresa, nome, dados_novos)
+                atualizados += 1
+                logger.info(f"    {nome}: atualizado ({', '.join(dados_novos.keys())})")
+            elif dados_novos and args.dry_run:
+                logger.info(f"    [DRY-RUN] {nome}: {list(dados_novos.keys())}")
+                atualizados += 1
+            else:
+                logger.debug(f"    {nome}: sem dados novos")
+
+            progresso["processados"].append(chave)
+            salvar_progresso(progresso)
+            time.sleep(1)
+
+        except Exception as e:
+            logger.error(f"    ERRO {nome}: {e}")
+            progresso["erros"].append({"empresa": empresa, "nome": nome, "erro": str(e)})
+            salvar_progresso(progresso)
+            erros += 1
+
+    return {"atualizados": atualizados, "erros": erros, "imgs": 0}
 
 
 def _processar_apenas_imagens(empresa, download_key, args, progresso):
