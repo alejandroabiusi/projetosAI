@@ -11,10 +11,12 @@ import os
 import re
 import sqlite3
 from datetime import datetime
+from pathlib import Path
 from pypdf import PdfReader
 
-PDF_DIR = r"C:\Projetos_AI\coleta\downloads\mrv\transcricoes_ri"
-DB_PATH = r"C:\Projetos_AI\coleta\data\transcricoes.db"
+PROJECT_ROOT = Path(__file__).parent
+PDF_DIR = str(PROJECT_ROOT / "downloads" / "mrv" / "transcricoes_ri")
+DB_PATH = str(PROJECT_ROOT / "data" / "transcricoes.db")
 EMPRESA = "mrv"
 MODELO = "pdf_oficial_mrv"
 

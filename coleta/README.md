@@ -1,73 +1,77 @@
-# Web Scraper de Inteligencia Competitiva
+# Projeto Coleta — Empreendimentos Imobiliários
 
-Monitoramento automatizado de lancamentos e produtos da concorrencia.
+Scrapers e pipeline de enriquecimento de dados de **empreendimentos imobiliários** de incorporadoras brasileiras. Mantém uma base SQLite consolidada (`data/empreendimentos.db`) com ~3.500 empreendimentos de ~78 empresas, geocodificada via base local de CEPs, com mapa interativo HTML e dashboard Streamlit.
 
-## Estrutura do Projeto
+> **NOTA**: A parte de coleta e análise de releases / RI / earnings calls foi movida para `../analise_releases/`. Este projeto cobre exclusivamente empreendimentos.
 
-```
-scraper_inteligencia/
-├── config/
-│   ├── __init__.py
-│   └── settings.py            # Configuracoes gerais (URLs, paths, timeouts)
-├── scrapers/
-│   ├── __init__.py
-│   ├── base_scraper.py        # Classe base com logica compartilhada
-│   ├── planoeplano_ri.py      # Scraper de releases - Plano&Plano
-│   └── cury_ri.py             # Scraper de releases - Cury (a construir)
-├── downloads/
-│   ├── planoeplano/
-│   │   ├── releases/          # PDFs de resultados trimestrais
-│   │   └── lancamentos/       # Dados de empreendimentos (futuro)
-│   └── cury/
-│       ├── releases/
-│       └── lancamentos/
-├── logs/                      # Logs de execucao
-├── data/                      # CSVs e bases consolidadas (futuro)
-├── run_releases.py            # Runner para todos os scrapers de releases
-├── requirements.txt
-└── README.md
-```
-
-## Instalacao
-
-A unica dependencia que nao estava no guia de instalacao original e o
-webdriver-manager, que gerencia automaticamente o ChromeDriver:
+## Estrutura
 
 ```
-pip install webdriver-manager
+coleta/
+├── config/                     # Settings, regionais, catálogo de sites
+├── scrapers/                   # Scrapers de empreendimentos (38 arquivos)
+│   ├── base_scraper.py         # Classe base (Selenium, logging, downloads)
+│   ├── {mrv,cury,direcional,planoeplano,tenda,vivabenx,vivaz,metrocasa}_empreendimentos.py
+│   ├── generico_empreendimentos.py     # Scraper genérico (parametrizável por empresa)
+│   ├── wpapi_empreendimentos.py        # WordPress REST API
+│   ├── generico_novas_empresas_*.py    # 17 batches de empresas menores
+│   ├── verificar_status.py             # Re-detecta fases, reconcilia URLs mortas
+│   └── ...
+├── scripts/                    # Scripts utilitários (extrações geográficas, requalificação)
+├── data/                       # empreendimentos.db, ceps_brasil.db, movimentacoes.db, KMLs
+├── downloads/                  # Imagens de empreendimentos (não versionado)
+├── dashboard/                  # Dashboard Streamlit
+├── docs/                       # Mapeamentos técnicos, relatórios de sessão
+├── build_logs/                 # Logs de execução (não versionado)
+├── enriquecer_*.py             # Pipeline de enriquecimento
+├── qualificar_produto.py       # Qualificação profunda (tipologias, lazer, vagas)
+├── gerar_mapa.py               # Mapa HTML interativo
+├── gerar_relatorio_pptx.py     # Relatório executivo PPTX
+├── run_atualizacao.py          # Atualização recorrente com diff/changelog
+└── CLAUDE.md                   # Documentação detalhada (ler antes de mexer)
 ```
 
-As demais dependencias (selenium, beautifulsoup4, requests) ja foram
-instaladas na Etapa 3 do Guia de Instalacao.
+## Pipeline padrão
 
-## Execucao
+```bash
+# 1. Coletar empreendimentos (todas as empresas ou específicas)
+python run_coleta.py
+python run_coleta.py mrv cury
 
-Abra o terminal na pasta raiz do projeto (scraper_inteligencia):
+# 2. Enriquecer (geocodificação, áreas, RI, unidades)
+python run_enriquecimento_completo.py
 
+# 3. Qualificar (tipologias detalhadas, lazer, vagas)
+python qualificar_produto.py
+
+# 4. Gerar mapa e dashboard
+python gerar_mapa.py
+streamlit run dashboard/app.py
+
+# 5. Atualização recorrente (com detecção de mudanças)
+python run_atualizacao.py
 ```
-python scrapers/planoeplano_ri.py
-python scrapers/planoeplano_ri.py 2025 2024 2023
-python run_releases.py
-python run_releases.py plano
-```
 
-## Empresas Monitoradas
+## Banco de Dados
 
-| Empresa       | RI                        | Site Comercial     | Releases | Lancamentos |
-|---------------|---------------------------|--------------------|----------|-------------|
-| Plano&Plano   | ri.planoeplano.com.br     | planoeplano.com.br | Pronto   | Fase 3      |
-| Cury          | A confirmar               | cury.net           | Fase 2   | Fase 4      |
+- **`data/empreendimentos.db`** — tabela principal com ~120 colunas, ~3.500 registros, ~98% com coordenadas
+- **`data/ceps_brasil.db`** — 905k CEPs com lat/lon (basedosdados.org)
+- **`data/movimentacoes.db`** — histórico de ciclo de vida (novo, removido, fase_mudou, preco_mudou, renomeado, relancado, cancelado)
+- Tabelas `runs`, `changelog`, `reconciliacao` em `empreendimentos.db` para change tracking
 
-## Configuracao
+## Empresas cobertas
 
-URLs, paths e parametros estao centralizados em `config/settings.py`.
-Para debug visual (ver o navegador funcionando), altere `headless` para `False`.
+77 incorporadoras. Top 15 por número de produtos: Tenda (469), MRV (441), Cury (272), VIC (185), Plano&Plano (157), Vitta (155), Magik JC (112), Direcional (111), Metrocasa (109), Vivaz (106), EBM (81), Trisul (65), HM (62), Grafico (60), Pacaembu (54). Lista completa em `CLAUDE.md`.
 
-## Notas Tecnicas
+## Empresas adicionadas via genéricos
 
-O site de RI da Plano&Plano usa a plataforma MZ Group, que carrega o conteudo
-da Central de Resultados via JavaScript. Por isso o Selenium e obrigatorio.
-Os PDFs sao servidos pela API da MZ em `api.mziq.com`.
+Cada empresa nova requer registro em `EMPRESA_CONFIG` do `enriquecer_dados.py` e configuração no `generico_empreendimentos.py` (ou `wpapi_empreendimentos.py` se for WP REST API). Cada site tem seus próprios elementos HTML — nunca usar solução totalmente genérica sem testar.
 
-O scraper respeita intervalos entre requisicoes (configuravel em settings.py)
-para nao sobrecarregar os servidores.
+## Documentação completa
+
+Ver `CLAUDE.md` na raiz deste diretório para:
+- Descrição detalhada de cada scraper e enriquecedor
+- Hierarquia de geocodificação (4 níveis)
+- Detector de fase e regressões conhecidas
+- Pipeline completo de qualificação
+- Convenções e gotchas por empresa
