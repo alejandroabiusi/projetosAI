@@ -1,7 +1,9 @@
+import os
 import pdfplumber
 import sys
 
-pdf = pdfplumber.open(r'C:/Projetos_AI/coleta/downloads/planoeplano/itr_dfp/PlanoePlano_ITR_2025_3T.pdf')
+_BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'downloads')
+pdf = pdfplumber.open(os.path.join(_BASE, 'planoeplano', 'itr_dfp', 'PlanoePlano_ITR_2025_3T.pdf'))
 output = []
 for i in range(72, 145):
     page = pdf.pages[i]

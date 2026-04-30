@@ -11,8 +11,8 @@ import os
 import unicodedata
 from pathlib import Path
 
-DB_PATH = "C:/Projetos_AI/analise_releases/dados_financeiros.db"
-COLETA_DIR = Path("C:/Projetos_AI/coleta/downloads")
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dados_financeiros.db")
+COLETA_DIR = Path(os.path.dirname(os.path.abspath(__file__))) / "downloads"
 
 
 def strip_accents(s):

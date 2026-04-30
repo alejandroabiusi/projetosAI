@@ -1,6 +1,8 @@
+import os
 import pdfplumber
 
-pdf = pdfplumber.open('C:/Projetos_AI/coleta/downloads/cyrela/itr_dfp/Cyrela_ITR_1T2025.pdf')
+_BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'downloads')
+pdf = pdfplumber.open(os.path.join(_BASE, 'cyrela', 'itr_dfp', 'Cyrela_ITR_1T2025.pdf'))
 
 # ============================================================
 # 1T2025 (31/03/2025) and 4T2024 (31/12/2024) data

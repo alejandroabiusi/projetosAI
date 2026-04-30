@@ -1,7 +1,9 @@
+import os
 import pdfplumber
 import sys
 
-pdf = pdfplumber.open('C:/Projetos_AI/coleta/downloads/planoeplano/itr_dfp/PlanoePlano_ITR_2022_1T.pdf')
+_BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'downloads')
+pdf = pdfplumber.open(os.path.join(_BASE, 'planoeplano', 'itr_dfp', 'PlanoePlano_ITR_2022_1T.pdf'))
 for i in range(30, 100):
     text = pdf.pages[i].extract_text() or ''
     tl = text.lower()

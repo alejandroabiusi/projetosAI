@@ -237,7 +237,7 @@ def step3():
     except ImportError:
         import fitz  # pymupdf fallback
 
-    base = Path("C:/Projetos_AI/coleta/downloads")
+    base = Path(os.path.dirname(os.path.abspath(__file__))) / "downloads"
 
     # Companies of interest and their latest releases
     empresas = {

@@ -12,8 +12,8 @@ import os
 from pathlib import Path
 from datetime import datetime
 
-DB_PATH = "C:/Projetos_AI/analise_releases/dados_financeiros.db"
-PLANILHAS_DIR = Path("C:/Projetos_AI/analise_releases/planilhas")
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dados_financeiros.db")
+PLANILHAS_DIR = Path(os.path.dirname(os.path.abspath(__file__))) / "planilhas"
 
 # Fields that are percentages/ratios — should NOT be multiplied by multiplicador
 CAMPOS_PERCENTUAIS = {
@@ -72,8 +72,7 @@ def periodo_valido(p):
     m = re.match(r'^(\d)T(\d{4})$', p)
     if not m: return False
     tri, ano = int(m.group(1)), int(m.group(2))
-    if ano < 2020 or ano > 2025: return False
-    if ano == 2025 and tri > 3: return False
+    if ano < 2020 or ano > 2026: return False
     return True
 
 

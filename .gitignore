@@ -5,6 +5,7 @@
 *.db
 !coleta/data/empreendimentos.db
 !analise_releases/dados_financeiros.db
+!analise_releases/data/transcricoes.db
 
 # Dados grandes (CSV/Excel) — exceto planilhas do projeto
 *.csv

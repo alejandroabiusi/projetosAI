@@ -1,32 +1,119 @@
-# Projeto Análise Releases — Dados Financeiros de Incorporadoras
+# Projeto Analise Releases — Dados Financeiros de Incorporadoras
 
 ## Objetivo
-Extrair dados financeiros trimestrais de releases e planilhas de incorporadoras brasileiras, populando um banco SQLite que servirá como referência para um assistente de análises financeiras.
+Extrair dados financeiros trimestrais de releases, planilhas interativas e ITRs de incorporadoras brasileiras de capital aberto, populando um banco SQLite para analise comparativa e assistente financeiro.
 
 ## Banco de Dados
 - **Arquivo**: `dados_financeiros.db` (SQLite, ~230KB)
 - **Tabela principal**: `dados_trimestrais` (136 colunas, 279 registros)
 - **Tabela auxiliar**: `empresas` (6 registros)
-- **Período**: 1T2020 a 4T2024
+- **Periodo**: 1T2020 a 4T2024 (banco precisa ser atualizado com dados 2025)
 - **Empresas**: Tenda, MRV, Direcional, Cury, PlanoePlano, Cyrela
-- **Segmentos**: Consolidado, MRV Incorporação, Luggo, Resia, Urba, Alea, Riva, Tenda
+- **Segmentos**: Consolidado, MRV Incorporacao, Luggo, Resia, Urba, Alea, Riva, Tenda
 
-## Campos principais (136 colunas em `dados_trimestrais`)
+## Estrutura de Pastas
 
-### Identificação
+```
+analise_releases/
+├── dados_financeiros.db          # Banco SQLite principal
+├── CLAUDE.md                     # Este arquivo
+├── INSTRUCOES_PROJETO_RELEASES.md
+│
+├── downloads/                    # PDFs e docs de RI (antes em coleta/downloads/)
+│   ├── cury/
+│   │   ├── releases/             # Cury_Release_YYYY_QT.pdf
+│   │   ├── apresentacoes/
+│   │   ├── audios/
+│   │   ├── demonstracoes/
+│   │   ├── itr_dfp/
+│   │   ├── transcricoes/
+│   │   └── transcricoes_ri/
+│   ├── cyrela/                   # Mesma estrutura
+│   ├── direcional/
+│   ├── mouradubeux/
+│   ├── mrv/
+│   ├── planoeplano/
+│   └── tenda/
+│
+├── planilhas/                    # Planilhas interativas XLSX
+│   ├── Tenda_Planilha_Fundamentos_2026-03.xlsx
+│   ├── Cury_Planilha_Fundamentos_2026-03.xlsx
+│   ├── MRV_Base_Dados_Operacionais_Financeiros_2026-03.xlsx
+│   ├── Direcional_Planilha_Interativa_2026-03.xlsx
+│   ├── PlanoePlano_Planilha_Interativa_2026-03.xlsx
+│   ├── Cyrela_Dados_Operacionais_2026-03.xlsx
+│   ├── Cyrela_Demonstracoes_Financeiras_2026-03.xlsx
+│   ├── Cyrela_Lancamentos_2026-03.xlsx
+│   ├── Cyrela_Principais_Indicadores_2026-03.xlsx
+│   └── MouraDubeux_Planilha_Fundamentos_2026-03.xlsx
+│
+├── scrapers/                     # Scrapers de sites de RI
+│   ├── base_scraper.py           # Classe base (Selenium, logging, download)
+│   ├── mzgroup_ri.py             # Scraper generico MZ Group (Cury, MRV, Direcional, Cyrela, PlanoePlano, MouraDubeux)
+│   ├── tenda_ri.py               # Scraper Tenda (Next.js/Sumaq, requests)
+│   └── planoeplano_ri.py         # Scraper PlanoePlano (variante especifica)
+│
+├── config/
+│   └── settings.py               # URLs de RI, paths de downloads, config Selenium/requests
+│
+├── output/                       # Analises geradas (briefings, quantitativos)
+│   ├── briefing_*.md
+│   ├── quanti_*.md
+│   ├── analise_investimento.md
+│   └── analise_tenda_lens.md
+│
+├── assistant/                    # Assistente Chainlit/Gradio com RAG
+│   ├── app.py                    # Chainlit app
+│   ├── app_gradio.py             # Gradio app
+│   ├── config.py
+│   └── rag/                      # RAG pipeline
+│
+├── logs/                         # Logs dos scrapers
+│
+├── criar_banco_v2.py             # Criacao do DB via extracao label-based das planilhas
+├── populate_itr_batch*.py        # Scripts de populacao incremental (batch 2-14)
+├── ingerir_releases.py           # Ingestao de releases PDF no banco
+├── run_all_steps.py              # Pipeline original de 5 etapas
+├── gerar_analise_incorporadoras.py  # Geracao de analises comparativas
+├── extract_itr_batch.py          # Extracao batch de ITRs/DFPs
+├── update_schema.py              # Atualizacao do schema do banco
+└── scan_itr.py                   # Scanner de documentos ITR
+```
+
+## Downloads de RI — Nomenclatura padrao
+
+Formato: `Empresa_Tipo_YYYY_QT.ext`
+
+Exemplos:
+- `MRV_Release_2025_4T.pdf`
+- `Cyrela_ITR_2024_3T.pdf`
+- `Tenda_Apresentacao_2025_1T.pdf`
+
+## Cobertura dos releases PDF (em downloads/{empresa}/releases/)
+- **Tenda**: 3T2016 a 4T2025
+- **MRV**: 1T2012 a 4T2025
+- **Direcional**: 4T2007 a 4T2025
+- **Cury**: 3T2020 a 4T2025
+- **PlanoePlano**: 3T2020 a 4T2025
+- **Cyrela**: 3T2005 a 4T2025
+- **MouraDubeux**: 4T2019 a 4T2025
+
+## Campos principais do banco (136 colunas em `dados_trimestrais`)
+
+### Identificacao
 - empresa, segmento, periodo, ano, trimestre, fonte
 
-### Lançamentos e vendas
+### Lancamentos e vendas
 - vgv_lancado, empreendimentos_lancados, unidades_lancadas, preco_medio_lancamento
 - vendas_brutas_vgv, vendas_brutas_unidades, vendas_liquidas_vgv, vendas_liquidas_unidades
 - distratos_vgv, distratos_unidades, vso_liquido
 
-### DRE (Demonstração de Resultados)
+### DRE
 - receita_liquida, custo_mercadorias_vendidas, lucro_bruto, margem_bruta
 - despesas_comerciais, despesas_gerais_administrativas, sga_total
 - resultado_financeiro, lucro_liquido, margem_liquida, ebitda, margem_ebitda
 
-### Balanço e endividamento
+### Balanco e endividamento
 - divida_bruta, caixa_equivalentes, divida_liquida, patrimonio_liquido
 - divida_liquida_patrimonio, roe
 
@@ -34,19 +121,18 @@ Extrair dados financeiros trimestrais de releases e planilhas de incorporadoras 
 - estoque_unidades, estoque_vgv, landbank_vgv, landbank_unidades
 - obras_entregues_unidades, velocidade_vendas
 
-## Planilhas fonte (em `planilhas/`)
-- `Cury_Planilha_Fundamentos_2026-03.xlsx`
-- `Cyrela_Dados_Operacionais_2026-03.xlsx`, `Cyrela_Demonstracoes_Financeiras_2026-03.xlsx`, etc.
-- `Direcional_Planilha_Interativa_2026-03.xlsx`
-- `MRV_Base_Dados_Operacionais_Financeiros_2026-03.xlsx`
-- `PlanoePlano_Planilha_Interativa_2026-03.xlsx`
-- `Tenda_Planilha_Fundamentos_2026-03.xlsx`
-- `MouraDubeux_Planilha_Fundamentos_2026-03.xlsx` (excluída do DB por decisão do projeto)
+## Scrapers de RI
 
-## Schema de referência
-- `schema_sugestao_v2.xlsx` — 100 campos organizados em 6 categorias
+### mzgroup_ri.py — Scraper generico MZ Group
+Todas as incorporadoras (exceto Tenda) usam plataforma MZ Group. Selenium navega a central de resultados, seleciona ano, filtra por tipo e baixa PDFs.
 
-## Scripts principais
+```bash
+cd analise_releases
+python scrapers/mzgroup_ri.py cury                    # Releases de todos os anos
+python scrapers/mzgroup_ri.py mrv 2025 2024            # Apenas anos especificos
+python scrapers/mzgroup_ri.py cyrela --tipo itr_dfp    # ITRs/DFPs
+python scrapers/mzgroup_ri.py direcional --tipo demonstracoes
+```
 
 ### Pipeline financeiro (DB `dados_financeiros.db`)
 | Script | Função |
@@ -92,6 +178,7 @@ Extrair dados financeiros trimestrais de releases e planilhas de incorporadoras 
 - Low fill rates esperados: divida_liquida/geracao_caixa (~16%) — só em algumas planilhas
 
 ## Como rodar
+
 ```bash
 # --- Pipeline financeiro ---
 python criar_banco_v2.py                       # Criar/recriar DB do zero

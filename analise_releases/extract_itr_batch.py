@@ -161,7 +161,7 @@ def process_itr(empresa, itr_name, pdf_path):
 # Main - specify which ITRs to process
 # =============================================
 if __name__ == '__main__':
-    BASE = r'C:\Projetos_AI\coleta\downloads'
+    BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'downloads')
 
     # ITRs to process - edit this list as needed
     itrs = [
